@@ -67,6 +67,24 @@ class Database
      */
     public function bind($parameter, $value, $type = null)
     {
+        // Als geen type is opgegeven, bepaal automatisch het juiste type
+        if (is_null($type)) {
+            switch (true) {
+                case is_int($value):
+                    $type = PDO::PARAM_INT;
+                    break;
+                case is_bool($value):
+                    $type = PDO::PARAM_BOOL;
+                    break;
+                case is_null($value):
+                    $type = PDO::PARAM_NULL;
+                    break;
+                default:
+                    $type = PDO::PARAM_STR;
+                    break;
+            }
+        }
+        
         $this->statement->bindValue($parameter, $value, $type);
     }
 
