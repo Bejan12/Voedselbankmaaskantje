@@ -94,7 +94,8 @@ class Leveranciers extends BaseController
                 'contactnaam_err' => '',
                 'contactemail_err' => '',
                 'contacttelefoon_err' => '',
-                'eerstvolgendelevering_err' => ''
+                'eerstvolgendelevering_err' => '',
+                'general_err' => ''
             ];
 
             // Validate data
@@ -114,6 +115,8 @@ class Leveranciers extends BaseController
                 $data['contactemail_err'] = 'Contact e-mail is verplicht';
             } elseif (!filter_var($data['contactemail'], FILTER_VALIDATE_EMAIL)) {
                 $data['contactemail_err'] = 'Ongeldig e-mailadres';
+            } elseif ($this->leverancierModel->emailExists($data['contactemail'])) {
+                $data['general_err'] = 'E-mail adres is al in gebruik, probeer het opnieuw.';
             }
 
             if (empty($data['contacttelefoon'])) {
@@ -122,13 +125,27 @@ class Leveranciers extends BaseController
 
             if (empty($data['eerstvolgendelevering'])) {
                 $data['eerstvolgendelevering_err'] = 'Eerstvolgende levering is verplicht';
+            } else {
+                // Valideer datum
+                $leveringDatum = DateTime::createFromFormat('Y-m-d\TH:i', $data['eerstvolgendelevering']);
+                $vandaag = new DateTime();
+                $maxDatum = new DateTime('2026-12-31');
+                
+                if (!$leveringDatum) {
+                    $data['eerstvolgendelevering_err'] = 'Ongeldige datum/tijd format';
+                } elseif ($leveringDatum < $vandaag) {
+                    $data['eerstvolgendelevering_err'] = 'De leveringsdatum kan niet in het verleden liggen';
+                } elseif ($leveringDatum > $maxDatum) {
+                    $data['eerstvolgendelevering_err'] = 'De leveringsdatum kan niet verder dan eind 2026 liggen';
+                }
             }
 
             // Make sure errors are empty
-            if (empty($data['bedrijfsnaam_err']) && empty($data['adres_err']) && 
-                empty($data['contactnaam_err']) && empty($data['contactemail_err']) && 
-                empty($data['contacttelefoon_err']) && empty($data['eerstvolgendelevering_err'])) {
-                
+            if (empty($data['bedrijfsnaam_err']) && empty($data['adres_err']) &&
+                empty($data['contactnaam_err']) && empty($data['contactemail_err']) &&
+                empty($data['contacttelefoon_err']) && empty($data['eerstvolgendelevering_err']) &&
+                empty($data['general_err'])) {
+
                 try {
                     // Add leverancier
                     if ($this->leverancierModel->addLeverancier($data)) {
@@ -144,7 +161,7 @@ class Leveranciers extends BaseController
                     }
                 } catch (Exception $e) {
                     // Database error
-                    $data['general_err'] = 'Er is een fout opgetreden bij het toevoegen van de leverancier';
+                    $data['general_err'] = 'Er is een onverwachte fout opgetreden bij het toevoegen van de leverancier. Probeer het opnieuw.';
                     $this->view('leveranciers/add', $data);
                 }
             } else {
@@ -155,5 +172,22 @@ class Leveranciers extends BaseController
             header('Location: ' . URLROOT . '/leveranciers/nieuw');
             exit();
         }
+    }
+
+    public function delete($id = null)
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET' && is_numeric($id)) {
+            try {
+                if ($this->leverancierModel->deleteLeverancierById($id)) {
+                    SessionHelper::flash('leverancier_message', 'Leverancier succesvol verwijderd.');
+                } else {
+                    SessionHelper::flash('leverancier_message', 'Fout bij verwijderen leverancier.');
+                }
+            } catch (Exception $e) {
+                SessionHelper::flash('leverancier_message', 'Fout bij verwijderen leverancier.');
+            }
+        }
+        header('Location: ' . URLROOT . '/leveranciers');
+        exit();
     }
 }

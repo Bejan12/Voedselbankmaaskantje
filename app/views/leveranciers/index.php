@@ -12,7 +12,7 @@
             <label for="sort">Sorteer op:</label>
             <select name="sort" id="sort" onchange="this.form.submit()">
                 <option value="eerstvolgende" <?php echo (isset($data['sort']) && $data['sort'] === 'eerstvolgende') ? 'selected' : ''; ?>>Eerstvolgende levering</option>
-                <option value="recent" <?php echo (isset($data['sort']) && $data['sort'] === 'recent') ? 'selected' : ''; ?>>Meest recent eerst</option>
+                <option value="recent" <?php echo (isset($data['sort']) && $data['sort'] === 'recent') ? 'selected' : ''; ?>>Meest recent toegevoegd</option>
             </select>
         </form>
     </div>
@@ -23,6 +23,7 @@
                 <tr>
                     <th>Leveranciernummer</th>
                     <th>Bedrijfsnaam</th>
+                    <th>Type</th>
                     <th>Adres</th>
                     <th>Naam</th>
                     <th>E-mail</th>
@@ -37,6 +38,7 @@
                         <tr>
                             <td><?php echo htmlspecialchars($leverancier->LeverancierID ?? ''); ?></td>
                             <td><?php echo htmlspecialchars($leverancier->Bedrijfsnaam ?? ''); ?></td>
+                            <td><?php echo htmlspecialchars($leverancier->LeverancierType ?? ''); ?></td>
                             <td><?php echo htmlspecialchars($leverancier->Adres ?? ''); ?></td>
                             <td><?php echo htmlspecialchars($leverancier->ContactNaam ?? ''); ?></td>
                             <td><?php echo htmlspecialchars($leverancier->ContactEmail ?? ''); ?></td>
@@ -88,14 +90,16 @@
 
     .table-container {
         overflow-x: auto;
+        margin: 0 auto;
     }
 
     .styled-table {
         width: 100%;
+        min-width: 1100px; /* Verhoog minimale breedte voor extra kolom */
         border-collapse: collapse;
-        font-size: 16px;
-        min-width: 800px;
+        font-size: 15px;
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        background: #fff;
     }
 
     .styled-table thead {
@@ -105,7 +109,7 @@
 
     .styled-table th,
     .styled-table td {
-        padding: 12px 15px;
+        padding: 10px;
         border: 1px solid #dddddd;
         text-align: left;
         vertical-align: middle;
@@ -113,10 +117,6 @@
 
     .styled-table tbody tr:nth-child(even) {
         background-color: #f9f9f9;
-    }
-
-    .text-center {
-        text-align: center;
     }
 
     .action-icons {
@@ -151,7 +151,7 @@
     }
 </style>
 
-<!-- Zorg dat je dit hebt in je <head> als het nog niet in je layout/header zit -->
+<!-- Vergeet niet deze in de layout/head op te nemen -->
 <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"> -->
 
 <?php require APPROOT . '/views/includes/footer.php'; ?>
