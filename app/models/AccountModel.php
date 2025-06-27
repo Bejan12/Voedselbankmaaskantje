@@ -17,6 +17,17 @@ class AccountModel
         return $this->db->single();
     }
 
+    public function findUserByEmail($email)
+    {
+        $this->db->query('SELECT g.*, p.Email, p.Voornaam, p.Achternaam 
+                         FROM Gebruiker g 
+                         JOIN Persoon p ON g.PersoonID = p.PersoonID 
+                         WHERE p.Email = :email');
+        $this->db->bind(':email', $email);
+        
+        return $this->db->single();
+    }
+
     public function register($data)
     {
         try {

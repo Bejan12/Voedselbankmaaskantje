@@ -72,4 +72,52 @@ class Accounts extends BaseController
             $this->view('accounts/register', $data);
         }
     }
+
+    public function login()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            // Process form submission
+            $data = [
+                'email' => trim($_POST['email']),
+                'wachtwoord' => $_POST['wachtwoord'],
+                'error' => '',
+                'success' => ''
+            ];
+
+            // Validate input
+            if (empty($data['email']) || empty($data['wachtwoord'])) {
+                $data['error'] = 'Vul alle velden in.';
+            }
+
+            // Authenticate user if no errors
+            if (empty($data['error'])) {
+                $user = $this->accountModel->findUserByEmail($data['email']);
+                
+                if ($user && password_verify($data['wachtwoord'], $user->WachtwoordHash)) {
+                    // Login successful - start session
+                    session_start();
+                    $_SESSION['user_id'] = $user->GebruikerID;
+                    $_SESSION['username'] = $user->Gebruikersnaam;
+                    $_SESSION['email'] = $user->Email;
+                    
+                    // Redirect to dashboard
+                    header('Location: ' . URLROOT . '/homepages/index');
+                    exit();
+                } else {
+                    $data['error'] = 'Onjuiste email of wachtwoord.';
+                }
+            }
+
+            $this->view('accounts/login', $data);
+        } else {
+            // Show login form
+            $data = [
+                'email' => '',
+                'error' => '',
+                'success' => ''
+            ];
+
+            $this->view('accounts/login', $data);
+        }
+    }
 }
