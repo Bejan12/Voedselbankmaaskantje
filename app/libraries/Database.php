@@ -38,13 +38,19 @@ class Database
 
     public function query($sql)
     {
+        // Sluit de vorige statement als die nog open staat (voor stored procedures)
+        if ($this->statement) {
+            $this->statement->closeCursor();
+        }
         $this->statement = $this->dbHandler->prepare($sql);
     }
 
     public function resultSet()
     {
         $this->statement->execute();
-        return $this->statement->fetchAll(PDO::FETCH_OBJ);
+        $result = $this->statement->fetchAll(PDO::FETCH_OBJ);
+        $this->statement->closeCursor(); // cursor sluiten na ophalen
+        return $result;
     }
 
     public function bind($parameter, $value, $type = null)

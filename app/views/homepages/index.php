@@ -66,7 +66,7 @@
                                     <p class="card-text text-muted mb-4">
                                         Werk aan het samenstellen en beheren van voedselpakketten voor klanten.
                                     </p>
-                                    <a href="<?= URLROOT; ?>/voedselpakketten" class="btn btn-warning btn-lg w-100">
+                                    <a href="<?= URLROOT; ?>/voedselpakket" class="btn btn-warning btn-lg w-100">
                                         <i class="bi bi-basket2 me-2"></i>Naar Voedselpakketten
                                     </a>
                                 </div>

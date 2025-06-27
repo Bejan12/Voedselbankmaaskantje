@@ -79,14 +79,20 @@ if (session_status() === PHP_SESSION_NONE) {
             font-weight: 500;
             color: #333;
         }
+
+        .navbar-brand img,
+        .logo {
+            max-width: 120px !important;
+            max-height: 60px !important;
+            width: auto;
+            height: auto;
+        }
     </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container-fluid">
-        <a class="navbar-brand" href="<?php echo URLROOT; ?>/homepages/index">
-            <img src="/img/voedselbank_logo.png" alt="Voedselbank Logo" class="logo">
-        </a>
+       
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -102,7 +108,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     <a class="nav-link" href="<?php echo URLROOT; ?>/magazijnvoorraad/index">Overzicht Voorraadbeheer</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?php echo URLROOT; ?>/voedselpakketten/index">Overzicht voedselpakket</a>
+                    <a class="nav-link" href="<?php echo URLROOT; ?>/voedselpakket/index">Overzicht voedselpakket</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="<?php echo URLROOT; ?>/klanten/index">Overzicht klanten</a>

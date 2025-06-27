@@ -58,8 +58,9 @@
         color: #FF7F32;
         border: 2px solid #FF7F32;
         border-radius: 6px;
-        font-weight: 600;
-        padding: 6px 18px;
+        font-weight: 500;
+        padding: 4px 12px;
+        font-size: 0.8rem;
         transition: background 0.2s, color 0.2s;
     }
     .btn-primary:hover, .btn-primary:focus {
@@ -71,15 +72,16 @@
         color: #fff;
         border: none;
         border-radius: 6px;
-        font-weight: 600;
-        padding: 6px 18px;
+        font-weight: 500;
+        padding: 4px 12px;
+        font-size: 0.8rem;
         transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-        box-shadow: 0 2px 8px rgba(255,59,59,0.08);
+        box-shadow: 0 1px 4px rgba(255,59,59,0.15);
     }
     .btn-danger:hover, .btn-danger:focus {
         background-color: #d32f2f;
         color: #fff;
-        box-shadow: 0 4px 16px rgba(255,59,59,0.16);
+        box-shadow: 0 2px 8px rgba(255,59,59,0.25);
     }
     .alert-warning, .alert-danger, .alert-success {
         border-radius: 6px;

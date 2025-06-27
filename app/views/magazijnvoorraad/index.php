@@ -350,13 +350,14 @@
 
 .btn {
     border-radius: 6px;
-    font-size: 0.875rem;
-    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+    font-weight: 500;
 }
 
 .btn-lg {
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
 }
 
 .table th {
@@ -459,8 +460,8 @@ h2 {
                 </button>
                 <form id="deleteForm" method="POST" style="display: inline;">
                     <input type="hidden" name="product_id" id="deleteProductId">
-                    <button type="submit" class="btn btn-danger">
-                        <i class="bi bi-trash me-1"></i>Definitief Verwijderen
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        <i class="bi bi-trash me-1"></i>Verwijderen
                     </button>
                 </form>
             </div>
