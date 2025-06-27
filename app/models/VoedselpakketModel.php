@@ -17,7 +17,7 @@ class VoedselpakketModel
      * @param string|null $filter
      * @return array
      */
-    public function getAll($filter = null)
+    public function getAll($filter = null, $datum = null)
     {
         // Alleen kolommen selecteren die daadwerkelijk bestaan in de database!
         $sql = "SELECT v.PakketNummer, v.VoedselpakketID, CONCAT(p.Voornaam, ' ', p.Achternaam) AS KlantNaam, p.Email, v.DatumSamenstelling, v.DatumUitgifte,
@@ -32,9 +32,15 @@ class VoedselpakketModel
         LEFT JOIN allergie a ON ka.AllergieID = a.AllergieID
         LEFT JOIN categorie c ON v.PakketCategorieID = c.CategorieID";
         if ($filter === 'beschikbaar') {
-            $sql .= " WHERE v.DatumUitgifte IS NULL";
+            $where[] = "v.DatumUitgifte IS NULL";
         } elseif ($filter === 'niet_beschikbaar') {
-            $sql .= " WHERE v.DatumUitgifte IS NOT NULL";
+            $where[] = "v.DatumUitgifte IS NOT NULL";
+        }
+        if ($datum) {
+            $where[] = "v.DatumSamenstelling = :datum";
+        }
+        if ($where) {
+            $sql .= " WHERE " . implode(' AND ', $where);
         }
         $sql .= " GROUP BY v.PakketNummer, v.VoedselpakketID, p.Voornaam, p.Achternaam, p.Email, v.DatumSamenstelling, v.DatumUitgifte, v.Status, v.Opmerking, v.DatumAangemaakt, v.DatumGewijzigd, v.IsActief, c.Naam
         ORDER BY v.VoedselpakketID DESC";
@@ -102,6 +108,11 @@ class VoedselpakketModel
         // Controleer of de datum in de toekomst ligt
         $inputDate = strtotime($datumSamenstelling);
         $today = strtotime(date('Y-m-d'));
+        // NIEUW: Controleer of de datum boven 2029 ligt
+        if ($inputDate > strtotime('2029-12-31')) {
+            error_log(date('[Y-m-d H:i:s]') . " Poging tot invoer van datum boven 2029: $datumSamenstelling");
+            return ['success'=>false, 'message'=>'Datum mag niet later zijn dan 31-12-2029'];
+        }
         if ($inputDate < $today) {
             error_log(date('[Y-m-d H:i:s]') . " Poging tot invoer van datum in het verleden: $datumSamenstelling");
             return ['success'=>false, 'message'=>'Je kunt geen datum in het verleden kiezen.'];
