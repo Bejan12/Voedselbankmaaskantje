@@ -520,13 +520,16 @@ class Magazijnvoorraad extends BaseController
                 $errors[] = 'Aantal in voorraad kan niet negatief zijn';
             }
 
-            // Slimme categorie validatie (alleen als productnaam is gewijzigd)
-            if ($categorie_id > 0 && !empty($productnaam) && $productnaam !== $originalProduct->ProductNaam) {
+           
+
+            // Slimme categorie validatie (altijd uitvoeren, niet alleen bij gewijzigde productnaam)
+            if ($categorie_id > 0 && !empty($productnaam)) {
                 $categorieValidatie = $this->validateProductCategory($productnaam, $categorie_id);
                 if (!$categorieValidatie['isValid']) {
                     $errors[] = $categorieValidatie['message'];
                 }
             }
+
 
             // Als er validatiefouten zijn
             if (!empty($errors)) {
