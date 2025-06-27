@@ -1,3 +1,4 @@
+
 <?php require_once APPROOT . '/views/includes/header.php'; ?>
 
 <div class="container py-5">
@@ -55,6 +56,24 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center p-4">
+                                    <div class="mb-4">
+                                        <i class="bi bi-basket display-3 text-warning"></i>
+                                    </div>
+                                    <h4 class="card-title text-warning mb-3">Voedselpakketten</h4>
+                                    <p class="card-text text-muted mb-4">
+                                        Werk aan het samenstellen en beheren van voedselpakketten voor klanten.
+                                    </p>
+                                    <a href="<?= URLROOT; ?>/voedselpakketten" class="btn btn-warning btn-lg w-100">
+                                        <i class="bi bi-basket2 me-2"></i>Naar Voedselpakketten
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -62,4 +81,3 @@
     </div>
 </div>
 
-<?php require_once APPROOT . '/views/includes/footer.php'; ?>
