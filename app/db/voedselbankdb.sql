@@ -231,20 +231,15 @@ CREATE TABLE IF NOT EXISTS `klantallergie` (
 DROP TABLE IF EXISTS `leverancier`;
 CREATE TABLE IF NOT EXISTS `leverancier` (
   `LeverancierID` int NOT NULL AUTO_INCREMENT,
-  `LeverancierNummer` varchar(6) NOT NULL,
   `GebruikerID` int NOT NULL,
-  `LeverancierTypeID` int NOT NULL,
   `Bedrijfsnaam` varchar(100) NOT NULL,
   `Adres` varchar(200) DEFAULT NULL,
   `ContactNaam` varchar(100) DEFAULT NULL,
   `ContactEmail` varchar(100) DEFAULT NULL,
   `ContactTelefoon` varchar(20) DEFAULT NULL,
   `EerstvolgendeLevering` datetime DEFAULT NULL,
-  `Status` enum('gepland','voorbereiden','onderweg','geleverd') DEFAULT 'gepland',
   PRIMARY KEY (`LeverancierID`),
-  UNIQUE KEY `LeverancierNummer_UNIQUE` (`LeverancierNummer`),
-  KEY `GebruikerID` (`GebruikerID`),
-  KEY `LeverancierTypeID` (`LeverancierTypeID`)
+  KEY `GebruikerID` (`GebruikerID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -317,7 +312,11 @@ CREATE TABLE IF NOT EXISTS `productleverancier` (
   KEY `LeverancierID` (`LeverancierID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- --------------------------------------------------------
 
+--
+-- Tabelstructuur voor tabel `rol`
+--
 
 DROP TABLE IF EXISTS `rol`;
 CREATE TABLE IF NOT EXISTS `rol` (
@@ -336,6 +335,11 @@ INSERT INTO `rol` (`RolID`, `Naam`) VALUES
 (2, 'Magazijnmedewerker'),
 (3, 'Vrijwilliger');
 
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `voedselopslag`
+--
 
 DROP TABLE IF EXISTS `voedselopslag`;
 CREATE TABLE IF NOT EXISTS `voedselopslag` (
@@ -391,41 +395,11 @@ CREATE TABLE IF NOT EXISTS `werknemer` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 COMMIT;
 
--- Nieuwe tabel voor LeverancierType
-DROP TABLE IF EXISTS `leverancier_type`;
-CREATE TABLE IF NOT EXISTS `leverancier_type` (
-  `LeverancierTypeID` int NOT NULL AUTO_INCREMENT,
-  `TypeNaam` varchar(50) NOT NULL,
-  PRIMARY KEY (`LeverancierTypeID`),
-  UNIQUE KEY `TypeNaam` (`TypeNaam`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 
--- Voeg standaard types toe
-INSERT INTO `leverancier_type` (`LeverancierTypeID`, `TypeNaam`) VALUES
-(1, 'Groothandel'),
-(2, 'Boer'),
-(3, 'Supermarkt'),
-(4, 'Bakkerij');
-
-
-DROP TABLE IF EXISTS `leverancier`;
-CREATE TABLE IF NOT EXISTS `leverancier` (
-  `LeverancierID` int NOT NULL AUTO_INCREMENT,
-  `LeverancierNummer` varchar(6) NOT NULL,
-  `GebruikerID` int NOT NULL,
-  `LeverancierTypeID` int NOT NULL,
-  `Bedrijfsnaam` varchar(100) NOT NULL,
-  `Adres` varchar(200) DEFAULT NULL,
-  `ContactNaam` varchar(100) DEFAULT NULL,
-  `ContactEmail` varchar(100) DEFAULT NULL,
-  `ContactTelefoon` varchar(20) DEFAULT NULL,
-  `EerstvolgendeLevering` datetime DEFAULT NULL,
-  `Status` enum('gepland','voorbereiden','onderweg','geleverd') DEFAULT 'gepland',
-  PRIMARY KEY (`LeverancierID`),
-  UNIQUE KEY `LeverancierNummer_UNIQUE` (`LeverancierNummer`),
-  KEY `GebruikerID` (`GebruikerID`),
-  KEY `LeverancierTypeID` (`LeverancierTypeID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- ...existing code... (all your table structures)
 
 -- Testdata voor Allergie tabel
 INSERT IGNORE INTO `allergie` (`AllergieID`, `Naam`) VALUES
@@ -462,12 +436,12 @@ INSERT IGNORE INTO `gebruikerrol` (`GebruikerID`, `RolID`) VALUES
 (3, 3); -- Jan is Vrijwilliger
 
 -- Testdata voor Leverancier tabel
-INSERT IGNORE INTO `leverancier` (`LeverancierID`, `LeverancierNummer`, `GebruikerID`, `LeverancierTypeID`, `Bedrijfsnaam`, `Adres`, `ContactNaam`, `ContactEmail`, `ContactTelefoon`, `EerstvolgendeLevering`, `Status`) VALUES
-(1, '123456', 3, 3, 'Albert Heijn Maaskantje', 'Hoofdstraat 12, 5371AB Maaskantje', 'Jan Pieters', 'jan.pieters@ah.nl', '0412-345678', '2025-06-30 09:00:00', 'gepland'),
-(2, '234567', 1, 3, 'Jumbo Supermarkten', 'Marktplein 5, 5371CD Maaskantje', 'Marie van der Berg', 'marie.vandenberg@jumbo.com', '0412-567890', '2025-07-02 14:30:00', 'voorbereiden'),
-(3, '345678', 1, 2, 'Boerderij De Hof', 'Hofweg 25, 5371EF Maaskantje', 'Piet Janssen', 'piet@boerderijdehof.nl', '0412-123456', '2025-07-01 08:00:00', 'onderweg'),
-(4, '456789', 1, 4, 'Bakkerij Van Dijk', 'Kerkstraat 8, 5371GH Maaskantje', 'Kees van Dijk', 'info@bakkerijvandijk.nl', '0412-789012', '2025-06-29 07:00:00', 'gepland'),
-(5, '567890', 1, 1, 'Groothandel Maaskantje', 'Industrieweg 15, 5371IJ Maaskantje', 'Sandra Verhagen', 's.verhagen@groothandel.nl', '0412-345123', '2025-07-03 10:00:00', 'voorbereiden');
+INSERT IGNORE INTO `leverancier` (`LeverancierID`, `GebruikerID`, `Bedrijfsnaam`, `Adres`, `ContactNaam`, `ContactEmail`, `ContactTelefoon`, `EerstvolgendeLevering`) VALUES
+(1, 3, 'Albert Heijn Maaskantje', 'Hoofdstraat 12, 5371AB Maaskantje', 'Jan Pieters', 'jan.pieters@ah.nl', '0412-345678', '2025-06-30 09:00:00'),
+(2, 1, 'Jumbo Supermarkten', 'Marktplein 5, 5371CD Maaskantje', 'Marie van der Berg', 'marie.vandenberg@jumbo.com', '0412-567890', '2025-07-02 14:30:00'),
+(3, 1, 'Boerderij De Hof', 'Hofweg 25, 5371EF Maaskantje', 'Piet Janssen', 'piet@boerderijdehof.nl', '0412-123456', '2025-07-01 08:00:00'),
+(4, 1, 'Bakkerij Van Dijk', 'Kerkstraat 8, 5371GH Maaskantje', 'Kees van Dijk', 'info@bakkerijvandijk.nl', '0412-789012', '2025-06-29 07:00:00'),
+(5, 1, 'Groothandel Maaskantje', 'Industrieweg 15, 5371IJ Maaskantje', 'Sandra Verhagen', 's.verhagen@groothandel.nl', '0412-345123', '2025-07-03 10:00:00');
 
 -- Testdata voor Product tabel
 INSERT IGNORE INTO `product` (`ProductID`, `LeverancierID`, `AllergieID`, `CategorieID`, `ProductNaam`, `EAN`, `AantalInVoorraad`) VALUES
@@ -557,7 +531,3 @@ INSERT IGNORE INTO `werknemer` (`WerknemerID`, `GebruikerID`) VALUES
 (2, 2); -- Marie Jansen
 
 COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
