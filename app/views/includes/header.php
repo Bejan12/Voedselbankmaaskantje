@@ -63,12 +63,13 @@
     <div class="navbar">
         <img src="/img/voedselbank_logo.png" alt="Voedselbank Logo" class="logo">
         <div class="nav-links">
-            <a href="#">Dashboard</a>
+            <a href="<?= URLROOT; ?>homepages/index">Dashboard</a>
             <a href="#">Overzicht accounts</a>
             <a href="#">Overzicht Leveranciers</a>
             <a href="#">Overzicht Voorraadbeheer</a>
             <a href="#">Overzicht voedselpakket</a>
             <a href="#">Overzicht klanten</a>
+            <a href="<?= URLROOT; ?>accounts/register">Registreren</a>
         </div>
     </div>
 

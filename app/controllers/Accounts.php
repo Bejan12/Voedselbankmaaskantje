@@ -1,0 +1,75 @@
+<?php
+
+class Accounts extends BaseController
+{
+    private $accountModel;
+
+    public function __construct()
+    {
+        $this->accountModel = $this->model('AccountModel');
+    }
+
+    public function register()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            // Process form submission
+            $data = [
+                'voornaam' => trim($_POST['voornaam']),
+                'achternaam' => trim($_POST['achternaam']),
+                'email' => trim($_POST['email']),
+                'telefoon' => trim($_POST['telefoon']),
+                'geboortedatum' => $_POST['geboortedatum'],
+                'gebruikersnaam' => trim($_POST['gebruikersnaam']),
+                'wachtwoord' => $_POST['wachtwoord'],
+                'error' => '',
+                'success' => ''
+            ];
+
+            // Validate input
+            if (empty($data['voornaam']) || empty($data['achternaam']) || 
+                empty($data['email']) || empty($data['gebruikersnaam']) || 
+                empty($data['wachtwoord'])) {
+                $data['error'] = 'Vul alle verplichte velden in.';
+            }
+
+            // Check if username already exists
+            if (empty($data['error']) && $this->accountModel->findUserByUsername($data['gebruikersnaam'])) {
+                $data['error'] = 'Gebruikersnaam bestaat al.';
+            }
+
+            // Register user if no errors
+            if (empty($data['error'])) {
+                if ($this->accountModel->register($data)) {
+                    $data['success'] = 'Registratie succesvol!';
+                    // Clear form data
+                    $data = array_merge($data, [
+                        'voornaam' => '',
+                        'achternaam' => '',
+                        'email' => '',
+                        'telefoon' => '',
+                        'geboortedatum' => '',
+                        'gebruikersnaam' => '',
+                        'wachtwoord' => ''
+                    ]);
+                } else {
+                    $data['error'] = 'Er is iets misgegaan bij de registratie.';
+                }
+            }
+
+            $this->view('accounts/register', $data);
+        } else {
+            // Show registration form
+            $data = [
+                'voornaam' => '',
+                'achternaam' => '',
+                'email' => '',
+                'telefoon' => '',
+                'geboortedatum' => '',
+                'gebruikersnaam' => '',
+                'wachtwoord' => ''
+            ];
+
+            $this->view('accounts/register', $data);
+        }
+    }
+}
