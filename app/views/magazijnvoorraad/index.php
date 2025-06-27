@@ -106,18 +106,35 @@
                 </div>
             </div>
 
-            <!-- Status berichten -->
-            <?php if (isset($data['error'])): ?>
-                <div class="alert alert-danger" role="alert">
-                    <i class="bi bi-exclamation-triangle me-2"></i><?= $data['error']; ?>
-                </div>
-            <?php endif; ?>
 
-            <?php if (isset($data['success'])): ?>
-                <div class="alert alert-success" role="alert">
-                    <i class="bi bi-check-circle me-2"></i><?= $data['success']; ?>
-                </div>
-            <?php endif; ?>
+        <!-- Status berichten -->
+    <?php if (isset($_GET['error'])): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i><?= htmlspecialchars($_GET['error']); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
+<?php if (isset($_GET['success'])): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i><?= htmlspecialchars($_GET['success']); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
+<?php if (isset($data['error'])): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i><?= $data['error']; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
+<?php if (isset($data['success'])): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i><?= $data['success']; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
 
             <?php if (isset($data['geselecteerdProduct'])): ?>
                 <div class="alert alert-info" role="alert">
@@ -262,12 +279,22 @@
                                                     </span>
                                                 <?php endif; ?>
                                             </td>
-                                            <td class="text-center">
-                                                <a href="<?= URLROOT; ?>/magazijnvoorraad/wijzigProduct/<?= $product->ProductID; ?>" 
-                                                   class="btn btn-sm btn-outline-primary" 
-                                                   title="Product wijzigen">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
+                                        
+                                        <td class="text-center">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                        <a href="<?= URLROOT; ?>/magazijnvoorraad/wijzigProduct/<?= $product->ProductID; ?>" 
+                                         class="btn btn-outline-primary" 
+                                         title="Product wijzigen">
+                                        <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button type="button" 
+                                        class="btn btn-outline-danger" 
+                                        title="Product verwijderen"
+                                        onclick="confirmDelete(<?= $product->ProductID; ?>, '<?= htmlspecialchars($product->ProductNaam, ENT_QUOTES); ?>')">
+                                        <i class="bi bi-trash"></i>
+                                        </button>
+                                        </div>
+                                        </td>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -412,3 +439,68 @@ h2 {
     padding: 0.5rem 1rem;
 }
 </style>
+<html lang="nl">
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="bi bi-exclamation-triangle me-2"></i>Product Verwijderen
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="text-danger me-3">
+                        <i class="bi bi-exclamation-triangle-fill fs-1"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1">Weet je het zeker?</h6>
+                        <p class="mb-0 text-muted">Deze actie kan niet ongedaan worden gemaakt.</p>
+                    </div>
+                </div>
+                <div class="alert alert-warning">
+                    <strong>Let op:</strong> Je staat op het punt om het volgende product te verwijderen:
+                    <br><strong id="productToDelete"></strong>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Annuleren
+                </button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <input type="hidden" name="product_id" id="deleteProductId">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i>Definitief Verwijderen
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Delete confirmation functie
+function confirmDelete(productId, productNaam) {
+    document.getElementById('deleteProductId').value = productId;
+    document.getElementById('productToDelete').textContent = productNaam;
+    document.getElementById('deleteForm').action = '<?= URLROOT; ?>/magazijnvoorraad/verwijderProduct';
+    
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+
+// Auto-hide alerts after 7 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    const alerts = document.querySelectorAll('.alert-dismissible');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            const closeBtn = alert.querySelector('.btn-close');
+            if (closeBtn) closeBtn.click();
+        }, 7000);
+    });
+});
+</script>
+
+<?php require_once APPROOT . '/views/includes/footer.php'; ?>

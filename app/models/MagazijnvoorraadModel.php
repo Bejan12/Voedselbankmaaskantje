@@ -487,5 +487,154 @@ class MagazijnvoorraadModel
         }
     }
 
+    /**
+     * Controleert of een product gekoppeld is aan een voedselpakket
+     */
+    public function isProductGekoppeldAanVoedselpakket($productId)
+    {
+        try {
+            $this->db->query('
+                SELECT COUNT(*) as count 
+                FROM VoedselpakketProduct vp
+                WHERE vp.ProductID = :product_id
+            ');
+            $this->db->bind(':product_id', $productId);
+            $result = $this->db->single();
+            return $result->count > 0;
+        } catch (Exception $e) {
+            error_log("Fout bij controleren voedselpakket koppeling: " . $e->getMessage());
+            return true; // Bij twijfel, niet verwijderen
+        }
+    }
+
+    /**
+     * Controleert of een product bestaat in voedselopslag
+     */
+    public function isProductInVoedselopslag($productId)
+    {
+        try {
+            $this->db->query('
+                SELECT COUNT(*) as count 
+                FROM Voedselopslag 
+                WHERE ProductID = :product_id
+            ');
+            $this->db->bind(':product_id', $productId);
+            $result = $this->db->single();
+            return $result->count > 0;
+        } catch (Exception $e) {
+            error_log("Fout bij controleren voedselopslag: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Haalt product gegevens op voor verwijdering (met naam voor bevestiging)
+     */
+    public function getProductVoorVerwijdering($productId)
+    {
+        try {
+            $this->db->query('
+                SELECT 
+                    p.ProductID,
+                    p.ProductNaam,
+                    p.EAN,
+                    c.Naam AS Categorie,
+                    l.Bedrijfsnaam AS Leverancier,
+                    p.AantalInVoorraad
+                FROM Product p
+                JOIN Categorie c ON p.CategorieID = c.CategorieID
+                JOIN Leverancier l ON p.LeverancierID = l.LeverancierID
+                WHERE p.ProductID = :product_id
+            ');
+            
+            $this->db->bind(':product_id', $productId);
+            return $this->db->single();
+        } catch (Exception $e) {
+            error_log("Fout bij ophalen product voor verwijdering: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Verwijdert een product uit de database
+     */
+    public function verwijderProduct($productId)
+    {
+        try {
+            // Start transactie voor consistentie
+            $this->db->query('START TRANSACTION');
+            
+            // Eerst verwijderen uit voedselopslag als het bestaat
+            try {
+                $this->db->query('DELETE FROM Voedselopslag WHERE ProductID = :product_id');
+                $this->db->bind(':product_id', $productId);
+                $this->db->execute();
+                error_log("Product verwijderd uit voedselopslag");
+            } catch (Exception $e) {
+                error_log("Geen voedselopslag record gevonden (normaal): " . $e->getMessage());
+            }
+            
+            // Dan het product zelf verwijderen
+            $this->db->query('DELETE FROM Product WHERE ProductID = :product_id');
+            $this->db->bind(':product_id', $productId);
+            $success = $this->db->execute();
+            
+            if ($success) {
+                // Check of er daadwerkelijk een record is verwijderd
+                if ($this->db->rowCount() > 0) {
+                    $this->db->query('COMMIT');
+                    error_log("Product succesvol verwijderd - ID: $productId");
+                    return true;
+                } else {
+                    $this->db->query('ROLLBACK');
+                    error_log("Geen product gevonden om te verwijderen - ID: $productId");
+                    throw new Exception('Product niet gevonden');
+                }
+            } else {
+                $this->db->query('ROLLBACK');
+                throw new Exception('Kon product niet verwijderen uit database');
+            }
+            
+        } catch (Exception $e) {
+            // Rollback bij fout
+            try {
+                $this->db->query('ROLLBACK');
+            } catch (Exception $rollbackError) {
+                error_log("Rollback fout: " . $rollbackError->getMessage());
+            }
+            
+            error_log("Fout bij verwijderen product: " . $e->getMessage());
+            
+            // Controleer specifieke fouten
+            if (strpos($e->getMessage(), 'foreign key constraint') !== false || 
+                strpos($e->getMessage(), 'Cannot delete') !== false) {
+                throw new Exception('Product is al gekoppeld aan een voedselpakket en kan niet worden verwijderd');
+            } elseif (strpos($e->getMessage(), 'Product niet gevonden') !== false) {
+                throw new Exception('Product niet gevonden');
+            } else {
+                throw new Exception('Database fout bij verwijderen: ' . $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Telt het aantal voedselpakketten waar dit product in zit
+     */
+    public function getAantalVoedselpakkettenVoorProduct($productId)
+    {
+        try {
+            $this->db->query('
+                SELECT COUNT(DISTINCT VoedselpakketID) as count 
+                FROM VoedselpakketProduct 
+                WHERE ProductID = :product_id
+            ');
+            $this->db->bind(':product_id', $productId);
+            $result = $this->db->single();
+            return $result->count;
+        } catch (Exception $e) {
+            error_log("Fout bij tellen voedselpakketten: " . $e->getMessage());
+            return 0;
+        }
+    }
 
 }

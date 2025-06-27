@@ -604,5 +604,62 @@ class Magazijnvoorraad extends BaseController
         }
     }
 
+    public function verwijderProduct()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
+            $productId = (int) $_POST['product_id'];
+            
+            if ($productId <= 0) {
+                header('Location: ' . URLROOT . '/magazijnvoorraad?error=' . urlencode('Ongeldig product ID'));
+                exit;
+            }
+            
+            try {
+                // Haal product gegevens op voor logging en foutmeldingen
+                $product = $this->magazijnvoorraadModel->getProductVoorVerwijdering($productId);
+                if (!$product) {
+                    header('Location: ' . URLROOT . '/magazijnvoorraad?error=' . urlencode('Product niet gevonden'));
+                    exit;
+                }
+                
+                error_log("Poging tot verwijderen product: ID=$productId, Naam=" . $product->ProductNaam);
+                
+                // Controleer of product gekoppeld is aan voedselpakketten
+                if ($this->magazijnvoorraadModel->isProductGekoppeldAanVoedselpakket($productId)) {
+                    $aantalPakketten = $this->magazijnvoorraadModel->getAantalVoedselpakkettenVoorProduct($productId);
+                    $errorMsg = 'Product is al gekoppeld aan een voedselpakket en kan niet worden verwijderd';
+                    if ($aantalPakketten > 0) {
+                        $errorMsg .= " (gebruikt in $aantalPakketten voedselpakket" . ($aantalPakketten > 1 ? 'ten' : '') . ")";
+                    }
+                    
+                    error_log("Product kan niet verwijderd worden - gekoppeld aan voedselpakketten: " . $product->ProductNaam);
+                    header('Location: ' . URLROOT . '/magazijnvoorraad?error=' . urlencode($errorMsg));
+                    exit;
+                }
+                
+                // Probeer product te verwijderen
+                $success = $this->magazijnvoorraadModel->verwijderProduct($productId);
+                
+                if ($success) {
+                    $successMsg = 'Product "' . $product->ProductNaam . '" succesvol verwijderd';
+                    error_log("Product succesvol verwijderd: " . $product->ProductNaam);
+                    header('Location: ' . URLROOT . '/magazijnvoorraad?success=' . urlencode($successMsg));
+                    exit;
+                } else {
+                    throw new Exception('Product kon niet worden verwijderd');
+                }
+                
+            } catch (Exception $e) {
+                error_log("Controller error bij verwijderen product: " . $e->getMessage());
+                header('Location: ' . URLROOT . '/magazijnvoorraad?error=' . urlencode($e->getMessage()));
+                exit;
+            }
+            
+        } else {
+            // Redirect als niet POST of geen product_id
+            header('Location: ' . URLROOT . '/magazijnvoorraad?error=' . urlencode('Ongeldige verwijder aanvraag'));
+            exit;
+        }
+    }
 
 }
