@@ -105,12 +105,8 @@
                     <?php endif; ?>
                 </div>
             </div>
-
-
-    <?php
-// ...existing code...
         
-       ?> <!-- Status berichten -->
+         <!-- Status berichten -->
          <?php if (isset($_GET['error'])): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <i class="bi bi-exclamation-triangle me-2"></i><?= htmlspecialchars($_GET['error']); ?>
@@ -205,9 +201,6 @@
                             <h6 class="mb-0">
                                 <i class="bi bi-table me-2"></i>Voorraad Details
                             </h6>
-                            <span class="badge bg-primary">
-                                <?= $totaalProducten; ?> product<?= $totaalProducten !== 1 ? 'en' : ''; ?>
-                            </span>
                         </div>
                     </div>
                     <div class="card-body p-0">
@@ -265,7 +258,7 @@
                                                         Kritiek
                                                     </span>
                                                 <?php elseif ($product->AantalInVoorraad <= 10): ?>
-                                                    <span class="badge bg-info status-badge">
+                                                    <span class="badge bg-warning text-dark status-badge">
                                                         Laag
                                                     </span>
                                                 <?php else: ?>
