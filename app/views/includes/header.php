@@ -69,12 +69,9 @@
             <a href="#">Overzicht Voorraadbeheer</a>
             <a href="#">Overzicht voedselpakket</a>
             <a href="<?= URLROOT; ?>klanten/index">Overzicht klanten</a>
+            <a href="<?= URLROOT; ?>klanten/afgerondepakketten">Afgeronde voedselpakketten</a>
         </div>
     </div>
-
-</body>
-</html>
-
 
 </body>
 </html>

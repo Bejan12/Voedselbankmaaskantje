@@ -89,7 +89,7 @@
 
 <div class="klanten-container">
     <div class="klanten-header-row">
-        <h3>Klant toevoegen</h3>
+        <h3>Klantgegevens wijzigen</h3>
         <a href="<?= URLROOT; ?>klanten/index" class="btn btn-orange">Terug</a>
     </div>
     <?php if (!empty($data['error'])): ?>
