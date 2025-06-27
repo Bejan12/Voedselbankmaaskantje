@@ -4,9 +4,4 @@
 
 <p>Welkom bij het managementsysteem van de voedselbank.</p>
 
-<div>
-    <a href="<?php echo URLROOT; ?>/accounts/register" class="btn">Registreren</a>
-    <a href="<?php echo URLROOT; ?>/accounts/login" class="btn">Inloggen</a>
-</div>
-
 <?php require APPROOT . '/views/includes/footer.php'; ?>

@@ -9,6 +9,14 @@ class Accounts extends BaseController
         $this->accountModel = $this->model('AccountModel');
     }
 
+    // Add default index method
+    public function index()
+    {
+        // Redirect to login page when accessing /accounts
+        header('Location: ' . URLROOT . '/accounts/login');
+        exit();
+    }
+
     public function register()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -98,7 +106,7 @@ class Accounts extends BaseController
                     session_start();
                     $_SESSION['user_id'] = $user->GebruikerID;
                     $_SESSION['username'] = $user->Gebruikersnaam;
-                    $_SESSION['email'] = $user->Email;
+                    $_SESSION['user_email'] = $user->Email; // Renamed from 'email' to 'user_email'
                     
                     // Redirect to dashboard
                     header('Location: ' . URLROOT . '/homepages/index');
@@ -119,5 +127,24 @@ class Accounts extends BaseController
 
             $this->view('accounts/login', $data);
         }
+    }
+
+    // Add logout method to handle user logout
+    public function logout()
+    {
+        // Start session if not already started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        // Clear all session variables
+        $_SESSION = [];
+        
+        // Destroy the session
+        session_destroy();
+        
+        // Redirect to homepage
+        header('Location: ' . URLROOT . '/homepages/index');
+        exit();
     }
 }
