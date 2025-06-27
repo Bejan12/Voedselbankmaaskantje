@@ -37,14 +37,14 @@ class Klanten extends BaseController
             $veganistisch = isset($_POST['veganistisch']) ? 1 : 0;
             $vegetarisch = isset($_POST['vegetarisch']) ? 1 : 0;
 
-            // Geen foutmelding tonen, alleen formulier opnieuw tonen bij fout
             if (
                 empty($voornaam) || empty($achternaam) || empty($adres) ||
                 empty($telefoon) || empty($email) ||
                 $aantalVolwassenen === '' || $aantalKinderen === '' || $aantalBabys === ''
             ) {
                 $data = [
-                    'form' => $_POST
+                    'form' => $_POST,
+                    'error' => 'Vul alle verplichte velden in.'
                 ];
                 $this->view('klanten/add', $data);
                 return;
@@ -64,17 +64,14 @@ class Klanten extends BaseController
                 'vegetarisch' => $vegetarisch
             ]);
 
-            // Geen foutmelding tonen, alleen terug naar overzicht of opnieuw formulier
             if ($result) {
-                $klanten = $this->klantenModel->getKlanten();
-                $data = [
-                    'title' => 'Overzicht Klanten',
-                    'klanten' => $klanten
-                ];
-                $this->view('klanten/index', $data);
+                $_SESSION['melding'] = "Klant succesvol toegevoegd.";
+                header('Location: /klanten');
+                exit;
             } else {
                 $data = [
-                    'form' => $_POST
+                    'form' => $_POST,
+                    'error' => 'Toevoegen mislukt. Mogelijk bestaat deze klant al.'
                 ];
                 $this->view('klanten/add', $data);
             }
@@ -147,6 +144,40 @@ class Klanten extends BaseController
         }
         header('Location: /klanten');
         exit;
+    }
+
+    public function afgerondepakketten()
+    {
+        // Haal alle klanten op
+        $klanten = $this->klantenModel->getKlanten();
+        $data = [
+            'title' => 'Afgeronde voedselpakketten per klant',
+            'klanten' => $klanten
+        ];
+        $this->view('klanten/afgerondepakketten', $data);
+    }
+
+    public function pakketten($klantId)
+    {
+        // Haal pakketten op voor deze klant
+        $pakketten = $this->klantenModel->getAfgerondeVoedselpakkettenByKlant($klantId);
+
+        if (empty($pakketten)) {
+            $data = [
+                'melding' => "Deze klant heeft nog geen voedselpakketten ontvangen.",
+                'pakketten' => [],
+                'klantId' => $klantId
+            ];
+            $this->view('klanten/pakketten', $data);
+            return;
+        }
+
+        $data = [
+            'pakketten' => $pakketten,
+            'melding' => null,
+            'klantId' => $klantId
+        ];
+        $this->view('klanten/pakketten', $data);
     }
 }
 
