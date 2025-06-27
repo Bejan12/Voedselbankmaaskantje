@@ -5,12 +5,12 @@
 
     <?php if (!empty($data['success'])): ?>
         <div class="alert alert-success">
-            Leverancier succesvol toegevoegd!
+            Leverancier succesvol gewijzigd!
         </div>
         <script>
             setTimeout(function() {
                 window.location.href = "<?php echo URLROOT; ?>/leveranciers";
-            }, 5000);
+            }, 3000);
         </script>
     <?php endif; ?>
 
@@ -21,23 +21,7 @@
     <?php endif; ?>
 
     <div class="form-container">
-        <form action="<?php echo URLROOT; ?>/leveranciers/add" method="POST">
-            <div class="form-group">
-                <label for="leverancier_type_id">Type Leverancier *</label>
-                <select id="leverancier_type_id" name="leverancier_type_id" required>
-                    <option value="">-- Selecteer type --</option>
-                    <?php if (!empty($data['leverancier_types'])): ?>
-                        <?php foreach ($data['leverancier_types'] as $type): ?>
-                            <option value="<?php echo $type->LeverancierTypeID; ?>" 
-                                    <?php echo (isset($data['leverancier_type_id']) && $data['leverancier_type_id'] == $type->LeverancierTypeID) ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($type->TypeNaam); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </select>
-                <span class="error"><?php echo $data['leverancier_type_id_err'] ?? ''; ?></span>
-            </div>
-
+        <form action="<?php echo URLROOT; ?>/leveranciers/edit/<?php echo $data['leverancier_id'] ?? ''; ?>" method="POST">
             <div class="form-group">
                 <label for="bedrijfsnaam">Bedrijfsnaam *</label>
                 <input type="text" id="bedrijfsnaam" name="bedrijfsnaam"
@@ -63,9 +47,7 @@
                 <label for="contactemail">Contact E-mail *</label>
                 <input type="email" id="contactemail" name="contactemail" 
                        value="<?php echo $data['contactemail'] ?? ''; ?>" required>
-                <?php if (!empty($data['contactemail_err']) && $data['contactemail_err'] !== 'Dit e-mailadres is al in gebruik bij een andere leverancier'): ?>
-                    <span class="error"><?php echo $data['contactemail_err']; ?></span>
-                <?php endif; ?>
+                <span class="error"><?php echo $data['contactemail_err'] ?? ''; ?></span>
             </div>
 
             <div class="form-group">
@@ -85,8 +67,9 @@
                 <span class="error"><?php echo $data['eerstvolgendelevering_err'] ?? ''; ?></span>
             </div>
 
+
             <div class="form-actions">
-                <button type="submit" class="btn-submit">Toevoegen</button>
+                <button type="submit" class="btn-submit">Wijzigen</button>
                 <a href="<?php echo URLROOT; ?>/leveranciers" class="btn-cancel">Annuleren</a>
             </div>
         </form>
@@ -120,15 +103,7 @@
         color: #333;
     }
 
-    .form-group input {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 16px;
-        box-sizing: border-box;
-    }
-
+    .form-group input,
     .form-group select {
         width: 100%;
         padding: 10px;
@@ -136,7 +111,6 @@
         border-radius: 4px;
         font-size: 16px;
         box-sizing: border-box;
-        background-color: white;
     }
 
     .form-group input:focus,
@@ -160,7 +134,7 @@
     }
 
     .btn-submit {
-        background-color: #28a745;
+        background-color: #007bff;
         color: white;
         padding: 12px 24px;
         border: none;
@@ -173,7 +147,7 @@
     }
 
     .btn-submit:hover {
-        background-color: #218838;
+        background-color: #0056b3;
     }
 
     .btn-cancel {
@@ -227,106 +201,6 @@
             transform: translateY(0);
         }
     }
-  .modal-content {
-        background-color: #fefefe;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-        max-width: 500px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid #ddd;
-        margin-bottom: 15px;
-    }
-
-    .modal-header h2 {
-        margin: 0;
-        font-size: 18px;
-        color: #333;
-    }
-
-    .close {
-        color: #aaa;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    .modal-body {
-        margin-bottom: 15px;
-    }
-
-    .modal-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-    }
-
-    .btn-modal-close {
-        background-color: #007bff;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: bold;
-        text-decoration: none;
-        display: inline-block;
-    }
-
-    .btn-modal-close:hover {
-        background-color: #0056b3;
-    }
 </style>
-
-
-  
-
-<script>
-// Modal functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('errorModal');
-    if (modal) {
-        const closeBtn = modal.querySelector('.close');
-        const modalCloseBtn = modal.querySelector('.btn-modal-close');
-        
-        // Close modal when clicking X
-        if (closeBtn) {
-            closeBtn.onclick = function() {
-                modal.style.display = 'none';
-            }
-        }
-        
-        // Close modal when clicking close button
-        if (modalCloseBtn) {
-            modalCloseBtn.onclick = function() {
-                modal.style.display = 'none';
-            }
-        }
-        
-        // Close modal when clicking outside of it
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
-    }
-});
-</script>
 
 <?php require APPROOT . '/views/includes/footer.php'; ?>

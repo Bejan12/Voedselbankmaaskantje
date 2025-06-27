@@ -36,7 +36,7 @@
                 <?php if (!empty($data['leveranciers'])): ?>
                     <?php foreach ($data['leveranciers'] as $leverancier): ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($leverancier->LeverancierID ?? ''); ?></td>
+                            <td><?php echo htmlspecialchars($leverancier->LeverancierNummer ?? ''); ?></td>
                             <td><?php echo htmlspecialchars($leverancier->Bedrijfsnaam ?? ''); ?></td>
                             <td><?php echo htmlspecialchars($leverancier->LeverancierType ?? ''); ?></td>
                             <td><?php echo htmlspecialchars($leverancier->Adres ?? ''); ?></td>
@@ -95,9 +95,9 @@
 
     .styled-table {
         width: 100%;
-        min-width: 1100px; /* Verhoog minimale breedte voor extra kolom */
+        min-width: 1100px; /* Verlaag minimale breedte */
         border-collapse: collapse;
-        font-size: 15px;
+        font-size: 14px; /* Verklein font-size lichtjes */
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
         background: #fff;
     }
@@ -109,7 +109,7 @@
 
     .styled-table th,
     .styled-table td {
-        padding: 10px;
+        padding: 8px; /* Verklein padding van 10px naar 8px */
         border: 1px solid #dddddd;
         text-align: left;
         vertical-align: middle;
@@ -149,6 +149,7 @@
     .bi {
         font-size: 1.2em;
     }
+
 </style>
 
 <!-- Vergeet niet deze in de layout/head op te nemen -->

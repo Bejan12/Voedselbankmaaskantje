@@ -231,6 +231,7 @@ CREATE TABLE IF NOT EXISTS `klantallergie` (
 DROP TABLE IF EXISTS `leverancier`;
 CREATE TABLE IF NOT EXISTS `leverancier` (
   `LeverancierID` int NOT NULL AUTO_INCREMENT,
+  `LeverancierNummer` varchar(6) NOT NULL,
   `GebruikerID` int NOT NULL,
   `LeverancierTypeID` int NOT NULL,
   `Bedrijfsnaam` varchar(100) NOT NULL,
@@ -239,8 +240,9 @@ CREATE TABLE IF NOT EXISTS `leverancier` (
   `ContactEmail` varchar(100) DEFAULT NULL,
   `ContactTelefoon` varchar(20) DEFAULT NULL,
   `EerstvolgendeLevering` datetime DEFAULT NULL,
-  `Status` enum('gepland', 'in voorbereiding', 'onderweg') DEFAULT 'gepland',
+  `Status` enum('gepland', 'voorbereiden', 'onderweg') DEFAULT 'gepland',
   PRIMARY KEY (`LeverancierID`),
+  UNIQUE KEY `LeverancierNummer_UNIQUE` (`LeverancierNummer`),
   KEY `GebruikerID` (`GebruikerID`),
   KEY `LeverancierTypeID` (`LeverancierTypeID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -414,10 +416,11 @@ INSERT INTO `leverancier_type` (`LeverancierTypeID`, `TypeNaam`) VALUES
 (3, 'Supermarkt'),
 (4, 'Bakkerij');
 
--- Wijzig tabel leverancier: voeg LeverancierTypeID en Status toe
+-- Wijzig tabel leverancier: voeg LeverancierTypeID, Status en LeverancierNummer toe
 DROP TABLE IF EXISTS `leverancier`;
 CREATE TABLE IF NOT EXISTS `leverancier` (
   `LeverancierID` int NOT NULL AUTO_INCREMENT,
+  `LeverancierNummer` varchar(6) NOT NULL,
   `GebruikerID` int NOT NULL,
   `LeverancierTypeID` int NOT NULL,
   `Bedrijfsnaam` varchar(100) NOT NULL,
@@ -426,8 +429,9 @@ CREATE TABLE IF NOT EXISTS `leverancier` (
   `ContactEmail` varchar(100) DEFAULT NULL,
   `ContactTelefoon` varchar(20) DEFAULT NULL,
   `EerstvolgendeLevering` datetime DEFAULT NULL,
-  `Status` enum('gepland', 'in voorbereiding', 'onderweg') DEFAULT 'gepland',
+  `Status` enum('gepland', 'voorbereiden', 'onderweg') DEFAULT 'gepland',
   PRIMARY KEY (`LeverancierID`),
+  UNIQUE KEY `LeverancierNummer_UNIQUE` (`LeverancierNummer`),
   KEY `GebruikerID` (`GebruikerID`),
   KEY `LeverancierTypeID` (`LeverancierTypeID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -467,12 +471,12 @@ INSERT IGNORE INTO `gebruikerrol` (`GebruikerID`, `RolID`) VALUES
 (3, 3); -- Jan is Vrijwilliger
 
 -- Testdata voor Leverancier tabel
-INSERT IGNORE INTO `leverancier` (`LeverancierID`, `GebruikerID`, `LeverancierTypeID`, `Bedrijfsnaam`, `Adres`, `ContactNaam`, `ContactEmail`, `ContactTelefoon`, `EerstvolgendeLevering`, `Status`) VALUES
-(1, 3, 3, 'Albert Heijn Maaskantje', 'Hoofdstraat 12, 5371AB Maaskantje', 'Jan Pieters', 'jan.pieters@ah.nl', '0412-345678', '2025-06-30 09:00:00', 'gepland'),
-(2, 1, 3, 'Jumbo Supermarkten', 'Marktplein 5, 5371CD Maaskantje', 'Marie van der Berg', 'marie.vandenberg@jumbo.com', '0412-567890', '2025-07-02 14:30:00', 'in voorbereiding'),
-(3, 1, 2, 'Boerderij De Hof', 'Hofweg 25, 5371EF Maaskantje', 'Piet Janssen', 'piet@boerderijdehof.nl', '0412-123456', '2025-07-01 08:00:00', 'onderweg'),
-(4, 1, 4, 'Bakkerij Van Dijk', 'Kerkstraat 8, 5371GH Maaskantje', 'Kees van Dijk', 'info@bakkerijvandijk.nl', '0412-789012', '2025-06-29 07:00:00', 'gepland'),
-(5, 1, 1, 'Groothandel Maaskantje', 'Industrieweg 15, 5371IJ Maaskantje', 'Sandra Verhagen', 's.verhagen@groothandel.nl', '0412-345123', '2025-07-03 10:00:00', 'in voorbereiding');
+INSERT IGNORE INTO `leverancier` (`LeverancierID`, `LeverancierNummer`, `GebruikerID`, `LeverancierTypeID`, `Bedrijfsnaam`, `Adres`, `ContactNaam`, `ContactEmail`, `ContactTelefoon`, `EerstvolgendeLevering`, `Status`) VALUES
+(1, '123456', 3, 3, 'Albert Heijn Maaskantje', 'Hoofdstraat 12, 5371AB Maaskantje', 'Jan Pieters', 'jan.pieters@ah.nl', '0412-345678', '2025-06-30 09:00:00', 'gepland'),
+(2, '234567', 1, 3, 'Jumbo Supermarkten', 'Marktplein 5, 5371CD Maaskantje', 'Marie van der Berg', 'marie.vandenberg@jumbo.com', '0412-567890', '2025-07-02 14:30:00', 'voorbereiden'),
+(3, '345678', 1, 2, 'Boerderij De Hof', 'Hofweg 25, 5371EF Maaskantje', 'Piet Janssen', 'piet@boerderijdehof.nl', '0412-123456', '2025-07-01 08:00:00', 'onderweg'),
+(4, '456789', 1, 4, 'Bakkerij Van Dijk', 'Kerkstraat 8, 5371GH Maaskantje', 'Kees van Dijk', 'info@bakkerijvandijk.nl', '0412-789012', '2025-06-29 07:00:00', 'gepland'),
+(5, '567890', 1, 1, 'Groothandel Maaskantje', 'Industrieweg 15, 5371IJ Maaskantje', 'Sandra Verhagen', 's.verhagen@groothandel.nl', '0412-345123', '2025-07-03 10:00:00', 'voorbereiden');
 
 -- Testdata voor Product tabel
 INSERT IGNORE INTO `product` (`ProductID`, `LeverancierID`, `AllergieID`, `CategorieID`, `ProductNaam`, `EAN`, `AantalInVoorraad`) VALUES

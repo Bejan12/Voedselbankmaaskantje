@@ -96,9 +96,6 @@ if (session_status() === PHP_SESSION_NONE) {
                     <a class="nav-link" href="<?php echo URLROOT; ?>/homepages/index">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Overzicht accounts</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" href="/leveranciers/index.php">Overzicht Leveranciers</a>
                 </li>
                 <li class="nav-item">
