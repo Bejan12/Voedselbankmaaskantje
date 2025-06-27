@@ -7,19 +7,20 @@ class Magazijnvoorraad extends BaseController
 
     public function __construct()
     {
-        $this->magazijnvoorraadModel = $this->model('Magazijnvoorraad');
+        $this->magazijnvoorraadModel = $this->model('MagazijnvoorraadModel');
     }
 
-    // ...existing code...
     public function index()
     {
         try {
             // Haal alle voorraadgegevens op via de model
             $voorraadGegevens = $this->magazijnvoorraadModel->getVoorraadOverzicht();
+            $alleProducten = $this->magazijnvoorraadModel->getAlleProducten();
 
             $data = [
                 'title' => 'Overzicht Magazijnvoorraad',
                 'voorraadGegevens' => $voorraadGegevens,
+                'alleProducten' => $alleProducten,
                 'heeftGegevens' => !empty($voorraadGegevens)
             ];
 
@@ -29,6 +30,7 @@ class Magazijnvoorraad extends BaseController
             $data = [
                 'title' => 'Overzicht Magazijnvoorraad',
                 'voorraadGegevens' => [],
+                'alleProducten' => [],
                 'heeftGegevens' => false,
                 'error' => 'Er is een fout opgetreden bij het laden van de voorraadgegevens.'
             ];
@@ -37,35 +39,40 @@ class Magazijnvoorraad extends BaseController
         }
     }
 
-    public function zoekProduct($ean = null)
+    public function zoekProduct()
     {
-        if (!$ean) {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
+            $productId = $_POST['product_id'];
+            
+            try {
+                $product = $this->magazijnvoorraadModel->zoekProductOpID($productId);
+                $alleProducten = $this->magazijnvoorraadModel->getAlleProducten();
+                
+                $data = [
+                    'title' => 'Zoekresultaat Magazijnvoorraad',
+                    'voorraadGegevens' => $product ? [$product] : [],
+                    'alleProducten' => $alleProducten,
+                    'heeftGegevens' => !empty($product),
+                    'geselecteerdProduct' => $productId
+                ];
+
+                $this->view('magazijnvoorraad/index', $data);
+
+            } catch (Exception $e) {
+                $data = [
+                    'title' => 'Zoekresultaat Magazijnvoorraad',
+                    'voorraadGegevens' => [],
+                    'alleProducten' => [],
+                    'heeftGegevens' => false,
+                    'error' => 'Er is een fout opgetreden bij het zoeken.',
+                    'geselecteerdProduct' => $productId
+                ];
+
+                $this->view('magazijnvoorraad/index', $data);
+            }
+        } else {
             header('Location: ' . URLROOT . '/magazijnvoorraad');
             exit;
-        }
-
-        try {
-            $product = $this->magazijnvoorraadModel->zoekProductOpEAN($ean);
-            
-            $data = [
-                'title' => 'Zoekresultaat Magazijnvoorraad',
-                'voorraadGegevens' => $product ? [$product] : [],
-                'heeftGegevens' => !empty($product),
-                'zoekterm' => $ean
-            ];
-
-            $this->view('magazijnvoorraad/index', $data);
-
-        } catch (Exception $e) {
-            $data = [
-                'title' => 'Zoekresultaat Magazijnvoorraad',
-                'voorraadGegevens' => [],
-                'heeftGegevens' => false,
-                'error' => 'Er is een fout opgetreden bij het zoeken.',
-                'zoekterm' => $ean
-            ];
-
-            $this->view('magazijnvoorraad/index', $data);
         }
     }
 }

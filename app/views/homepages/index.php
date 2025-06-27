@@ -1,41 +1,57 @@
 <?php require_once APPROOT . '/views/includes/header.php'; ?>
 
-<div class="container">
-    <div class="row mt-3">
-        <div class="col-2"></div>
-        <div class="col-8">
-            <h3><?php echo $data['title']; ?></h3>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="text-center mb-5">
+                <h1 class="display-4 text-primary mb-3"><?php echo $data['title']; ?></h1>
+                <p class="lead text-muted">Beheerssysteem Voedselbank Maaskantje</p>
+            </div>
             
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h5><i class="bi bi-house"></i> Voedselbank Maaskantje</h5>
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white py-4">
+                    <h3 class="mb-0 text-center">
+                        <i class="bi bi-house-heart me-2"></i>Welkom bij Voedselbank Maaskantje
+                    </h3>
                 </div>
-                <div class="card-body">
-                    <p>Welkom bij het beheerssysteem van Voedselbank Maaskantje.</p>
+                <div class="card-body p-5">
+                    <p class="text-center text-muted mb-5">
+                        Kies een van de onderstaande opties om het systeem te gebruiken
+                    </p>
                     
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="card h-100">
-                                <div class="card-body text-center">
-                                    <i class="bi bi-boxes display-4 text-primary"></i>
-                                    <h5 class="card-title mt-2">Magazijnvoorraad</h5>
-                                    <p class="card-text">Bekijk het overzicht van alle producten in voorraad</p>
-                                    <a href="<?= URLROOT; ?>/magazijnvoorraad" class="btn btn-primary">
-                                        <i class="bi bi-eye"></i> Overzicht Magazijnvoorraad
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center p-4">
+                                    <div class="mb-4">
+                                        <i class="bi bi-boxes display-3 text-primary"></i>
+                                    </div>
+                                    <h4 class="card-title text-primary mb-3">Magazijnvoorraad</h4>
+                                    <p class="card-text text-muted mb-4">
+                                        Bekijk en beheer het overzicht van alle producten in voorraad. 
+                                        Monitor voorraadniveaus en zoek specifieke producten.
+                                    </p>
+                                    <a href="<?= URLROOT; ?>/magazijnvoorraad" class="btn btn-primary btn-lg w-100">
+                                        <i class="bi bi-eye me-2"></i>Voorraad Bekijken
                                     </a>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="col-md-6 mb-3">
-                            <div class="card h-100">
-                                <div class="card-body text-center">
-                                    <i class="bi bi-people display-4 text-success"></i>
-                                    <h5 class="card-title mt-2">Klanten</h5>
-                                    <p class="card-text">Beheer klantgegevens en hun specifieke wensen</p>
-                                    <a href="#" class="btn btn-success disabled">
-                                        <i class="bi bi-person-plus"></i> Klanten beheren
-                                    </a>
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center p-4">
+                                    <div class="mb-4">
+                                        <i class="bi bi-people display-3 text-success"></i>
+                                    </div>
+                                    <h4 class="card-title text-success mb-3">Klantenbeheer</h4>
+                                    <p class="card-text text-muted mb-4">
+                                        Beheer klantgegevens en hun specifieke wensen en allergieën. 
+                                        Stel voedselpakketten samen op maat.
+                                    </p>
+                                    <button class="btn btn-outline-success btn-lg w-100" disabled>
+                                        <i class="bi bi-person-plus me-2"></i>Binnenkort Beschikbaar
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -43,7 +59,6 @@
                 </div>
             </div>
         </div>
-        <div class="col-2"></div>
     </div>
 </div>
 

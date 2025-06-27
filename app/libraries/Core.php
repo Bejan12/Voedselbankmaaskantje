@@ -1,4 +1,5 @@
 <?php
+
 /**
  * De Core class is de ruggegraat en meest belangrijke
  * class van het mvc-framework
@@ -49,8 +50,9 @@ class Core
 
         /**
          * Check of de method (tweede woord in de URL) bestaat in de controllerclass
+         * FIXED: Check first if $url[1] exists before trying to access it
          */
-        if (method_exists($this->currentController, $url[1])) {
+        if (isset($url[1]) && method_exists($this->currentController, $url[1])) {
 
             /**
              * Bewaar de naam van de method in $this->currentMethod

@@ -1,7 +1,7 @@
 <?php
 
 
-class Magazijnvoorraad
+class MagazijnvoorraadModel
 {
     private $db;
 
@@ -89,6 +89,56 @@ class Magazijnvoorraad
         } catch (Exception $e) {
             error_log("Fout bij ophalen gesorteerd voorraadoverzicht: " . $e->getMessage());
             return [];
+        }
+    }
+
+    /**
+     * Haalt alle producten op voor de dropdown
+     */
+    public function getAlleProducten()
+    {
+        try {
+            $this->db->query('
+                SELECT 
+                    p.ProductID,
+                    p.ProductNaam,
+                    p.EAN
+                FROM Product p
+                ORDER BY p.ProductNaam ASC
+            ');
+            
+            return $this->db->resultSet();
+        } catch (Exception $e) {
+            error_log("Fout bij ophalen alle producten: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Zoekt een product op basis van ProductID
+     */
+    public function zoekProductOpID($productId)
+    {
+        try {
+            $this->db->query('
+                SELECT 
+                    p.ProductID,
+                    p.ProductNaam,
+                    p.EAN,
+                    c.Naam AS Categorie,
+                    p.AantalInVoorraad,
+                    l.Bedrijfsnaam AS Leverancier
+                FROM Product p
+                JOIN Categorie c ON p.CategorieID = c.CategorieID
+                JOIN Leverancier l ON p.LeverancierID = l.LeverancierID
+                WHERE p.ProductID = :product_id
+            ');
+            
+            $this->db->bind(':product_id', $productId);
+            return $this->db->single();
+        } catch (Exception $e) {
+            error_log("Fout bij zoeken product op ID: " . $e->getMessage());
+            return null;
         }
     }
 }
