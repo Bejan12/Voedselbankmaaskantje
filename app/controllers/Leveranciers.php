@@ -11,14 +11,36 @@ class Leveranciers extends BaseController
 
     public function index()
     {
-        // Haal alle leveranciers op
-        $leveranciers = $this->leverancierModel->getAllLeveranciers();
+        try {
+            // Haal alle leveranciers op
+            $leveranciers = $this->leverancierModel->getAllLeveranciers();
 
-        $data = [
-            'title' => 'Overzicht Leveranciers',
-            'leveranciers' => $leveranciers
-        ];
+            if (empty($leveranciers)) {
+                // Geen leveranciers gevonden, toon error view
+                $data = [
+                    'title' => 'Geen Leveranciers',
+                    'error_message' => 'Er zijn nog geen leveranciers, probeer het later opnieuw!',
+                    'redirect_url' => URLROOT . '/homepages/index'
+                ];
+                $this->view('leveranciers/error', $data);
+                return;
+            }
 
-        $this->view('leveranciers/index', $data);
+            $data = [
+                'title' => 'Overzicht Leveranciers',
+                'leveranciers' => $leveranciers
+            ];
+
+            $this->view('leveranciers/index', $data);
+        } catch (Exception $e) {
+            // Database error occurred
+            $data = [
+                'title' => 'Database Error',
+                'error_message' => 'Er zijn nog geen leveranciers, probeer het later opnieuw!',
+                'redirect_url' => URLROOT . '/homepages/index'
+            ];
+
+            $this->view('leveranciers/error', $data);
+        }
     }
 }

@@ -27,11 +27,17 @@ if (session_status() === PHP_SESSION_NONE) {
             background-color: #14193B;
             padding: 0 30px;
             height: 80px;
+            position: relative;
         }
 
         .navbar img.logo {
-            height: 60px;
+            height: 220px;
             margin-right: 40px;
+            position: relative;
+            top: 70px;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 0 0 15px 15px;
         }
 
         .nav-link, .navbar-brand {

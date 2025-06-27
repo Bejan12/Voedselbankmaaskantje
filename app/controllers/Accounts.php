@@ -123,7 +123,10 @@ class Accounts extends BaseController
             if (empty($data['error'])) {
                 $user = $this->accountModel->findUserByEmail($data['email']);
                 
-                if ($user && password_verify($data['wachtwoord'], $user->WachtwoordHash)) {
+                // SHA-256 hash van het wachtwoord als binaire data
+                $inputHash = hash('sha256', $data['wachtwoord'], true);
+
+                if ($user && isset($user->WachtwoordHash) && $user->WachtwoordHash === $inputHash) {
                     // Login successful - don't call session_start() again
                     $_SESSION['user_id'] = $user->GebruikerID;
                     $_SESSION['username'] = $user->Gebruikersnaam;

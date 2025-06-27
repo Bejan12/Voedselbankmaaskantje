@@ -53,7 +53,8 @@ class AccountModel
             $persoonId = $result->id;
 
             // Hash the password
-            $hashedPassword = password_hash($data['wachtwoord'], PASSWORD_DEFAULT);
+            // $hashedPassword = password_hash($data['wachtwoord'], PASSWORD_DEFAULT);
+            $hashedPassword = hash('sha256', $data['wachtwoord'], true);
 
             // Insert into Gebruiker table
             $this->db->query('INSERT INTO Gebruiker (PersoonID, Gebruikersnaam, WachtwoordHash) 
