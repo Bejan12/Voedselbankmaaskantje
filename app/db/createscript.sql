@@ -1,410 +1,264 @@
-     -- Step: 01
-     -- ***************************************************************
-     -- Doel : Maak een nieuwe database aan met de naam Mvc_smartphone_2408A
-     -- ***************************************************************
-     -- Versie       Datum           Auteur              Omschrijving
-     -- ******       *****           ******              ************
-     -- 01           12-02-2025      Arjan de Ruijter    Smartphones
-     -- ***************************************************************
+-- DATABASE EN TABELSTRUCTUUR (MYSQL-VERSIE)
 
-     -- Verwijder database Mvc_smartphone_2408A
-     DROP DATABASE IF EXISTS `Mvc_smartphone_2408A`;
+-- Database aanmaken
+CREATE DATABASE IF NOT EXISTS VoedselbankDB;
+USE VoedselbankDB;
 
-     -- Maak een nieuwe database aan Mvc_smartphone_2408A
-     CREATE DATABASE `Mvc_smartphone_2408A`;
+-- Categorie
+CREATE TABLE Categorie (
+    CategorieID INT AUTO_INCREMENT PRIMARY KEY,
+    Naam VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci UNIQUE NOT NULL
+);
 
-     -- Gebruik database Mvc_smartphone_2408A
-     USE `Mvc_smartphone_2408A`;
+INSERT INTO Categorie (Naam) VALUES
+('Aardappelen, groente, fruit'),
+('Kaas, vleeswaren'),
+('Zuivel, plantaardig en eieren'),
+('Bakkerij en banket'),
+('Frisdrank, sappen, koffie en thee'),
+('Pasta, rijst en wereldkeuken'),
+('Soepen, sauzen, kruiden en olie'),
+('Snoep, koek, chips en chocolade'),
+('Baby, verzorging en hygiÃ«ne');
 
-     -- Step: 02
-     -- ***************************************************************
-     -- Doel : Maak een nieuwe tabel aan met de naam Smartphones
-     -- ***************************************************************
-     -- Versie       Datum           Auteur              Omschrijving
-     -- ******       *****           ******              ************
-     -- 01           12-02-2025      Arjan de Ruijter    Tabel Smartphones
-     -- ***************************************************************
-     -- Onderstaande velden toevoegen aan de tabel Smartphones
-     -- Merk, Model, Prijs, Geheugen, Besturingssysteem, Schermgrootte
-     -- Releasedatum, MegaPixels
-     -- ***************************************************************
+-- Persoon
+CREATE TABLE Persoon (
+    PersoonID INT AUTO_INCREMENT PRIMARY KEY,
+    Voornaam VARCHAR(50) NOT NULL,
+    Achternaam VARCHAR(50) NOT NULL,
+    Geboortedatum DATE,
+    Telefoon VARCHAR(20),
+    Email VARCHAR(100),
+    Adres VARCHAR(200)
+);
 
-     CREATE TABLE Smartphones
-     (
-          Id                 SMALLINT             UNSIGNED    NOT NULL        AUTO_INCREMENT
-          ,Merk              VARCHAR(50)                      NOT NULL
-          ,Model             VARCHAR(50)                      NOT NULL
-          ,Prijs             DECIMAL(6,2)                     NOT NULL    
-          ,Geheugen          DECIMAL(4,0)                     NOT NULL
-          ,Besturingssysteem VARCHAR(25)			  	  NOT NULL
-          ,Schermgrootte	    DECIMAL(2,1)				  NOT NULL
-          ,Releasedatum	    DATE 						  NOT NULL
-          ,MegaPixels	    TINYINT			UNSIGNED	  NOT NULL
-          ,Gewicht           DECIMAL(3,0)			       NOT NULL
-          ,IsActief          BIT                              NOT NULL        DEFAULT 1
-          ,Opmerking         VARCHAR(255)                         NULL        DEFAULT NULL
-          ,DatumAangemaakt   DATETIME(6)                      NOT NULL
-          ,DatumGewijzigd    DATETIME(6)                      NOT NULL
-          ,CONSTRAINT        PK_Smartphones_Id    PRIMARY KEY     CLUSTERED(Id)
-     ) ENGINE=InnoDB;
+-- Gebruiker
+CREATE TABLE Gebruiker (
+    GebruikerID INT AUTO_INCREMENT PRIMARY KEY,
+    PersoonID INT NOT NULL,
+    Gebruikersnaam VARCHAR(50) UNIQUE NOT NULL,
+    WachtwoordHash VARBINARY(64) NOT NULL,
+    IsGeblokkeerd BOOLEAN DEFAULT 0,
+    FOREIGN KEY (PersoonID) REFERENCES Persoon(PersoonID)
+);
 
-     -- Step: 03
-     -- ***************************************************************
-     -- Doel : Vul de tabel Smartphones met gegevens
-     -- ***************************************************************
-     -- Versie       Datum           Auteur              Omschrijving
-     -- ******       *****           ******              ************
-     -- 01           12-02-2025      Arjan de Ruijter    Vulling Smartphones
-     -- ***************************************************************
+-- Rol
+CREATE TABLE Rol (
+    RolID INT AUTO_INCREMENT PRIMARY KEY,
+    Naam VARCHAR(50) UNIQUE NOT NULL
+);
 
-     INSERT INTO Smartphones
-     (
-          Merk
-          ,Model
-          ,Prijs
-          ,Geheugen
-          ,Besturingssysteem
-          ,Schermgrootte
-          ,Releasedatum
-          ,MegaPixels
-          ,Gewicht
-          ,IsActief
-          ,Opmerking
-          ,DatumAangemaakt
-          ,DatumGewijzigd
-     )
-     VALUES
-     ('Apple', 'iPhone 16 Pro', 1358.99, 64, 'iOS 18', 6.9, '2025-01-10', 50, 234, 1, NULL, SYSDATE(6), SYSDATE(6)),
-     ('Samsung', 'Galaxy S25 Ultra', 1639, 512, 'Android 15', 7.2,  '2024-11-23', 100, 219, 1, NULL, SYSDATE(6), SYSDATE(6)),
-     ('Google', 'Pixel 9 Pro', 856, 1024, 'Android 15', 7.0, '2025-02-12', 200, 345, 1, NULL, SYSDATE(6), SYSDATE(6));
+-- GebruikerRol (many-to-many)
+CREATE TABLE GebruikerRol (
+    GebruikerID INT NOT NULL,
+    RolID INT NOT NULL,
+    PRIMARY KEY (GebruikerID, RolID),
+    FOREIGN KEY (GebruikerID) REFERENCES Gebruiker(GebruikerID),
+    FOREIGN KEY (RolID) REFERENCES Rol(RolID)
+);
 
+-- Leverancier
+CREATE TABLE Leverancier (
+    LeverancierID INT AUTO_INCREMENT PRIMARY KEY,
+    GebruikerID INT NOT NULL,
+    Bedrijfsnaam VARCHAR(100) NOT NULL,
+    Adres VARCHAR(200),
+    ContactNaam VARCHAR(100),
+    ContactEmail VARCHAR(100),
+    ContactTelefoon VARCHAR(20),
+    EerstvolgendeLevering DATETIME,
+    FOREIGN KEY (GebruikerID) REFERENCES Gebruiker(GebruikerID)
+);
 
+-- Allergie
+CREATE TABLE Allergie (
+    AllergieID INT AUTO_INCREMENT PRIMARY KEY,
+    Naam VARCHAR(50) UNIQUE NOT NULL
+);
 
-     -- Step: 04
-     -- *****************************************************************************************************
-     -- Doel : Maak een nieuwe tabel aan met de naam Sneakers
-     -- *****************************************************************************************************
-     -- Versie       Datum           Auteur              Omschrijving
-     -- ******       *****           ******              ************
-     -- 01           18-02-2025      Arjan de Ruijter    Tabel Sneakers
-     -- *****************************************************************************************************
-     -- Onderstaande velden toevoegen aan de tabel Sneakers
-     -- Type (Hardloop, Basketbal, Casual), Prijs, Materiaal (Leer, Mesh, Synthetisch), Gewicht, Releasedatum
-     -- *****************************************************************************************************
+-- Product
+CREATE TABLE Product (
+    ProductID INT AUTO_INCREMENT PRIMARY KEY,
+    LeverancierID INT NOT NULL,
+    AllergieID INT,
+    CategorieID INT NOT NULL,
+    ProductNaam VARCHAR(100) UNIQUE NOT NULL,
+    EAN CHAR(13) UNIQUE NOT NULL,
+    AantalInVoorraad INT NOT NULL CHECK (AantalInVoorraad >= 0),
+    FOREIGN KEY (LeverancierID) REFERENCES Leverancier(LeverancierID),
+    FOREIGN KEY (AllergieID) REFERENCES Allergie(AllergieID),
+    FOREIGN KEY (CategorieID) REFERENCES Categorie(CategorieID)
+);
 
-     CREATE TABLE Sneakers
-     (
-          Id                 SMALLINT        UNSIGNED    NOT NULL        AUTO_INCREMENT
-     ,Merk               VARCHAR(50)                 NOT NULL
-     ,Model              VARCHAR(50)                 NOT NULL	
-     ,IsActief           BIT                         NOT NULL        DEFAULT 1
-     ,Opmerking          VARCHAR(255)                    NULL        DEFAULT NULL
-     ,DatumAangemaakt    DATETIME(6)                 NOT NULL
-     ,DatumGewijzigd     DATETIME(6)                 NOT NULL
-     ,CONSTRAINT         PK_Smartphones_Id    PRIMARY KEY     CLUSTERED(Id)
-     ) ENGINE=InnoDB;
+-- ProductLeverancier (optioneel)
+CREATE TABLE ProductLeverancier (
+    ProductID INT NOT NULL,
+    LeverancierID INT NOT NULL,
+    PRIMARY KEY (ProductID, LeverancierID),
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
+    FOREIGN KEY (LeverancierID) REFERENCES Leverancier(LeverancierID)
+);
 
+-- Werknemer
+CREATE TABLE Werknemer (
+    WerknemerID INT AUTO_INCREMENT PRIMARY KEY,
+    GebruikerID INT NOT NULL,
+    FOREIGN KEY (GebruikerID) REFERENCES Gebruiker(GebruikerID)
+);
 
-     -- Step: 05
-     -- *****************************************************************
-     -- Doel : Vul de tabel Sneakers met gegevens
-     -- *****************************************************************
-     -- Versie       Datum           Auteur              Omschrijving
-     -- ******       *****           ******              ************
-     -- 01           18-02-2025      Arjan de Ruijter    Vulling Sneakers
-     -- *****************************************************************
+-- Contact
+CREATE TABLE Contact (
+    ContactID INT AUTO_INCREMENT PRIMARY KEY,
+    GebruikerID INT NOT NULL,
+    Telefoon VARCHAR(20),
+    Email VARCHAR(100),
+    FOREIGN KEY (GebruikerID) REFERENCES Gebruiker(GebruikerID)
+);
 
-     INSERT INTO Sneakers
-     (
-          Merk
-          ,Model
-          ,IsActief
-          ,Opmerking
-          ,DatumAangemaakt
-          ,DatumGewijzigd
-     )
-     VALUES
-     ('Nike', 'Air Jordan 1', 1, NULL, SYSDATE(6), SYSDATE(6)),
-     ('Adidas', 'Yeezy Boost 350', 1, NULL, SYSDATE(6), SYSDATE(6)),
-     ('New Balance', 'Pixel 9 Pro', 1, NULL, SYSDATE(6), SYSDATE(6));
+-- Klant
+CREATE TABLE Klant (
+    KlantID INT AUTO_INCREMENT PRIMARY KEY,
+    GebruikerID INT NOT NULL,
+    AantalVolwassenen INT NOT NULL CHECK (AantalVolwassenen >= 0),
+    AantalKinderen INT NOT NULL CHECK (AantalKinderen >= 0),
+    AantalBabys INT NOT NULL CHECK (AantalBabys >= 0),
+    GeenVarkensvlees BOOLEAN DEFAULT 0,
+    Veganistisch BOOLEAN DEFAULT 0,
+    Vegetarisch BOOLEAN DEFAULT 0,
+    FOREIGN KEY (GebruikerID) REFERENCES Gebruiker(GebruikerID)
+);
 
+-- Familie
+CREATE TABLE Familie (
+    KlantID INT NOT NULL,
+    FamilielidID INT NOT NULL,
+    PRIMARY KEY (KlantID, FamilielidID),
+    FOREIGN KEY (KlantID) REFERENCES Klant(KlantID),
+    FOREIGN KEY (FamilielidID) REFERENCES Klant(KlantID)
+);
 
+-- ProductAllergie
+CREATE TABLE ProductAllergie (
+    ProductID INT NOT NULL,
+    AllergieID INT NOT NULL,
+    PRIMARY KEY (ProductID, AllergieID),
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
+    FOREIGN KEY (AllergieID) REFERENCES Allergie(AllergieID)
+);
 
+-- Voedselpakket
+CREATE TABLE Voedselpakket (
+    VoedselpakketID INT AUTO_INCREMENT PRIMARY KEY,
+    KlantID INT NOT NULL,
+    DatumSamenstelling DATE NOT NULL,
+    DatumUitgifte DATE,
+    FOREIGN KEY (KlantID) REFERENCES Klant(KlantID)
+);
 
-     -- Step: 06
-     -- *****************************************************************************************************
-     -- Doel : Maak een nieuwe tabel aan met de naam Horloges
-     -- *****************************************************************************************************
-     -- Versie       Datum           Auteur              Omschrijving
-     -- ******       *****           ******              ************
-     -- 01           11-03-2025      Arjan de Ruijter    Tabel Horloges
-     -- *****************************************************************************************************
-     -- Onderstaande velden toevoegen aan de tabel Horloges
-     -- Materiaal (Goud, Diamant, RVS), Gewicht, Releasedatum, Waterdichtheid(m), Type (Analoog, Digitaal), Uniek kenmerk
-     -- *****************************************************************************************************
+-- VoedselpakketProduct
+CREATE TABLE VoedselpakketProduct (
+    VoedselpakketID INT NOT NULL,
+    ProductID INT NOT NULL,
+    Aantal INT NOT NULL CHECK (Aantal > 0),
+    PRIMARY KEY (VoedselpakketID, ProductID),
+    FOREIGN KEY (VoedselpakketID) REFERENCES Voedselpakket(VoedselpakketID),
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
+);
 
-     CREATE TABLE Horloges
-     (
-          Id                 SMALLINT        UNSIGNED    NOT NULL        AUTO_INCREMENT
-     ,Merk               VARCHAR(50)                 NOT NULL
-     ,Model              VARCHAR(50)                 NOT NULL
-     ,Prijs              DECIMAL(6,0)                NOT NULL	
-     ,IsActief           BIT                         NOT NULL        DEFAULT 1
-     ,Opmerking          VARCHAR(255)                    NULL        DEFAULT NULL
-     ,DatumAangemaakt    DATETIME(6)                 NOT NULL
-     ,DatumGewijzigd     DATETIME(6)                 NOT NULL
-     ,CONSTRAINT         PK_Horloges_Id    PRIMARY KEY     CLUSTERED(Id)
-     ) ENGINE=InnoDB;
+-- Voedselopslag
+CREATE TABLE Voedselopslag (
+    ProductID INT PRIMARY KEY,
+    AantalInMagazijn INT NOT NULL CHECK (AantalInMagazijn >= 0),
+    LaatsteAanleverDatum DATE,
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
+);
 
-     -- Step: 07
-     -- *****************************************************************
-     -- Doel : Vul de tabel Horloges met gegevens
-     -- *****************************************************************
-     -- Versie       Datum           Auteur              Omschrijving
-     -- ******       *****           ******              ************
-     -- 01           11-3-2025      Arjan de Ruijter    Vulling Horloges
-     -- *****************************************************************
+-- KlantAllergie
+CREATE TABLE KlantAllergie (
+    KlantID INT NOT NULL,
+    AllergieID INT NOT NULL,
+    PRIMARY KEY (KlantID, AllergieID),
+    FOREIGN KEY (KlantID) REFERENCES Klant(KlantID),
+    FOREIGN KEY (AllergieID) REFERENCES Allergie(AllergieID)
+);
 
-     INSERT INTO Horloges
-     (
-          Merk
-          ,Model
-          ,Prijs
-          ,IsActief
-          ,Opmerking
-          ,DatumAangemaakt
-          ,DatumGewijzigd
-     )
-     VALUES
-     ('Rolex', 'Daytona 126500LN', 19800, 1, NULL, SYSDATE(6), SYSDATE(6)),
-     ('Omega', 'Speedmaster Moonwatch Professional', 8500, 1, NULL, SYSDATE(6), SYSDATE(6)),
-     ('Vacheron Constantin', 'Overseas Perpetual Calendar Ultra-Thin', 98000, 1, NULL, SYSDATE(6), SYSDATE(6)),
-     ('Jaeger-LeCoultre', 'Reverso Tribute Duoface', 17000, 1, NULL, SYSDATE(6), SYSDATE(6));
+-- Rollen vullen
+INSERT INTO Rol (Naam) VALUES ('Directie'), ('Magazijnmedewerker'), ('Vrijwilliger');
 
+-- Indexen
+CREATE INDEX IDX_Product_EAN ON Product(EAN);
+CREATE INDEX IDX_Voedselpakket_KlantID ON Voedselpakket(KlantID);
+CREATE INDEX IDX_Klant_GebruikerID ON Klant(GebruikerID);
 
+-- Stored procedure: VoegProductToe
+DELIMITER //
+CREATE PROCEDURE VoegProductToe (
+    IN p_LeverancierID INT,
+    IN p_AllergieID INT,
+    IN p_CategorieID INT,
+    IN p_ProductNaam VARCHAR(100),
+    IN p_EAN CHAR(13),
+    IN p_AantalInVoorraad INT
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Fout bij toevoegen product';
+    END;
 
+    INSERT INTO Product (LeverancierID, AllergieID, CategorieID, ProductNaam, EAN, AantalInVoorraad)
+    VALUES (p_LeverancierID, p_AllergieID, p_CategorieID, p_ProductNaam, p_EAN, p_AantalInVoorraad);
+END;//
+DELIMITER ;
 
+-- Stored procedure: UpdateVoorraadNaPakket
+DELIMITER //
+CREATE PROCEDURE UpdateVoorraadNaPakket (
+    IN p_ProductID INT,
+    IN p_AantalGebruikt INT
+)
+BEGIN
+    DECLARE v_HuidigeVoorraad INT;
 
-     
-     -- Step: 08
-     -- *****************************************************************************************************
-     -- Doel : Maak een nieuwe tabel aan met de naam Torens
-     -- *****************************************************************************************************
-     -- Versie       Datum           Auteur              Omschrijving
-     -- ******       *****           ******              ************
-     -- 01           11-03-2025      Arjan de Ruijter    Tabel Torens
-     -- *****************************************************************************************************
-     -- Onderstaande velden zelf toevoegen aan de tabel Torens
-     -- Kosten, liftsnelheid, Obeservatiedek hoogte
-     -- *****************************************************************************************************
+    START TRANSACTION;
 
-     CREATE TABLE Torens
-     (
-          Id                 SMALLINT        UNSIGNED    NOT NULL        AUTO_INCREMENT
-     ,Naam               VARCHAR(50)                 NOT NULL
-     ,Locatie            VARCHAR(50)                 NOT NULL
-     ,Hoogte             DECIMAL(6,0)                NOT NULL
-     ,AantalVerdiepingen DECIMAL(4,0)                NOT NULL
-     ,JaarVoltooid       YEAR                        NOT NULL	
-     ,IsActief           BIT                         NOT NULL        DEFAULT 1
-     ,Opmerking          VARCHAR(255)                    NULL        DEFAULT NULL
-     ,DatumAangemaakt    DATETIME(6)                 NOT NULL
-     ,DatumGewijzigd     DATETIME(6)                 NOT NULL
-     ,CONSTRAINT         PK_Torens_Id    PRIMARY KEY     CLUSTERED(Id)
-     ) ENGINE=InnoDB;
+    SELECT AantalInVoorraad INTO v_HuidigeVoorraad
+    FROM Product WHERE ProductID = p_ProductID;
 
-     -- Step: 09
-     -- *****************************************************************
-     -- Doel : Vul de tabel Torens met gegevens
-     -- *****************************************************************
-     -- Versie       Datum           Auteur              Omschrijving
-     -- ******       *****           ******              ************
-     -- 01           11-3-2025      Arjan de Ruijter    Vulling Torens
-     -- *****************************************************************
+    IF v_HuidigeVoorraad IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Product niet gevonden';
+    END IF;
 
-     INSERT INTO Torens
-     (
-          Naam
-          ,Locatie
-          ,Hoogte
-          ,AantalVerdiepingen
-          ,JaarVoltooid
-          ,IsActief
-          ,Opmerking
-          ,DatumAangemaakt
-          ,DatumGewijzigd
-     )
-     VALUES
-     ('Burj Khalifa', 'Dubai, VAE', 828, 163, 2010, 1, NULL, SYSDATE(6), SYSDATE(6)),
-     ('Merdeka 118', 'Kuala Lumpur, Maleisië', 679, 118, 2023, 1, NULL, SYSDATE(6), SYSDATE(6)),
-     ('Shanghai Tower', 'Shanghai, China', 632, 128, 2015, 1, NULL, SYSDATE(6), SYSDATE(6)),
-     ('Abraj Al Bait Clock Tower', 'Mekka, Saoedi-Arabië', 601, 120, 2012, 1, NULL, SYSDATE(6), SYSDATE(6));
+    IF v_HuidigeVoorraad < p_AantalGebruikt THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Onvoldoende voorraad';
+    END IF;
 
+    UPDATE Product
+    SET AantalInVoorraad = AantalInVoorraad - p_AantalGebruikt
+    WHERE ProductID = p_ProductID;
 
+    UPDATE Voedselopslag
+    SET AantalInMagazijn = AantalInMagazijn - p_AantalGebruikt
+    WHERE ProductID = p_ProductID;
 
-     -- Step: 10
-     -- *****************************************************************************************************
-     -- Doel : Maak een nieuwe tabel aan met de naam Speakers
-     -- *****************************************************************************************************
-     -- Versie       Datum           Auteur              Omschrijving
-     -- ******       *****           ******              ************
-     -- 01           11-03-2025      Arjan de Ruijter    Tabel Speakers
-     -- *****************************************************************************************************
-     -- Onderstaande velden zelf toevoegen aan de tabel Speakers
-     -- frequentiebereik, Powerbankfunctie, Snelladen
-     -- *****************************************************************************************************
+    COMMIT;
+END;//
+DELIMITER ;
 
-     CREATE TABLE Speakers
-     (
-          Id                 SMALLINT        UNSIGNED    NOT NULL        AUTO_INCREMENT
-     ,Naam               VARCHAR(50)                 NOT NULL
-     ,Batterijduur       TINYINT         UNSIGNED    NOT NULL
-     ,Waterbestendigheid VARCHAR(50 )                NOT NULL
-     ,Connectiviteit     VARCHAR(30)                 NOT NULL
-     ,IsActief           BIT                         NOT NULL        DEFAULT 1
-     ,Opmerking          VARCHAR(255)                    NULL        DEFAULT NULL
-     ,DatumAangemaakt    DATETIME(6)                 NOT NULL
-     ,DatumGewijzigd     DATETIME(6)                 NOT NULL
-     ,CONSTRAINT         PK_Speakers_Id              PRIMARY KEY     CLUSTERED(Id)
-     ) ENGINE=InnoDB;
-
-     -- Step: 11
-     -- *****************************************************************
-     -- Doel : Vul de tabel Speakers met gegevens
-     -- *****************************************************************
-     -- Versie       Datum           Auteur              Omschrijving
-     -- ******       *****           ******              ************
-     -- 01           11-3-2025      Arjan de Ruijter     Vulling Speakers
-     -- *****************************************************************
-
-     INSERT INTO Speakers
-     (
-          Naam
-          ,Batterijduur
-          ,Waterbestendigheid
-          ,Connectiviteit
-          ,IsActief
-          ,Opmerking
-          ,DatumAangemaakt
-          ,DatumGewijzigd
-     )
-     VALUES
-     ('JBL Charge 5', 20,'IP67 (stof- en waterdicht)', 'Bluetooth 5.1', 1, NULL, SYSDATE(6), SYSDATE(6)),
-     ('Bose SoundLink Flex', 12, 'IP67 (water- en stofdicht)', 'Bluetooth 4.2', 1, NULL, SYSDATE(6), SYSDATE(6)),
-     ('Sony SRS-XB43', 24, 'IP67 (water-, stof- en roestbestendig)', 'Bluetooth 5.0, NFC', 1, NULL, SYSDATE(6), SYSDATE(6)),
-     ('Ultimate Ears (UE) Boom 3', 15, 'IP67 (waterdicht en drijvend!)', 'Bluetooth 5.0', 1, NULL, SYSDATE(6), SYSDATE(6));
-
-
-
-
-     -- Step: 12
-     -- *****************************************************************************************************
-     -- Doel : Maak een nieuwe tabel aan met de naam Zangeres
-     -- *****************************************************************************************************
-     -- Versie       Datum           Auteur              Omschrijving
-     -- ******       *****           ******              ************
-     -- 01           18-03-2025      Arjan de Ruijter    Tabel Zangeres
-     -- *****************************************************************************************************
-     -- Onderstaande velden zelf toevoegen aan de tabel Zangeres
-     -- *****************************************************************************************************
-
-     CREATE TABLE Zangeres
-     (
-          Id                 SMALLINT        UNSIGNED    NOT NULL        AUTO_INCREMENT
-     ,Naam               VARCHAR(25)                 NOT NULL
-     ,Nettowaarde        SMALLINT        UNSIGNED    NOT NULL
-     ,Land               VARCHAR(50 )                NOT NULL
-     ,Mobiel             VARCHAR(30)                 NOT NULL
-     ,Leeftijd           TINYINT         UNSIGNED    NOT NULL
-     ,IsActief           BIT                         NOT NULL        DEFAULT 1
-     ,Opmerking          VARCHAR(255)                    NULL        DEFAULT NULL
-     ,DatumAangemaakt    DATETIME(6)                 NOT NULL
-     ,DatumGewijzigd     DATETIME(6)                 NOT NULL
-     ,CONSTRAINT         PK_Zangeres_Id              PRIMARY KEY     CLUSTERED(Id)
-     ) ENGINE=InnoDB;
-
-     -- Step: 13
-     -- *****************************************************************
-     -- Doel : Vul de tabel Zangeres met gegevens
-     -- *****************************************************************
-     -- Versie       Datum           Auteur              Omschrijving
-     -- ******       *****           ******              ************
-     -- 01           18-3-2025      Arjan de Ruijter     Vulling Zangeres
-     -- *****************************************************************
-
-     INSERT INTO Zangeres
-     (
-          Naam
-          ,Nettowaarde
-          ,Land
-          ,Mobiel
-          ,Leeftijd
-          ,IsActief
-          ,Opmerking
-          ,DatumAangemaakt
-          ,DatumGewijzigd
-     )
-     VALUES
-     ('Rihanna', 1400,'Barbados', '+1246 2400 1862400', 36, 1, NULL, SYSDATE(6), SYSDATE(6))
-     ,('Madonna', 575,'Verenigde Staten', '+13425 182345', 65, 1, NULL, SYSDATE(6), SYSDATE(6))
-     ,('Taylor Swift', 570,'Verenigde Staten', '+13421 231356', 34, 1, NULL, SYSDATE(6), SYSDATE(6))
-     ,('Beyoncé', 420,'Verenigde Staten', '+18723 213481', 41, 1, NULL, SYSDATE(6), SYSDATE(6))
-     ,('Jennifer Lopez', 400,'Verenigde Staten', '+16254 751243', 54, 1, NULL, SYSDATE(6), SYSDATE(6));
-
-
-     
-     -- Step: 14
-     -- *****************************************************************************************************
-     -- Doel : Maak een nieuwe tabel aan met de naam Ufc
-     -- *****************************************************************************************************
-     -- Versie       Datum           Auteur              Omschrijving
-     -- ******       *****           ******              ************
-     -- 01           26-03-2025      Arjan de Ruijter    Tabel Ufc
-     -- *****************************************************************************************************
-     -- Onderstaande velden zelf toevoegen aan de tabel Ufc
-     -- *****************************************************************************************************
-
-     CREATE TABLE Ufc
-     (
-          Id                 SMALLINT        UNSIGNED       NOT NULL        AUTO_INCREMENT
-     ,Naam               VARCHAR(250)                   NOT NULL
-     ,RanglijstNummer    INT             UNSIGNED       NOT NULL
-     ,Lengte             DECIMAL(6,2)    UNSIGNED       NOT NULL
-     ,Gewicht            INT             UNSIGNED       NOT NULL
-     ,Leeftijd           INT             UNSIGNED       NOT NULL
-     ,WinstDoorKnockout  INT             UNSIGNED       NOT NULL
-     ,IsActief           BIT                            NOT NULL        DEFAULT 1
-     ,Opmerking          VARCHAR(255)                       NULL        DEFAULT NULL
-     ,DatumAangemaakt    DATETIME(6)                    NOT NULL
-     ,DatumGewijzigd     DATETIME(6)                    NOT NULL
-     ,CONSTRAINT         PK_Ufc_Id       PRIMARY KEY    CLUSTERED(Id)
-     ) ENGINE=InnoDB;
-
-     -- Step: 15
-     -- *****************************************************************
-     -- Doel : Vul de tabel Ufc met gegevens
-     -- *****************************************************************
-     -- Versie       Datum           Auteur              Omschrijving
-     -- ******       *****           ******              ************
-     -- 01           26-3-2025      Arjan de Ruijter     Vulling Ufc
-     -- *****************************************************************
-
-     INSERT INTO Ufc
-     (
-          Naam
-          ,RanglijstNummer
-          ,Lengte
-          ,Gewicht
-          ,Leeftijd
-          ,WinstDoorKnockout
-          ,IsActief
-          ,Opmerking
-          ,DatumAangemaakt
-          ,DatumGewijzigd
-     )
-     VALUES
-     ('Islam Makhachev', 3, 1.78, 70, 32, 5, 1, NULL, SYSDATE(6), SYSDATE(6))
-     ,('Jon Jones', 1, 1.93, 112, 36, 11, 1, NULL, SYSDATE(6), SYSDATE(6))
-     ,('Israel Adesanya', 5, 1.93, 84, 34, 16, 1, NULL, SYSDATE(6), SYSDATE(6))
-     ,('Alexander Volkanovski', 2, 1.68, 66, 35, 13, 1, NULL, SYSDATE(6), SYSDATE(6))
-     ,('Leon Edwards', 4, 1.83, 77, 32, 8, 1, NULL, SYSDATE(6), SYSDATE(6));
+-- Stored procedure: GetProductVoorraadOverzicht
+DELIMITER //
+CREATE PROCEDURE GetProductVoorraadOverzicht()
+BEGIN
+    SELECT 
+        p.ProductID,
+        p.ProductNaam,
+        p.EAN,
+        c.Naam AS Categorie,
+        p.AantalInVoorraad,
+        l.Bedrijfsnaam AS Leverancier
+    FROM Product p
+    JOIN Categorie c ON p.CategorieID = c.CategorieID
+    JOIN Leverancier l ON p.LeverancierID = l.LeverancierID
+    ORDER BY c.Naam, p.ProductNaam;
+END;//
+DELIMITER ;
