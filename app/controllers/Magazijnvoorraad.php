@@ -426,4 +426,183 @@ class Magazijnvoorraad extends BaseController
             }
         }
     }
+
+ 
+    public function wijzigProduct($productId = null)
+    {
+        if (!$productId) {
+            header('Location: ' . URLROOT . '/magazijnvoorraad');
+            exit;
+        }
+
+        try {
+            // Haal product gegevens op
+            $product = $this->magazijnvoorraadModel->getProductVoorWijziging($productId);
+            
+            if (!$product) {
+                header('Location: ' . URLROOT . '/magazijnvoorraad?error=' . urlencode('Product niet gevonden'));
+                exit;
+            }
+
+            // Haal alle categorieën, leveranciers en allergieën op
+            $categorieën = $this->magazijnvoorraadModel->getAlleCategorieën();
+            $leveranciers = $this->magazijnvoorraadModel->getAlleLeveranciers();
+            $allergieën = $this->magazijnvoorraadModel->getAlleAllergieën();
+
+            $data = [
+                'title' => 'Product Wijzigen',
+                'product' => $product,
+                'categorieën' => $categorieën,
+                'leveranciers' => $leveranciers,
+                'allergieën' => $allergieën
+            ];
+
+            $this->view('magazijnvoorraad/wijzigproduct', $data);
+
+        } catch (Exception $e) {
+            header('Location: ' . URLROOT . '/magazijnvoorraad?error=' . urlencode('Fout bij laden product: ' . $e->getMessage()));
+            exit;
+        }
+    }
+
+    public function updateProduct()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            // Valideer en sanitize input
+            $productId = (int) ($_POST['product_id'] ?? 0);
+            $productnaam = trim($_POST['productnaam'] ?? '');
+            $categorie_id = (int) ($_POST['categorie_id'] ?? 0);
+            $leverancier_id = (int) ($_POST['leverancier_id'] ?? 0);
+            $aantal_voorraad = (int) ($_POST['aantal_voorraad'] ?? 0);
+            
+            // Fix allergie_id handling - lege string wordt null
+            $allergie_id = null;
+            if (isset($_POST['allergie_id']) && $_POST['allergie_id'] !== '' && $_POST['allergie_id'] !== '0') {
+                $allergie_id = (int) $_POST['allergie_id'];
+            }
+
+            // Haal originele product op voor fallback
+            $originalProduct = $this->magazijnvoorraadModel->getProductVoorWijziging($productId);
+            if (!$originalProduct) {
+                header('Location: ' . URLROOT . '/magazijnvoorraad?error=' . urlencode('Product niet gevonden'));
+                exit;
+            }
+
+            // Bewaar formulierdata voor bij fout
+            $formData = [
+                'productnaam' => $productnaam,
+                'categorie_id' => $categorie_id,
+                'leverancier_id' => $leverancier_id,
+                'aantal_voorraad' => $aantal_voorraad,
+                'allergie_id' => $allergie_id
+            ];
+
+            // Validatie
+            $errors = [];
+
+            if ($productId <= 0) {
+                $errors[] = 'Ongeldig product ID';
+            }
+
+            if (empty($productnaam)) {
+                $errors[] = 'Productnaam is verplicht';
+            }
+
+            if ($categorie_id <= 0) {
+                $errors[] = 'Categorie is verplicht';
+            }
+
+            if ($leverancier_id <= 0) {
+                $errors[] = 'Leverancier is verplicht';
+            }
+
+            if ($aantal_voorraad < 0) {
+                $errors[] = 'Aantal in voorraad kan niet negatief zijn';
+            }
+
+            // Slimme categorie validatie (alleen als productnaam is gewijzigd)
+            if ($categorie_id > 0 && !empty($productnaam) && $productnaam !== $originalProduct->ProductNaam) {
+                $categorieValidatie = $this->validateProductCategory($productnaam, $categorie_id);
+                if (!$categorieValidatie['isValid']) {
+                    $errors[] = $categorieValidatie['message'];
+                }
+            }
+
+            // Als er validatiefouten zijn
+            if (!empty($errors)) {
+                $data = [
+                    'title' => 'Product Wijzigen',
+                    'product' => $originalProduct,
+                    'categorieën' => $this->magazijnvoorraadModel->getAlleCategorieën(),
+                    'leveranciers' => $this->magazijnvoorraadModel->getAlleLeveranciers(),
+                    'allergieën' => $this->magazijnvoorraadModel->getAlleAllergieën(),
+                    'formData' => $formData,
+                    'error' => implode('<br>', $errors)
+                ];
+
+                $this->view('magazijnvoorraad/wijzigproduct', $data);
+                return;
+            }
+
+            try {
+                // Controleer of productnaam al bestaat voor ander product
+                if ($this->magazijnvoorraadModel->productnaamBestaatVoorAnderProduct($productnaam, $productId)) {
+                    $data = [
+                        'title' => 'Product Wijzigen',
+                        'product' => $originalProduct,
+                        'categorieën' => $this->magazijnvoorraadModel->getAlleCategorieën(),
+                        'leveranciers' => $this->magazijnvoorraadModel->getAlleLeveranciers(),
+                        'allergieën' => $this->magazijnvoorraadModel->getAlleAllergieën(),
+                        'formData' => $formData,
+                        'error' => 'Product niet succesvol gewijzigd: Er bestaat al een product met deze naam'
+                    ];
+
+                    $this->view('magazijnvoorraad/wijzigproduct', $data);
+                    return;
+                }
+
+                // Debug logging
+                error_log("Controller: Wijzigen product ID $productId - Naam: $productnaam, Cat: $categorie_id, Lev: $leverancier_id, All: " . ($allergie_id ?? 'NULL') . ", Voorr: $aantal_voorraad");
+
+                // Wijzig product
+                $success = $this->magazijnvoorraadModel->wijzigProduct(
+                    $productId,
+                    $leverancier_id, 
+                    $allergie_id, 
+                    $categorie_id, 
+                    $productnaam, 
+                    $aantal_voorraad
+                );
+
+                if ($success) {
+                    // Redirect naar overzicht met succesbericht
+                    header('Location: ' . URLROOT . '/magazijnvoorraad?success=' . urlencode('Product "' . $productnaam . '" succesvol gewijzigd'));
+                    exit;
+                } else {
+                    throw new Exception('Product kon niet worden gewijzigd in de database');
+                }
+
+            } catch (Exception $e) {
+                error_log("Controller error bij wijzigen product: " . $e->getMessage());
+                
+                $data = [
+                    'title' => 'Product Wijzigen',
+                    'product' => $originalProduct,
+                    'categorieën' => $this->magazijnvoorraadModel->getAlleCategorieën(),
+                    'leveranciers' => $this->magazijnvoorraadModel->getAlleLeveranciers(),
+                    'allergieën' => $this->magazijnvoorraadModel->getAlleAllergieën(),
+                    'formData' => $formData,
+                    'error' => 'Product niet succesvol gewijzigd: ' . $e->getMessage()
+                ];
+
+                $this->view('magazijnvoorraad/wijzigproduct', $data);
+            }
+        } else {
+            // Redirect als niet POST
+            header('Location: ' . URLROOT . '/magazijnvoorraad');
+            exit;
+        }
+    }
+
+
 }

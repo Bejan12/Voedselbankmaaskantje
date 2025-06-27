@@ -350,4 +350,142 @@ class MagazijnvoorraadModel
         
         return $ean12 . $checkDigit;
     }
+
+    /**
+     * Haalt een product op voor wijziging (met alle details)
+     */
+    public function getProductVoorWijziging($productId)
+    {
+        try {
+            $this->db->query('
+                SELECT 
+                    p.ProductID,
+                    p.ProductNaam,
+                    p.EAN,
+                    p.CategorieID,
+                    p.LeverancierID,
+                    p.AllergieID,
+                    p.AantalInVoorraad,
+                    c.Naam AS Categorie,
+                    l.Bedrijfsnaam AS Leverancier,
+                    a.Naam AS Allergie
+                FROM Product p
+                JOIN Categorie c ON p.CategorieID = c.CategorieID
+                JOIN Leverancier l ON p.LeverancierID = l.LeverancierID
+                LEFT JOIN Allergie a ON p.AllergieID = a.AllergieID
+                WHERE p.ProductID = :product_id
+            ');
+            
+            $this->db->bind(':product_id', $productId);
+            return $this->db->single();
+        } catch (Exception $e) {
+            error_log("Fout bij ophalen product voor wijziging: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Wijzigt een bestaand product
+     */
+    public function wijzigProduct($productId, $leverancier_id, $allergie_id, $categorie_id, $productnaam, $aantal_voorraad)
+    {
+        try {
+            // Als allergie_id null is, zet het naar NULL voor de database
+            if ($allergie_id === 0 || $allergie_id === '0') {
+                $allergie_id = null;
+            }
+            
+            // Debug logging
+            error_log("Wijzigen product ID $productId: Leverancier=$leverancier_id, Allergie=$allergie_id, Categorie=$categorie_id, Naam=$productnaam, Voorraad=$aantal_voorraad");
+            
+            // Update product (EAN blijft hetzelfde)
+            $this->db->query('
+                UPDATE Product 
+                SET LeverancierID = :leverancier_id, 
+                    AllergieID = :allergie_id, 
+                    CategorieID = :categorie_id, 
+                    ProductNaam = :productnaam, 
+                    AantalInVoorraad = :aantal_voorraad
+                WHERE ProductID = :product_id
+            ');
+            
+            $this->db->bind(':product_id', $productId);
+            $this->db->bind(':leverancier_id', $leverancier_id);
+            $this->db->bind(':allergie_id', $allergie_id, $allergie_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+            $this->db->bind(':categorie_id', $categorie_id);
+            $this->db->bind(':productnaam', $productnaam);
+            $this->db->bind(':aantal_voorraad', $aantal_voorraad);
+            
+            $success = $this->db->execute();
+            
+            if ($success) {
+                // Update ook voedselopslag tabel als die bestaat
+                try {
+                    $this->db->query('
+                        UPDATE Voedselopslag 
+                        SET AantalInMagazijn = :aantal_voorraad, 
+                            LaatsteAanleverDatum = CURDATE()
+                        WHERE ProductID = :product_id
+                    ');
+                    $this->db->bind(':product_id', $productId);
+                    $this->db->bind(':aantal_voorraad', $aantal_voorraad);
+                    $this->db->execute();
+                    error_log("Product succesvol gewijzigd in voedselopslag");
+                } catch (Exception $e) {
+                    error_log("Fout bij wijzigen in voedselopslag (niet kritiek): " . $e->getMessage());
+                    // Dit is niet kritiek, dus we gaan door
+                }
+            }
+            
+            return $success;
+            
+        } catch (Exception $e) {
+            error_log("Fout bij wijzigen product (details): " . $e->getMessage());
+            
+            // Controleer specifieke fouten
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+                if (strpos($e->getMessage(), 'ProductNaam') !== false) {
+                    throw new Exception('Er bestaat al een product met deze naam');
+                } else {
+                    throw new Exception('Dit product bestaat al in het systeem');
+                }
+            } elseif (strpos($e->getMessage(), 'foreign key constraint') !== false || strpos($e->getMessage(), 'Cannot add or update') !== false) {
+                if (strpos($e->getMessage(), 'LeverancierID') !== false) {
+                    throw new Exception('Onbekende leverancier geselecteerd');
+                } elseif (strpos($e->getMessage(), 'CategorieID') !== false) {
+                    throw new Exception('Onbekende categorie geselecteerd');
+                } elseif (strpos($e->getMessage(), 'AllergieID') !== false) {
+                    throw new Exception('Onbekende allergie geselecteerd');
+                } else {
+                    throw new Exception('Ongeldige gegevens: controleer leverancier, categorie en allergie');
+                }
+            } else {
+                throw new Exception('Database fout: ' . $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Controleert of een productnaam al bestaat (behalve voor het huidige product)
+     */
+    public function productnaamBestaatVoorAnderProduct($productnaam, $productId)
+    {
+        try {
+            $this->db->query('
+                SELECT COUNT(*) as count 
+                FROM Product 
+                WHERE ProductNaam = :productnaam 
+                AND ProductID != :product_id
+            ');
+            $this->db->bind(':productnaam', $productnaam);
+            $this->db->bind(':product_id', $productId);
+            $result = $this->db->single();
+            return $result->count > 0;
+        } catch (Exception $e) {
+            error_log("Fout bij controleren productnaam: " . $e->getMessage());
+            return false;
+        }
+    }
+
+
 }

@@ -209,6 +209,7 @@
                                         <th class="text-center">Voorraad</th>
                                         <th>Leverancier</th>
                                         <th class="text-center">Status</th>
+                                        <th class="text-center">Acties</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -241,8 +242,8 @@
                                                 <small class="text-muted">
                                                     <i class="bi bi-building me-1"></i><?= htmlspecialchars($product->Leverancier); ?>
                                                 </small>
-                            </td>
-                            <td class="text-center">
+                                            </td>
+                                            <td class="text-center">
                                                 <?php if ($product->AantalInVoorraad <= 0): ?>
                                                     <span class="badge bg-danger status-badge">
                                                         Uitverkocht
@@ -260,6 +261,13 @@
                                                         Goed
                                                     </span>
                                                 <?php endif; ?>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="<?= URLROOT; ?>/magazijnvoorraad/wijzigProduct/<?= $product->ProductID; ?>" 
+                                                   class="btn btn-sm btn-outline-primary" 
+                                                   title="Product wijzigen">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
