@@ -1,23 +1,7 @@
-<?php require_once APPROOT . '/views/includes/header.php'; ?>
+<?php require APPROOT . '/views/includes/header.php'; ?>
 
-<!-- Voor het centreren van de container gebruiken we het bootstrap grid -->
-<div class="container">
-    <div class="row mt-3">
+<h1><?php echo $data['title']; ?></h1>
 
-        <div class="col-2"></div>
+<p>Welkom bij het managementsysteem van de voedselbank.</p>
 
-        <div class="col-8">
-
-            <h3><?php echo $data['title']; ?></h3>
-
-            
-
-        </div>
-        
-        <div class="col-2"></div>
-        
-    </div>
-
-</div>
-
-<?php require_once APPROOT . '/views/includes/footer.php'; ?>
+<?php require APPROOT . '/views/includes/footer.php'; ?>
