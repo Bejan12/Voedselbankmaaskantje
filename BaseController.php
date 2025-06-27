@@ -6,19 +6,25 @@
 class BaseController
 {
     /**
-     * Laad een model
+     * Hier maken we een nieuw model object aan en geven deze 
+     * terug aan de controller
      */
     public function model($model)
     {
-        // Require model file
-        require_once '../app/models/' . $model . '.php';
+        // Check if APPROOT is defined, otherwise use relative path
+        if (defined('APPROOT')) {
+            require_once APPROOT . '/models/' . $model . '.php';
+        } else {
+            require_once '../app/models/' . $model . '.php';
+        }
         
         // Instantiate model
         return new $model();
     }
 
     /**
-     * Laad een view
+     * De view method laadt het view-bestand en geeft informatie
+     * mee aan de view met het $data-array
      */
     public function view($view, $data = [])
     {

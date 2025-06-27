@@ -1,0 +1,17 @@
+{
+    "name": "samir/voedselbankmaaskantje",
+    "autoload": {
+        "psr-4": {
+            "Samir\\Voedselbankmaaskantje\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "samirr-0",
+            "email": "336754@student.mboutrecht.nl"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^12.2"
+    }
+}
