@@ -1,4 +1,3 @@
-
 <?php require_once APPROOT . '/views/includes/header.php'; ?>
 
 <div class="container py-5">
@@ -74,6 +73,24 @@
                             </div>
                         </div>
 
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center p-4">
+                                    <div class="mb-4">
+                                        <i class="bi bi-truck display-3 text-info"></i>
+                                    </div>
+                                    <h4 class="card-title text-info mb-3">Leveranciers</h4>
+                                    <p class="card-text text-muted mb-4">
+                                        Beheer leveranciersinformatie en contactgegevens. 
+                                        Voeg nieuwe leveranciers toe en bewerk bestaande gegevens.
+                                    </p>
+                                    <a href="<?= URLROOT; ?>/leveranciers" class="btn btn-info btn-lg w-100">
+                                        <i class="bi bi-building me-2"></i>Leveranciers Beheren
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -81,3 +98,6 @@
     </div>
 </div>
 
+
+
+<?php require APPROOT . '/views/includes/footer.php'; ?>
