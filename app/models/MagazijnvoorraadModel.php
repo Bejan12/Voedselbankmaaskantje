@@ -200,6 +200,26 @@ class MagazijnvoorraadModel
     }
 
     /**
+     * Haalt een specifieke categorie op basis van ID
+     */
+    public function getCategorieById($categorieId)
+    {
+        try {
+            $this->db->query('
+                SELECT CategorieID, Naam 
+                FROM Categorie 
+                WHERE CategorieID = :categorie_id
+            ');
+            
+            $this->db->bind(':categorie_id', $categorieId);
+            return $this->db->single();
+        } catch (Exception $e) {
+            error_log("Fout bij ophalen categorie: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
      * Voegt een nieuw product toe
      */
     public function voegProductToe($leverancier_id, $allergie_id, $categorie_id, $productnaam, $ean, $aantal_voorraad)
@@ -234,7 +254,7 @@ class MagazijnvoorraadModel
                 
                 $success = $this->db->execute();
                 
-                // Voeg ook toe aan voedselopslag tabel
+                // Voeg ook toe aan voedselopslag tabel als die bestaat
                 if ($success) {
                     try {
                         $this->db->query('
@@ -255,5 +275,62 @@ class MagazijnvoorraadModel
             error_log("Fout bij toevoegen product: " . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * Controleert of een EAN-code al bestaat
+     */
+    public function eanBestaat($ean)
+    {
+        try {
+            $this->db->query('SELECT COUNT(*) as count FROM Product WHERE EAN = :ean');
+            $this->db->bind(':ean', $ean);
+            $result = $this->db->single();
+            return $result->count > 0;
+        } catch (Exception $e) {
+            error_log("Fout bij controleren EAN: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Genereert een unieke EAN-code
+     */
+    public function generateUniqueEAN()
+    {
+        $maxAttempts = 10;
+        $attempts = 0;
+        
+        do {
+            $ean = $this->generateEANCode();
+            $attempts++;
+        } while ($this->eanBestaat($ean) && $attempts < $maxAttempts);
+        
+        if ($attempts >= $maxAttempts) {
+            throw new Exception('Kon geen unieke EAN-code genereren');
+        }
+        
+        return $ean;
+    }
+
+    /**
+     * Genereert een EAN-13 code met check digit
+     */
+    private function generateEANCode()
+    {
+        // Genereer 12 willekeurige cijfers
+        $ean12 = '';
+        for ($i = 0; $i < 12; $i++) {
+            $ean12 .= mt_rand(0, 9);
+        }
+        
+        // Bereken check digit
+        $sum = 0;
+        for ($i = 0; $i < 12; $i++) {
+            $sum += (int)$ean12[$i] * ($i % 2 === 0 ? 1 : 3);
+        }
+        $checkDigit = (10 - ($sum % 10)) % 10;
+        
+        return $ean12 . $checkDigit;
     }
 }

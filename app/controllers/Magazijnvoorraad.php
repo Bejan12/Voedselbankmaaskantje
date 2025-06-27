@@ -13,6 +13,9 @@ class Magazijnvoorraad extends BaseController
     public function index()
     {
         try {
+            // Check voor succesbericht in URL
+            $success = $_GET['success'] ?? null;
+            
             // Haal alle voorraadgegevens op via de model
             $voorraadGegevens = $this->magazijnvoorraadModel->getVoorraadOverzicht();
             
@@ -29,18 +32,13 @@ class Magazijnvoorraad extends BaseController
                 $alleProducten = $voorraadGegevens; // Gebruik dezelfde data
             }
 
-          
-            // In de index() method, voeg dit toe na try { 
-            // Check voor succesbericht in URL
-            $success = $_GET['success'] ?? null;
-
             $data = [
-            'title' => 'Overzicht Magazijnvoorraad',
-            'voorraadGegevens' => $voorraadGegevens,
-            'alleProducten' => $alleProducten,
-            'heeftGegevens' => !empty($voorraadGegevens),
-            'success' => $success  // Voeg deze regel toe
-];
+                'title' => 'Overzicht Magazijnvoorraad',
+                'voorraadGegevens' => $voorraadGegevens,
+                'alleProducten' => $alleProducten,
+                'heeftGegevens' => !empty($voorraadGegevens),
+                'success' => $success
+            ];
 
             $this->view('magazijnvoorraad/index', $data);
 
@@ -131,6 +129,14 @@ class Magazijnvoorraad extends BaseController
                 $errors[] = 'Aantal in voorraad kan niet negatief zijn';
             }
 
+            // Slimme categorie validatie
+            if ($categorie_id > 0 && !empty($productnaam)) {
+                $categorieValidatie = $this->validateProductCategory($productnaam, $categorie_id);
+                if (!$categorieValidatie['isValid']) {
+                    $errors[] = $categorieValidatie['message'];
+                }
+            }
+
             // Als er validatiefouten zijn
             if (!empty($errors)) {
                 $data = [
@@ -199,6 +205,83 @@ class Magazijnvoorraad extends BaseController
             exit;
         }
     }
+
+    /**
+     * Valideer of een product bij de juiste categorie hoort - HARDE VALIDATIE
+     */
+    private function validateProductCategory($productnaam, $categorie_id)
+    {
+        try {
+            // Haal categorie naam op
+            $categorie = $this->magazijnvoorraadModel->getCategorieById($categorie_id);
+            if (!$categorie) {
+                return ['isValid' => false, 'message' => 'Onbekende categorie'];
+            }
+
+            $productNaamLower = strtolower($productnaam);
+            $categorieNaamLower = strtolower($categorie->Naam);
+
+            // Definieer trefwoorden per categorie (aangepast aan jouw database categorieën)
+            $categoryKeywords = [
+                'aardappelen, groente, fruit' => ['aardappel', 'wortel', 'ui', 'tomaat', 'sla', 'paprika', 'courgette', 'broccoli', 'spinazie', 'appel', 'banaan', 'sinaasappel', 'peer', 'druif', 'aardbei', 'kiwi', 'mango', 'ananas', 'fruit', 'groente'],
+                'kaas, vleeswaren' => ['kaas', 'ham', 'worst', 'salami', 'vleeswaren', 'spek', 'biefstuk'],
+                'zuivel, plantaardig en eieren' => ['melk', 'yoghurt', 'boter', 'room', 'kwark', 'karnemelk', 'zuivel', 'eieren', 'ei'],
+                'bakkerij en banket' => ['brood', 'croissant', 'cake', 'taart', 'koek', 'banket', 'volkoren'],
+                'frisdrank, sappen, koffie en thee' => ['sap', 'water', 'frisdrank', 'thee', 'koffie', 'bier', 'wijn', 'drank', 'appelsap'],
+                'pasta, rijst en wereldkeuken' => ['pasta', 'rijst', 'muesli', 'havermout', 'couscous', 'quinoa', 'graan', 'spaghetti'],
+                'soepen, sauzen, kruiden en olie' => ['soep', 'saus', 'kruiden', 'olie', 'azijn', 'tomatensoep'],
+                'snoep, koek, chips en chocolade' => ['snoep', 'chocolade', 'chips', 'koek', 'koekjes'],
+                'baby, verzorging en hygiëne' => ['baby', 'luier', 'verzorging', 'shampoo']
+            ];
+
+            // Controleer of de gekozen categorie logisch is
+            if (isset($categoryKeywords[$categorieNaamLower])) {
+                $keywords = $categoryKeywords[$categorieNaamLower];
+                $isLogical = false;
+                
+                foreach ($keywords as $keyword) {
+                    if (strpos($productNaamLower, $keyword) !== false) {
+                        $isLogical = true;
+                        break;
+                    }
+                }
+                
+                if (!$isLogical) {
+                    // Zoek betere categorieën
+                    $suggestedCategories = [];
+                    foreach ($categoryKeywords as $catName => $keywords) {
+                        foreach ($keywords as $keyword) {
+                            if (strpos($productNaamLower, $keyword) !== false) {
+                                $suggestedCategories[] = $catName;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (!empty($suggestedCategories)) {
+                        return [
+                            'isValid' => false, 
+                            'message' => "Product '{$productnaam}' past niet bij categorie '{$categorie->Naam}'. Kies een van deze categorieën: " . implode(', ', $suggestedCategories)
+                        ];
+                    } else {
+                        return [
+                            'isValid' => false, 
+                            'message' => "Product '{$productnaam}' past niet bij categorie '{$categorie->Naam}'. Controleer de categorie keuze."
+                        ];
+                    }
+                }
+            }
+
+            return ['isValid' => true, 'message' => ''];
+            
+        } catch (Exception $e) {
+            error_log("Fout bij categorie validatie: " . $e->getMessage());
+            return ['isValid' => true, 'message' => '']; // Bij fout, laat gewoon door
+        }
+    }
+
+    // ... rest van de methods blijven hetzelfde ...
+
 
     public function zoekProduct()
     {
@@ -277,16 +360,12 @@ class Magazijnvoorraad extends BaseController
                     $alleProducten = $this->magazijnvoorraadModel->getVoorraadOverzichtGesorteerd();
                 }
 
-                // Check voor succesbericht in URL
-                $success = $_GET['success'] ?? null;
-                
                 $data = [
                     'title' => 'Zoekresultaat Magazijnvoorraad',
                     'voorraadGegevens' => $product ? [$product] : [],
                     'alleProducten' => $alleProducten,
                     'heeftGegevens' => !empty($product),
-                    'zoekterm' => $ean,
-                    'success' => $success
+                    'zoekterm' => $ean
                 ];
 
                 $this->view('magazijnvoorraad/index', $data);
