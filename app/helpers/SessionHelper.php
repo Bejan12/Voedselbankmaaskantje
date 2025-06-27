@@ -25,4 +25,19 @@ class SessionHelper {
             'accounts/register'
         ];
     }
+
+    // Flash message setter/getter
+    public static function flash($name = '', $message = '') {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        if (!empty($name)) {
+            if (!empty($message)) {
+                $_SESSION[$name] = $message;
+            } elseif (!empty($_SESSION[$name])) {
+                echo '<div class="alert alert-success">' . $_SESSION[$name] . '</div>';
+                unset($_SESSION[$name]);
+            }
+        }
+    }
 }

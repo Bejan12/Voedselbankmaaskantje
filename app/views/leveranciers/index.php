@@ -3,7 +3,17 @@
 <div class="container mt-4">
     <h1 class="title"><?php echo $data['title']; ?></h1>
 
+    <?php SessionHelper::flash('leverancier_message'); ?>
+
     <a href="/leveranciers/nieuw" class="btn-add">Leverancier toevoegen</a>
+
+    <form method="get" class="filter-form" style="margin-bottom: 20px;">
+        <label for="sort">Sorteer op:</label>
+        <select name="sort" id="sort" onchange="this.form.submit()">
+            <option value="eerstvolgende" <?php echo (isset($data['sort']) && $data['sort'] === 'eerstvolgende') ? 'selected' : ''; ?>>Eerstvolgende levering</option>
+            <option value="recent" <?php echo (isset($data['sort']) && $data['sort'] === 'recent') ? 'selected' : ''; ?>>Meest recent eerst</option>
+        </select>
+    </form>
 
     <div class="table-container">
         <table class="styled-table">
@@ -36,6 +46,10 @@
         </table>
     </div>
 </div>
+
+<br>
+<br>
+<br>
 
 <style>
     .title {
@@ -91,10 +105,6 @@
 
     .text-center {
         text-align: center;
-    }
-</style>
-
-<?php require APPROOT . '/views/includes/footer.php'; ?>
     }
 </style>
 
