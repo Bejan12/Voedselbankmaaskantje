@@ -35,9 +35,20 @@ class SessionHelper {
             if (!empty($message)) {
                 $_SESSION[$name] = $message;
             } elseif (!empty($_SESSION[$name])) {
-                echo '<div class="alert alert-success">' . $_SESSION[$name] . '</div>';
+                $type = isset($_SESSION[$name.'_type']) ? $_SESSION[$name.'_type'] : 'success';
+                $class = ($type === 'error' || $type === 'danger') ? 'alert-danger' : 'alert-success';
+
+                echo '<div class="alert '.$class.'">'.$_SESSION[$name].'</div>';
+
                 unset($_SESSION[$name]);
+                unset($_SESSION[$name.'_type']);
             }
         }
+    }
+
+    // Add type parameter to set message with a type
+    public static function setFlash($name, $message, $type = 'success') {
+        $_SESSION[$name] = $message;
+        $_SESSION[$name.'_type'] = $type;
     }
 }

@@ -30,7 +30,12 @@ class LeverancierModel
                                      l.ContactEmail, 
                                      l.ContactTelefoon, 
                                      DATE_FORMAT(l.EerstvolgendeLevering, '%d-%m-%Y %H:%i') as EerstvolgendeLevering,
-                                     t.TypeNaam AS LeverancierType
+                                     t.TypeNaam AS LeverancierType,
+                                     l.Status,
+                                     CASE 
+                                         WHEN l.Status = 'onderweg' THEN 1 
+                                         ELSE 0 
+                                     END as IsOnderweg
                               FROM leverancier l
                               JOIN leverancier_type t ON l.LeverancierTypeID = t.LeverancierTypeID
                               ORDER BY $orderBy");
@@ -75,8 +80,8 @@ class LeverancierModel
             $leveringDatum = DateTime::createFromFormat('Y-m-d\TH:i', $data['eerstvolgendelevering']);
             $mysqlDateTime = $leveringDatum ? $leveringDatum->format('Y-m-d H:i:s') : $data['eerstvolgendelevering'];
             
-            $this->db->query("INSERT INTO leverancier (LeverancierNummer, GebruikerID, LeverancierTypeID, Bedrijfsnaam, Adres, ContactNaam, ContactEmail, ContactTelefoon, EerstvolgendeLevering) 
-                              VALUES (:leverancier_nummer, 1, :leverancier_type_id, :bedrijfsnaam, :adres, :contactnaam, :contactemail, :contacttelefoon, :eerstvolgendelevering)");
+            $this->db->query("INSERT INTO leverancier (LeverancierNummer, GebruikerID, LeverancierTypeID, Bedrijfsnaam, Adres, ContactNaam, ContactEmail, ContactTelefoon, EerstvolgendeLevering, Status) 
+                              VALUES (:leverancier_nummer, 1, :leverancier_type_id, :bedrijfsnaam, :adres, :contactnaam, :contactemail, :contacttelefoon, :eerstvolgendelevering, 'gepland')");
             
             $this->db->bind(':leverancier_nummer', $leverancierNummer);
             $this->db->bind(':leverancier_type_id', $data['leverancier_type_id']);
@@ -181,6 +186,25 @@ class LeverancierModel
             
             $result = $this->db->single();
             return $result ? true : false;
+        } catch (\Throwable $e) {
+            throw $e;
+        }
+    }
+
+    public function canDeleteLeverancier($id)
+    {
+        try {
+            $this->db->query("SELECT Status FROM leverancier WHERE LeverancierID = :id");
+            $this->db->bind(':id', $id);
+            
+            $result = $this->db->single();
+            
+            if (!$result) {
+                return false; // Leverancier bestaat niet
+            }
+            
+            // Kan niet verwijderen als status 'onderweg' is
+            return $result->Status !== 'onderweg';
         } catch (\Throwable $e) {
             throw $e;
         }

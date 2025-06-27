@@ -240,7 +240,7 @@ CREATE TABLE IF NOT EXISTS `leverancier` (
   `ContactEmail` varchar(100) DEFAULT NULL,
   `ContactTelefoon` varchar(20) DEFAULT NULL,
   `EerstvolgendeLevering` datetime DEFAULT NULL,
-  `Status` enum('gepland', 'voorbereiden', 'onderweg') DEFAULT 'gepland',
+  `Status` enum('gepland','voorbereiden','onderweg','geleverd') DEFAULT 'gepland',
   PRIMARY KEY (`LeverancierID`),
   UNIQUE KEY `LeverancierNummer_UNIQUE` (`LeverancierNummer`),
   KEY `GebruikerID` (`GebruikerID`),
@@ -416,7 +416,7 @@ INSERT INTO `leverancier_type` (`LeverancierTypeID`, `TypeNaam`) VALUES
 (3, 'Supermarkt'),
 (4, 'Bakkerij');
 
--- Wijzig tabel leverancier: voeg LeverancierTypeID, Status en LeverancierNummer toe
+
 DROP TABLE IF EXISTS `leverancier`;
 CREATE TABLE IF NOT EXISTS `leverancier` (
   `LeverancierID` int NOT NULL AUTO_INCREMENT,
@@ -429,7 +429,7 @@ CREATE TABLE IF NOT EXISTS `leverancier` (
   `ContactEmail` varchar(100) DEFAULT NULL,
   `ContactTelefoon` varchar(20) DEFAULT NULL,
   `EerstvolgendeLevering` datetime DEFAULT NULL,
-  `Status` enum('gepland', 'voorbereiden', 'onderweg') DEFAULT 'gepland',
+  `Status` enum('gepland','voorbereiden','onderweg','geleverd') DEFAULT 'gepland',
   PRIMARY KEY (`LeverancierID`),
   UNIQUE KEY `LeverancierNummer_UNIQUE` (`LeverancierNummer`),
   KEY `GebruikerID` (`GebruikerID`),

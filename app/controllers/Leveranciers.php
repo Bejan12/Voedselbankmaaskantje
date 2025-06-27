@@ -354,13 +354,29 @@ class Leveranciers extends BaseController
     {
         if ($_SERVER['REQUEST_METHOD'] === 'GET' && is_numeric($id)) {
             try {
+                // Check if leverancier exists and get its status
+                $leverancier = $this->leverancierModel->getLeverancierById($id);
+                
+                if (!$leverancier) {
+                    SessionHelper::flash('leverancier_message', 'Leverancier niet gevonden.', 'alert alert-danger');
+                    header('Location: ' . URLROOT . '/leveranciers');
+                    exit();
+                }
+
+                // Check if leverancier can be deleted
+                if (!$this->leverancierModel->canDeleteLeverancier($id)) {
+                    SessionHelper::flash('leverancier_message', 'Leverancier kan niet verwijderd worden omdat deze al onderweg is!', 'alert alert-danger');
+                    header('Location: ' . URLROOT . '/leveranciers');
+                    exit();
+                }
+
                 if ($this->leverancierModel->deleteLeverancierById($id)) {
-                    SessionHelper::flash('leverancier_message', 'Leverancier succesvol verwijderd.');
+                    SessionHelper::flash('leverancier_message', 'Leverancier succesvol verwijderd.', 'alert alert-success');
                 } else {
-                    SessionHelper::flash('leverancier_message', 'Fout bij verwijderen leverancier.');
+                    SessionHelper::flash('leverancier_message', 'Fout bij verwijderen leverancier.', 'alert alert-danger');
                 }
             } catch (Exception $e) {
-                SessionHelper::flash('leverancier_message', 'Fout bij verwijderen leverancier.');
+                SessionHelper::flash('leverancier_message', 'Fout bij verwijderen leverancier.', 'alert alert-danger');
             }
         }
         header('Location: ' . URLROOT . '/leveranciers');

@@ -3,7 +3,24 @@
 <div class="container mt-4">
     <h1 class="title"><?php echo $data['title']; ?></h1>
 
-    <?php SessionHelper::flash('leverancier_message'); ?>
+    <?php 
+    // Replace the simple flash with conditional styling
+    if (isset($_SESSION['leverancier_message'])) {
+        $messageClass = 'alert-success'; // Default to success
+        
+        // Check if the message contains typical error phrases
+        if (strpos($_SESSION['leverancier_message'], 'kan niet') !== false || 
+            strpos($_SESSION['leverancier_message'], 'fout') !== false || 
+            strpos($_SESSION['leverancier_message'], 'error') !== false || 
+            strpos($_SESSION['leverancier_message'], 'niet verwijderd') !== false ||
+            strpos($_SESSION['leverancier_message'], 'mislukt') !== false) {
+            $messageClass = 'alert-danger';
+        }
+        
+        echo '<div class="alert ' . $messageClass . '">' . $_SESSION['leverancier_message'] . '</div>';
+        unset($_SESSION['leverancier_message']);
+    }
+    ?>
 
     <a href="/leveranciers/nieuw" class="btn-add">Leverancier toevoegen</a>
 
@@ -71,6 +88,27 @@
         margin-bottom: 30px;
     }
 
+    /* Alert styling for flash messages */
+    .alert {
+        padding: 12px 20px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+
+    .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+
+    .alert-success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+    }
+
     .btn-add {
         display: inline-block;
         background-color: #28a745;
@@ -95,9 +133,9 @@
 
     .styled-table {
         width: 100%;
-        min-width: 1100px; /* Verlaag minimale breedte */
+        min-width: 1100px;
         border-collapse: collapse;
-        font-size: 14px; /* Verklein font-size lichtjes */
+        font-size: 14px;
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
         background: #fff;
     }
@@ -109,7 +147,7 @@
 
     .styled-table th,
     .styled-table td {
-        padding: 8px; /* Verklein padding van 10px naar 8px */
+        padding: 8px;
         border: 1px solid #dddddd;
         text-align: left;
         vertical-align: middle;
@@ -150,9 +188,17 @@
         font-size: 1.2em;
     }
 
+    .disabled-link {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+
+    .disabled-link:hover {
+        background-color: transparent !important;
+    }
 </style>
 
-<!-- Vergeet niet deze in de layout/head op te nemen -->
 <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"> -->
+<!-- Vergeet niet deze in de layout/head op te nemen -->
 
 <?php require APPROOT . '/views/includes/footer.php'; ?>
