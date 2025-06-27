@@ -336,11 +336,6 @@ INSERT INTO `rol` (`RolID`, `Naam`) VALUES
 (2, 'Magazijnmedewerker'),
 (3, 'Vrijwilliger');
 
--- --------------------------------------------------------
-
---
--- Tabelstructuur voor tabel `voedselopslag`
---
 
 DROP TABLE IF EXISTS `voedselopslag`;
 CREATE TABLE IF NOT EXISTS `voedselopslag` (
