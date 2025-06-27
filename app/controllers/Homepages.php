@@ -2,27 +2,69 @@
 
 class Homepages extends BaseController
 {
+    private $homepageModel;
 
-    public function index($firstname = NULL, $infix = NULL, $lastname = NULL)
+    public function __construct()
     {
-        /**
-         * Het $data-array geeft informatie mee aan de view-pagina
-         */
+        $this->homepageModel = $this->model('HomepageModel');
+    }
 
+    public function index($gebruikerID = 1) // temporary hardcoded user ID for demo
+    {
+        // Get user information
+        $gebruikerInfo = $this->homepageModel->getGebruikerInfo($gebruikerID);
+        
+        // Check if user exists
+        $gebruikerError = null;
+        if (!$gebruikerInfo) {
+            $gebruikerError = 'Gebruiker niet gevonden.';
+        }
+        
+        // Get available functions based on user role
+        $toegankelijkeFuncties = $this->homepageModel->getToegankelijkeFuncties($gebruikerID);
+        
+        // Get inventory overview
+        $voorraadOverzicht = $this->homepageModel->getProductVoorraadOverzicht();
+
+        // Get food packages (without filter initially)
+        $voedselpakketten = $this->homepageModel->getVoedselpakkettenMetFilter();
 
         $data = [
-            'title' => 'Homepagina',
+            'title' => 'Dashboard Voedselbank',
+            'gebruiker' => $gebruikerInfo,
+            'gebruikerError' => $gebruikerError,
+            'functies' => $toegankelijkeFuncties,
+            'voorraad' => $voorraadOverzicht,
+            'voedselpakketten' => $voedselpakketten,
+            'filterMessage' => ''
         ];
 
-        /**
-         * Met de view-method uit de BaseController-class wordt de view
-         * aangeroepen met de informatie uit het $data-array
-         */
         $this->view('homepages/index', $data);
     }
 
-    /**
-     * De optellen-method berekent de som van twee getallen
-     * We gebruiken deze method voor een unittest
-     */
+    public function filterPakketten()
+    {
+        $gebruikerID = 1; // temporary hardcoded user ID for demo
+        $filter = isset($_POST['filter']) ? $_POST['filter'] : null;
+        
+        // Get filtered packages
+        $voedselpakketten = $this->homepageModel->getVoedselpakkettenMetFilter($filter);
+        
+        $gebruikerInfo = $this->homepageModel->getGebruikerInfo($gebruikerID);
+        $gebruikerError = null;
+        if (!$gebruikerInfo) {
+            $gebruikerError = 'Gebruiker niet gevonden.';
+        }
+        $data = [
+            'title' => 'Dashboard Voedselbank',
+            'gebruiker' => $gebruikerInfo,
+            'gebruikerError' => $gebruikerError,
+            'functies' => $this->homepageModel->getToegankelijkeFuncties($gebruikerID),
+            'voorraad' => $this->homepageModel->getProductVoorraadOverzicht(),
+            'voedselpakketten' => $voedselpakketten,
+            'filterMessage' => empty($voedselpakketten) ? 'Geen voedselpakketten gevonden voor deze filter' : ''
+        ];
+
+        $this->view('homepages/index', $data);
+    }
 }

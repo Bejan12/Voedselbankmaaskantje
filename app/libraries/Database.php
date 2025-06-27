@@ -50,6 +50,10 @@ class Database
 
     public function query($sql)
     {
+        // Sluit de vorige statement als die nog open staat (voor stored procedures)
+        if ($this->statement) {
+            $this->statement->closeCursor();
+        }
         $this->statement = $this->dbHandler->prepare($sql);
     }
 
@@ -59,7 +63,9 @@ class Database
     public function resultSet()
     {
         $this->statement->execute();
-        return $this->statement->fetchAll(PDO::FETCH_OBJ);
+        $result = $this->statement->fetchAll(PDO::FETCH_OBJ);
+        $this->statement->closeCursor(); // cursor sluiten na ophalen
+        return $result;
     }
 
     /**
@@ -67,7 +73,11 @@ class Database
      */
     public function bind($parameter, $value, $type = null)
     {
-        $this->statement->bindValue($parameter, $value, $type);
+        if ($type === null) {
+            $this->statement->bindValue($parameter, $value);
+        } else {
+            $this->statement->bindValue($parameter, $value, $type);
+        }
     }
 
     /**
@@ -82,7 +92,7 @@ class Database
     {
         $this->statement->execute();
         $result = $this->statement->fetch(PDO::FETCH_OBJ);
-        $this->statement->closecursor();
+        $this->statement->closeCursor();
         return $result;
     }
 
