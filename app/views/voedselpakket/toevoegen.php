@@ -11,7 +11,7 @@
                     <form method="post" action="" onsubmit="return validateForm()">
                         <div class="mb-3">
                             <label for="klantId" class="form-label">Klant</label>
-                            <select name="klantId" id="klantId" class="form-select" required onchange="showAllergie(); showProducten(); showSamenstelBox();">
+                            <select name="klantId" id="klantId" class="form-select" required onchange="showAllergie(); showKeuzeBox();">
                                 <option value="">-- Kies een klant --</option>
                                 <?php foreach($data['klanten'] as $klant): ?>
                                     <option value="<?= $klant->KlantID ?>" data-allergie="<?= htmlspecialchars($klant->Allergieen ?: '-') ?>">
@@ -28,49 +28,40 @@
                             <label for="datum" class="form-label">Datum samenstelling</label>
                             <input type="date" name="datum" id="datum" class="form-control" min="<?= date('Y-m-d') ?>" required>
                         </div>
-                        <div id="productenBox">
-                            <!-- Hier komen de product-selects per categorie -->
-                            <?php 
-                            $categorieen = isset($data['categorieen']) && is_array($data['categorieen']) ? $data['categorieen'] : [];
-                            $producten = isset($data['producten']) && is_array($data['producten']) ? $data['producten'] : [];
-                            ?>
-                            <?php foreach($categorieen as $categorie): ?>
-                                <div class="mb-3 product-select" data-categorie="<?= $categorie->CategorieID ?>">
-                                    <label class="form-label"><?= htmlspecialchars($categorie->Naam) ?></label>
-                                    <select name="producten[<?= $categorie->CategorieID ?>]" class="form-select product-dropdown" data-categorie="<?= $categorie->CategorieID ?>">
-                                        <option value="">-- Kies een product --</option>
-                                        <?php if(isset($producten[$categorie->CategorieID]) && is_array($producten[$categorie->CategorieID])): ?>
-                                            <?php foreach($producten[$categorie->CategorieID] as $product): ?>
-                                                <option value="<?= $product->ProductID ?>" data-allergieen="<?= htmlspecialchars($product->Allergieen) ?>">
-                                                    <?= htmlspecialchars($product->ProductNaam) ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        <?php endif; ?>
-                                    </select>
-                                </div>
-                            <?php endforeach; ?>
+                        <!-- Pakketkeuze of samenstellen -->
+                        <div class="mb-3" id="pakketKeuzeBox">
+                            <label for="pakketCategorieId" class="form-label">Pakketkeuze</label>
+                            <select name="pakketCategorieId" id="pakketCategorieId" class="form-select">
+                                <option value="">-- Kies een standaardpakket --</option>
+                                <?php foreach($data['categorieen'] as $cat): ?>
+                                    <option value="<?= $cat->CategorieID ?>"><?= htmlspecialchars($cat->Naam) ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div id="samenstelBox" style="display:none;">
-                            <h5 class="mt-4 mb-2" style="color:#EE7B00;">Stel een pakket samen zonder allergenen</h5>
-                            <?php foreach($categorieen as $categorie): ?>
-                                <div class="mb-3">
-                                    <label class="form-label"><?= htmlspecialchars($categorie->Naam) ?></label>
-                                    <div class="row">
-                                        <?php if(isset($producten[$categorie->CategorieID]) && is_array($producten[$categorie->CategorieID])): ?>
-                                            <?php foreach($producten[$categorie->CategorieID] as $product): ?>
-                                                <div class="col-12 col-md-6">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input allergie-check" type="checkbox" name="samenstel[<?= $categorie->CategorieID ?>][]" value="<?= $product->ProductID ?>" id="prod<?= $product->ProductID ?>" data-allergieen="<?= htmlspecialchars($product->Allergieen) ?>">
-                                                        <label class="form-check-label" for="prod<?= $product->ProductID ?>">
-                                                            <?= htmlspecialchars($product->ProductNaam) ?>
-                                                        </label>
-                                                    </div>
+                            <h5 class="mt-4 mb-2" style="color:#EE7B00;">Stel een allergievrij pakket samen</h5>
+                            <div class="alert alert-info">Vink hieronder de producten aan die géén allergenen bevatten voor deze klant.</div>
+                            <?php if(isset($data['productenPerCategorie']) && is_array($data['productenPerCategorie'])): ?>
+                                <?php foreach($data['productenPerCategorie'] as $catId => $producten): ?>
+                                    <div class="mb-2"><b><?= htmlspecialchars($data['categorieNamen'][$catId] ?? '') ?></b></div>
+                                    <div class="row mb-3">
+                                        <?php foreach($producten as $product): ?>
+                                            <div class="col-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="samenstel[<?= $catId ?>][]" value="<?= $product->ProductID ?>" id="prod<?= $product->ProductID ?>">
+                                                    <label class="form-check-label" for="prod<?= $product->ProductID ?>">
+                                                        <?= htmlspecialchars($product->ProductNaam) ?>
+                                                    </label>
                                                 </div>
-                                            <?php endforeach; ?>
-                                        <?php endif; ?>
+                                            </div>
+                                        <?php endforeach; ?>
                                     </div>
-                                </div>
-                            <?php endforeach; ?>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+                        <div class="mb-3" id="opmerkingBox">
+                            <label for="opmerking" class="form-label">Opmerking (optioneel)</label>
+                            <textarea name="opmerking" id="opmerking" class="form-control" rows="2"></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary" style="background:#EE7B00;border:none;">Voeg toe</button>
                         <a href="<?= URLROOT ?>/voedselpakket/index" class="btn btn-outline-secondary ms-2">Annuleer</a>
@@ -103,51 +94,22 @@ function showAllergie() {
         text.textContent = '';
     }
 }
-function showProducten() {
-    // Filter producten per categorie op basis van allergie klant
+function showKeuzeBox() {
     const klantSelect = document.getElementById('klantId');
     const klantOption = klantSelect.options[klantSelect.selectedIndex];
     const allergieString = klantOption.dataset.allergie || '';
-    const allergieen = allergieString.split(',').map(a => a.trim().toLowerCase());
-    document.querySelectorAll('.product-select').forEach(function(div) {
-        const select = div.querySelector('select');
-        Array.from(select.options).forEach(function(opt) {
-            if (!opt.value) return; // skip placeholder
-            const prodAllergie = (opt.dataset.allergieen || '').split(',').map(a => a.trim().toLowerCase());
-            // Als klant allergie heeft en product bevat die allergie, verberg optie
-            let hide = false;
-            allergieen.forEach(function(klantAllergie) {
-                if (klantAllergie && prodAllergie.includes(klantAllergie)) hide = true;
-            });
-            opt.style.display = hide ? 'none' : '';
-        });
-    });
-}
-function showSamenstelBox() {
-    // Toon samenstelBox alleen als klant allergie heeft
-    const klantSelect = document.getElementById('klantId');
-    const klantOption = klantSelect.options[klantSelect.selectedIndex];
-    const allergieString = klantOption.dataset.allergie || '';
+    const pakketKeuzeBox = document.getElementById('pakketKeuzeBox');
     const samenstelBox = document.getElementById('samenstelBox');
     if (allergieString && allergieString !== '-') {
+        pakketKeuzeBox.style.display = 'none';
         samenstelBox.style.display = 'block';
-        // Verberg producten met allergie in checkboxen
-        const allergieen = allergieString.split(',').map(a => a.trim().toLowerCase());
-        document.querySelectorAll('.allergie-check').forEach(function(checkbox) {
-            const prodAllergie = (checkbox.dataset.allergieen || '').split(',').map(a => a.trim().toLowerCase());
-            let hide = false;
-            allergieen.forEach(function(klantAllergie) {
-                if (klantAllergie && prodAllergie.includes(klantAllergie)) hide = true;
-            });
-            checkbox.parentElement.style.display = hide ? 'none' : '';
-        });
     } else {
+        pakketKeuzeBox.style.display = 'block';
         samenstelBox.style.display = 'none';
     }
 }
 document.addEventListener('DOMContentLoaded', function() {
-    showProducten();
-    showSamenstelBox();
+    showKeuzeBox();
 });
 </script>
 <?php require_once APPROOT . '/views/includes/footer.php'; ?>
