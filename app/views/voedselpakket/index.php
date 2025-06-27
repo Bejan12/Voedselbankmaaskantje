@@ -6,6 +6,7 @@
             <div class="card shadow-lg mb-4">
                 <div class="card-body">
                     <h2 class="mb-3" style="color:#EE7B00;">Overzicht Voedselpakketten</h2>
+                    <a href="<?= URLROOT ?>/voedselpakket/toevoegen" class="btn btn-success mb-3">Voedselpakket toevoegen</a>
                     <form class="row g-2 mb-3" method="get" action="<?= URLROOT ?>/voedselpakket/index">
                         <div class="col-auto">
                             <select name="filter" class="form-select">
@@ -25,22 +26,30 @@
                         <table class="table table-bordered align-middle text-center">
                             <thead style="background:#DDD7D7;">
                                 <tr>
-                                    <th>Pakket ID</th>
+                                    <th>Pakketnummer</th>
                                     <th>Klantnaam</th>
+                                    <th>Email</th>
                                     <th>Datum Samenstelling</th>
                                     <th>Datum Uitgifte</th>
+                                    <th>Allergieën/Wensen</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php if(count($data['pakketten'])): foreach($data['pakketten'] as $pakket): ?>
+                                <?php 
+                                $totaal = count($data['pakketten']);
+                                if($totaal): 
+                                    $nummer = $totaal;
+                                    foreach($data['pakketten'] as $pakket): ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($pakket->VoedselpakketID) ?></td>
+                                        <td><?= sprintf('#%03d', $nummer--) ?></td>
                                         <td><?= htmlspecialchars($pakket->KlantNaam) ?></td>
-                                        <td><?= htmlspecialchars($pakket->DatumSamenstelling) ?></td>
-                                        <td><?= $pakket->DatumUitgifte ? htmlspecialchars($pakket->DatumUitgifte) : '<span class="badge bg-success">Beschikbaar</span>' ?></td>
+                                        <td><?= htmlspecialchars($pakket->Email) ?></td>
+                                        <td><?= date('d-m-Y', strtotime($pakket->DatumSamenstelling)) ?></td>
+                                        <td><?= $pakket->DatumUitgifte ? date('d-m-Y', strtotime($pakket->DatumUitgifte)) : '<span class="badge bg-success">Beschikbaar</span>' ?></td>
+                                        <td><?= htmlspecialchars($pakket->Allergieen ?: '-') ?></td>
                                     </tr>
                                 <?php endforeach; else: ?>
-                                    <tr><td colspan="4">Geen voedselpakketten gevonden</td></tr>
+                                    <tr><td colspan="6">Geen voedselpakketten gevonden</td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
