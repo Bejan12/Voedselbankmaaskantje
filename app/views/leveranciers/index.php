@@ -7,13 +7,15 @@
 
     <a href="/leveranciers/nieuw" class="btn-add">Leverancier toevoegen</a>
 
-    <form method="get" class="filter-form" style="margin-bottom: 20px;">
-        <label for="sort">Sorteer op:</label>
-        <select name="sort" id="sort" onchange="this.form.submit()">
-            <option value="eerstvolgende" <?php echo (isset($data['sort']) && $data['sort'] === 'eerstvolgende') ? 'selected' : ''; ?>>Eerstvolgende levering</option>
-            <option value="recent" <?php echo (isset($data['sort']) && $data['sort'] === 'recent') ? 'selected' : ''; ?>>Meest recent eerst</option>
-        </select>
-    </form>
+    <div class="table-filter-bar" style="text-align: right; margin-bottom: 10px;">
+        <form method="get" class="filter-form" style="display: inline-block;">
+            <label for="sort">Sorteer op:</label>
+            <select name="sort" id="sort" onchange="this.form.submit()">
+                <option value="eerstvolgende" <?php echo (isset($data['sort']) && $data['sort'] === 'eerstvolgende') ? 'selected' : ''; ?>>Eerstvolgende levering</option>
+                <option value="recent" <?php echo (isset($data['sort']) && $data['sort'] === 'recent') ? 'selected' : ''; ?>>Meest recent eerst</option>
+            </select>
+        </form>
+    </div>
 
     <div class="table-container">
         <table class="styled-table">
@@ -26,6 +28,7 @@
                     <th>E-mail</th>
                     <th>Telefoonnummer</th>
                     <th>Eerstvolgende levering (DD/MM/JJJJ)</th>
+                    <th style="width: 90px;">Acties</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,6 +42,16 @@
                             <td><?php echo htmlspecialchars($leverancier->ContactEmail ?? ''); ?></td>
                             <td><?php echo htmlspecialchars($leverancier->ContactTelefoon ?? ''); ?></td>
                             <td><?php echo htmlspecialchars($leverancier->EerstvolgendeLevering ?? ''); ?></td>
+                            <td>
+                                <div class="action-icons">
+                                    <a href="<?php echo URLROOT; ?>/leveranciers/edit/<?php echo $leverancier->LeverancierID; ?>" title="Wijzig" class="icon-link">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <a href="<?php echo URLROOT; ?>/leveranciers/delete/<?php echo $leverancier->LeverancierID; ?>" title="Verwijder" class="icon-link text-danger" onclick="return confirm('Weet je zeker dat je deze leverancier wilt verwijderen?');">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -47,9 +60,7 @@
     </div>
 </div>
 
-<br>
-<br>
-<br>
+<br><br><br>
 
 <style>
     .title {
@@ -97,6 +108,7 @@
         padding: 12px 15px;
         border: 1px solid #dddddd;
         text-align: left;
+        vertical-align: middle;
     }
 
     .styled-table tbody tr:nth-child(even) {
@@ -106,6 +118,40 @@
     .text-center {
         text-align: center;
     }
+
+    .action-icons {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: flex-start;
+        height: 100%;
+    }
+
+    .icon-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px;
+        font-size: 1.2em;
+        color: inherit;
+        text-decoration: none;
+        border-radius: 4px;
+        height: 100%;
+        min-width: 30px;
+    }
+
+    .icon-link:hover {
+        background-color: #f0f0f0;
+        text-decoration: none;
+        color: #495057;
+    }
+
+    .bi {
+        font-size: 1.2em;
+    }
 </style>
+
+<!-- Zorg dat je dit hebt in je <head> als het nog niet in je layout/header zit -->
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"> -->
 
 <?php require APPROOT . '/views/includes/footer.php'; ?>

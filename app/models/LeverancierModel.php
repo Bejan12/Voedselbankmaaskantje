@@ -12,9 +12,14 @@ class LeverancierModel
     public function getAllLeveranciers($sort = 'eerstvolgende')
     {
         try {
-            $orderBy = "EerstvolgendeLevering ASC";
             if ($sort === 'recent') {
                 $orderBy = "LeverancierID DESC";
+            } else {
+                // Eerst alle toekomstige leveringen, gesorteerd op dichtstbijzijnde datum, daarna de rest
+                $orderBy = "
+                    (EerstvolgendeLevering < NOW()) ASC, 
+                    ABS(TIMESTAMPDIFF(SECOND, NOW(), EerstvolgendeLevering)) ASC
+                ";
             }
 
             $this->db->query("SELECT LeverancierID, 
