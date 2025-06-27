@@ -94,7 +94,12 @@ class Magazijnvoorraad extends BaseController
             $categorie_id = (int) ($_POST['categorie_id'] ?? 0);
             $leverancier_id = (int) ($_POST['leverancier_id'] ?? 0);
             $aantal_voorraad = (int) ($_POST['aantal_voorraad'] ?? 0);
-            $allergie_id = !empty($_POST['allergie_id']) ? (int) $_POST['allergie_id'] : null;
+            
+            // Fix allergie_id handling - lege string wordt null
+            $allergie_id = null;
+            if (isset($_POST['allergie_id']) && $_POST['allergie_id'] !== '' && $_POST['allergie_id'] !== '0') {
+                $allergie_id = (int) $_POST['allergie_id'];
+            }
 
             // Bewaar formulierdata voor bij fout
             $formData = [
@@ -162,12 +167,15 @@ class Magazijnvoorraad extends BaseController
                         'leveranciers' => $this->magazijnvoorraadModel->getAlleLeveranciers(),
                         'allergieën' => $this->magazijnvoorraadModel->getAlleAllergieën(),
                         'formData' => $formData,
-                        'error' => 'Product met deze EAN-code bestaat al'
+                        'error' => 'Product met deze EAN-code bestaat al: ' . htmlspecialchars($bestaandProduct->ProductNaam)
                     ];
 
                     $this->view('magazijnvoorraad/nieuwproduct', $data);
                     return;
                 }
+
+                // Debug logging
+                error_log("Controller: Toevoegen product - Naam: $productnaam, EAN: $ean, Cat: $categorie_id, Lev: $leverancier_id, All: " . ($allergie_id ?? 'NULL') . ", Voorr: $aantal_voorraad");
 
                 // Voeg product toe
                 $success = $this->magazijnvoorraadModel->voegProductToe(
@@ -181,20 +189,22 @@ class Magazijnvoorraad extends BaseController
 
                 if ($success) {
                     // Redirect naar overzicht met succesbericht
-                    header('Location: ' . URLROOT . '/magazijnvoorraad?success=' . urlencode('Product succesvol toegevoegd'));
+                    header('Location: ' . URLROOT . '/magazijnvoorraad?success=' . urlencode('Product "' . $productnaam . '" succesvol toegevoegd'));
                     exit;
                 } else {
-                    throw new Exception('Onbekende fout bij toevoegen product');
+                    throw new Exception('Product kon niet worden opgeslagen in de database');
                 }
 
             } catch (Exception $e) {
+                error_log("Controller error bij toevoegen product: " . $e->getMessage());
+                
                 $data = [
                     'title' => 'Nieuw Product Toevoegen',
                     'categorieën' => $this->magazijnvoorraadModel->getAlleCategorieën(),
                     'leveranciers' => $this->magazijnvoorraadModel->getAlleLeveranciers(),
                     'allergieën' => $this->magazijnvoorraadModel->getAlleAllergieën(),
                     'formData' => $formData,
-                    'error' => 'Er is een fout opgetreden: ' . $e->getMessage()
+                    'error' => $e->getMessage()
                 ];
 
                 $this->view('magazijnvoorraad/nieuwproduct', $data);

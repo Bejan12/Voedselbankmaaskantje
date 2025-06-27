@@ -225,55 +225,72 @@ class MagazijnvoorraadModel
     public function voegProductToe($leverancier_id, $allergie_id, $categorie_id, $productnaam, $ean, $aantal_voorraad)
     {
         try {
-            // Gebruik de stored procedure als die bestaat
-            try {
-                $this->db->query('CALL VoegProductToe(:leverancier_id, :allergie_id, :categorie_id, :productnaam, :ean, :aantal_voorraad)');
-                $this->db->bind(':leverancier_id', $leverancier_id);
-                $this->db->bind(':allergie_id', $allergie_id);
-                $this->db->bind(':categorie_id', $categorie_id);
-                $this->db->bind(':productnaam', $productnaam);
-                $this->db->bind(':ean', $ean);
-                $this->db->bind(':aantal_voorraad', $aantal_voorraad);
-                
-                return $this->db->execute();
-            } catch (Exception $e) {
-                // Als stored procedure niet werkt, gebruik normale INSERT
-                error_log("Stored procedure failed, using normal INSERT: " . $e->getMessage());
-                
-                $this->db->query('
-                    INSERT INTO Product (LeverancierID, AllergieID, CategorieID, ProductNaam, EAN, AantalInVoorraad) 
-                    VALUES (:leverancier_id, :allergie_id, :categorie_id, :productnaam, :ean, :aantal_voorraad)
-                ');
-                
-                $this->db->bind(':leverancier_id', $leverancier_id);
-                $this->db->bind(':allergie_id', $allergie_id);
-                $this->db->bind(':categorie_id', $categorie_id);
-                $this->db->bind(':productnaam', $productnaam);
-                $this->db->bind(':ean', $ean);
-                $this->db->bind(':aantal_voorraad', $aantal_voorraad);
-                
-                $success = $this->db->execute();
-                
-                // Voeg ook toe aan voedselopslag tabel als die bestaat
-                if ($success) {
-                    try {
-                        $this->db->query('
-                            INSERT INTO Voedselopslag (ProductID, AantalInMagazijn, LaatsteAanleverDatum) 
-                            VALUES (LAST_INSERT_ID(), :aantal_voorraad, CURDATE())
-                        ');
-                        $this->db->bind(':aantal_voorraad', $aantal_voorraad);
-                        $this->db->execute();
-                    } catch (Exception $e) {
-                        error_log("Fout bij toevoegen aan voedselopslag: " . $e->getMessage());
-                        // Dit is niet kritiek, dus we gaan door
-                    }
-                }
-                
-                return $success;
+            // Als allergie_id null is, zet het naar NULL voor de database
+            if ($allergie_id === 0 || $allergie_id === '0') {
+                $allergie_id = null;
             }
+            
+            // Debug logging
+            error_log("Toevoegen product: Leverancier=$leverancier_id, Allergie=$allergie_id, Categorie=$categorie_id, Naam=$productnaam, EAN=$ean, Voorraad=$aantal_voorraad");
+            
+            // Probeer eerst normale INSERT (stored procedure kan problemen hebben)
+            $this->db->query('
+                INSERT INTO Product (LeverancierID, AllergieID, CategorieID, ProductNaam, EAN, AantalInVoorraad) 
+                VALUES (:leverancier_id, :allergie_id, :categorie_id, :productnaam, :ean, :aantal_voorraad)
+            ');
+            
+            $this->db->bind(':leverancier_id', $leverancier_id);
+            $this->db->bind(':allergie_id', $allergie_id, $allergie_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+            $this->db->bind(':categorie_id', $categorie_id);
+            $this->db->bind(':productnaam', $productnaam);
+            $this->db->bind(':ean', $ean);
+            $this->db->bind(':aantal_voorraad', $aantal_voorraad);
+            
+            $success = $this->db->execute();
+            
+            if ($success) {
+                // Probeer ook toe te voegen aan voedselopslag tabel als die bestaat
+                try {
+                    $this->db->query('
+                        INSERT INTO Voedselopslag (ProductID, AantalInMagazijn, LaatsteAanleverDatum) 
+                        VALUES (LAST_INSERT_ID(), :aantal_voorraad, CURDATE())
+                    ');
+                    $this->db->bind(':aantal_voorraad', $aantal_voorraad);
+                    $this->db->execute();
+                    error_log("Product succesvol toegevoegd aan voedselopslag");
+                } catch (Exception $e) {
+                    error_log("Fout bij toevoegen aan voedselopslag (niet kritiek): " . $e->getMessage());
+                    // Dit is niet kritiek, dus we gaan door
+                }
+            }
+            
+            return $success;
+            
         } catch (Exception $e) {
-            error_log("Fout bij toevoegen product: " . $e->getMessage());
-            return false;
+            error_log("Fout bij toevoegen product (details): " . $e->getMessage());
+            
+            // Controleer specifieke fouten
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+                if (strpos($e->getMessage(), 'ProductNaam') !== false) {
+                    throw new Exception('Er bestaat al een product met deze naam');
+                } elseif (strpos($e->getMessage(), 'EAN') !== false) {
+                    throw new Exception('Er bestaat al een product met deze EAN-code');
+                } else {
+                    throw new Exception('Dit product bestaat al in het systeem');
+                }
+            } elseif (strpos($e->getMessage(), 'foreign key constraint') !== false || strpos($e->getMessage(), 'Cannot add or update') !== false) {
+                if (strpos($e->getMessage(), 'LeverancierID') !== false) {
+                    throw new Exception('Onbekende leverancier geselecteerd');
+                } elseif (strpos($e->getMessage(), 'CategorieID') !== false) {
+                    throw new Exception('Onbekende categorie geselecteerd');
+                } elseif (strpos($e->getMessage(), 'AllergieID') !== false) {
+                    throw new Exception('Onbekende allergie geselecteerd');
+                } else {
+                    throw new Exception('Ongeldige gegevens: controleer leverancier, categorie en allergie');
+                }
+            } else {
+                throw new Exception('Database fout: ' . $e->getMessage());
+            }
         }
     }
 
