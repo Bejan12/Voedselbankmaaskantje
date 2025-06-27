@@ -1,0 +1,1 @@
+{"version":1,"defects":{"MagazijnvoorraadTest::testValidateProductCategory":8,"MagazijnvoorraadModelTest::testGenerateUniqueEAN":8,"MagazijnvoorraadModelTest::testValidateProductCategory":8,"MagazijnvoorraadModelTest::testVoegProductToe":8,"MagazijnvoorraadModelTest::testWijzigProduct":8,"MagazijnvoorraadModelTest::testWijzigProductMetFoutieveCategorie":8},"times":[]}
