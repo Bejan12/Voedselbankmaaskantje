@@ -12,7 +12,7 @@ define('DB_PASS', '');
  * De naam van de virtualhost
  */
 
-define('URLROOT', 'http://eindexamen/');
+define('URLROOT', 'http://examenmerge/');
 
 /**
  * Het pad naar de folder app

@@ -91,7 +91,7 @@
 <div class="klanten-container">
     <div class="klanten-header-row">
         <h3><?= $data['title']; ?></h3>
-        <a href="<?= URLROOT; ?>klanten/add" class="btn btn-orange">Klant toevoegen</a>
+        <a href="<?= URLROOT; ?>/klanten/add" class="btn btn-orange">Klant toevoegen</a>
     </div>
 
     <?php if (!empty($data['success'])): ?>
