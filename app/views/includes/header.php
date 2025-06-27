@@ -68,9 +68,13 @@
             <a href="#">Overzicht Leveranciers</a>
             <a href="#">Overzicht Voorraadbeheer</a>
             <a href="#">Overzicht voedselpakket</a>
-            <a href="#">Overzicht klanten</a>
+            <a href="<?= URLROOT; ?>klanten/index">Overzicht klanten</a>
         </div>
     </div>
+
+</body>
+</html>
+
 
 </body>
 </html>
