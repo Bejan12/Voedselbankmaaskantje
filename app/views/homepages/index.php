@@ -16,7 +16,7 @@
                 </div>
                 <div class="card-body p-5">
                     <p class="text-center text-muted mb-5">
-                        Kies een van de onderstaande opties om het systeem te gebruiken
+                        Kies een van de onderstaande opties om het systeem te gebruike
                     </p>
                     
                     <div class="row g-4">
