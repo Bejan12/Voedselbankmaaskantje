@@ -1,4 +1,5 @@
 <?php
+// Initialize session only once
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -126,7 +127,6 @@ if (session_status() === PHP_SESSION_NONE) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-                </li>
             </ul>
         </div>
     </div>

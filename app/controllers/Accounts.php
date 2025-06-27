@@ -12,9 +12,20 @@ class Accounts extends BaseController
     // Add default index method
     public function index()
     {
-        // Redirect to login page when accessing /accounts
-        header('Location: ' . URLROOT . '/accounts/login');
-        exit();
+        // Check if user is already logged in, redirect to homepage
+        if (isset($_SESSION['user_id'])) {
+            header('Location: ' . URLROOT . '/homepages/index');
+            exit();
+        }
+        
+        // Show login page directly instead of redirecting
+        $data = [
+            'email' => '',
+            'error' => '',
+            'success' => ''
+        ];
+
+        $this->view('accounts/login', $data);
     }
 
     public function register()
@@ -83,6 +94,17 @@ class Accounts extends BaseController
 
     public function login()
     {
+        // Ensure session is started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        // Check if user is already logged in, redirect to homepage
+        if (isset($_SESSION['user_id'])) {
+            header('Location: ' . URLROOT . '/homepages/index');
+            exit();
+        }
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Process form submission
             $data = [
@@ -102,11 +124,10 @@ class Accounts extends BaseController
                 $user = $this->accountModel->findUserByEmail($data['email']);
                 
                 if ($user && password_verify($data['wachtwoord'], $user->WachtwoordHash)) {
-                    // Login successful - start session
-                    session_start();
+                    // Login successful - don't call session_start() again
                     $_SESSION['user_id'] = $user->GebruikerID;
                     $_SESSION['username'] = $user->Gebruikersnaam;
-                    $_SESSION['user_email'] = $user->Email; // Renamed from 'email' to 'user_email'
+                    $_SESSION['user_email'] = $user->Email;
                     
                     // Redirect to dashboard
                     header('Location: ' . URLROOT . '/homepages/index');
