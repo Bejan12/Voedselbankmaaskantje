@@ -52,16 +52,24 @@ class HomepageModel
                     v.VoedselpakketID,
                     CONCAT(p.Voornaam, ' ', p.Achternaam) as KlantNaam,
                     v.DatumSamenstelling,
-                    v.DatumUitgifte
+                    v.DatumUitgifte,
+                    GROUP_CONCAT(DISTINCT l.Bedrijfsnaam SEPARATOR ', ') as Leveranciers
                 FROM voedselpakket v
                 JOIN klant k ON v.KlantID = k.KlantID
                 JOIN gebruiker g ON k.GebruikerID = g.GebruikerID
-                JOIN persoon p ON g.PersoonID = p.PersoonID";
+                JOIN persoon p ON g.PersoonID = p.PersoonID
+                LEFT JOIN voedselpakketproduct vpp ON v.VoedselpakketID = vpp.VoedselpakketID
+                LEFT JOIN product pr ON vpp.ProductID = pr.ProductID
+                LEFT JOIN leverancier l ON pr.LeverancierID = l.LeverancierID";
 
         if ($filter) {
             $sql .= " WHERE v.DatumUitgifte = :filter";
+        }
+        $sql .= " GROUP BY v.VoedselpakketID, p.Voornaam, p.Achternaam, v.DatumSamenstelling, v.DatumUitgifte";
+
+        if ($filter) {
             $this->db->query($sql);
-            $this->db->bind(':filter', $filter);
+            $this->db->bind(':filter', $filter, PDO::PARAM_STR);
         } else {
             $this->db->query($sql);
         }

@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Overzicht Voedselpakket</title>
+    <title>Voedselbank Maaskantje</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?= URLROOT ?>/public/css/style.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;700&display=swap');
 
@@ -23,11 +25,8 @@
         }
 
         .navbar img.logo {
-            height: 220px;
-            margin-right: 40px;
-            position: relative;
-            top: 50%;
-            left: 1%;
+            height: 60px;
+            margin-right: 30px;
         }
 
         .nav-links {
@@ -39,12 +38,31 @@
             color: #CECECE;
             text-decoration: none;
             font-weight: 500;
-            font-size: 14px;
+            font-size: 16px;
             transition: color 0.3s;
         }
 
-        .nav-links a:hover {
-            color: #ffffff;
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #EE7B00;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                height: auto;
+                padding: 10px 0;
+            }
+
+            .navbar img.logo {
+                margin-bottom: 10px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
         }
 
         .content {
@@ -60,17 +78,17 @@
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <img src="/img/voedselbank_logo.png" alt="Voedselbank Logo" class="logo">
+    <nav class="navbar">
+        <img src="<?= URLROOT ?>/public/img/voedselbank_logo.png" alt="Voedselbank Logo" class="logo">
         <div class="nav-links">
-            <a href="#">Dashboard</a>
+            <a href="<?= URLROOT ?>/homepages/index" class="<?= ($_SERVER['REQUEST_URI'] == '/' ? 'active' : '') ?>">Dashboard</a>
             <a href="#">Overzicht accounts</a>
             <a href="#">Overzicht Leveranciers</a>
             <a href="#">Overzicht Voorraadbeheer</a>
-            <a href="#">Overzicht voedselpakket</a>
+            <a href="<?= URLROOT ?>/voedselpakket/index" class="active">Overzicht voedselpakket</a>
             <a href="#">Overzicht klanten</a>
         </div>
-    </div>
+    </nav>
 
 </body>
 </html>
