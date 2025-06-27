@@ -107,48 +107,43 @@
             </div>
 
 
-        <!-- Status berichten -->
-    <?php if (isset($_GET['error'])): ?>
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-triangle me-2"></i><?= htmlspecialchars($_GET['error']); ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-<?php endif; ?>
+    <?php
+// ...existing code...
+        
+       ?> <!-- Status berichten -->
+         <?php if (isset($_GET['error'])): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i><?= htmlspecialchars($_GET['error']); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
 
-<?php if (isset($_GET['success'])): ?>
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle me-2"></i><?= htmlspecialchars($_GET['success']); ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-<?php endif; ?>
+        <?php if (isset($_GET['success'])): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i><?= htmlspecialchars($_GET['success']); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
 
-<?php if (isset($data['error'])): ?>
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-triangle me-2"></i><?= $data['error']; ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-<?php endif; ?>
+        <?php if (isset($data['error'])): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i><?= $data['error']; ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
 
-<?php if (isset($data['success'])): ?>
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle me-2"></i><?= $data['success']; ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-<?php endif; ?>
+        <?php if (isset($data['geselecteerdProduct'])): ?>
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle me-2"></i>Resultaat voor geselecteerd product
+            </div>
+        <?php endif; ?>
 
-            <?php if (isset($data['geselecteerdProduct'])): ?>
-                <div class="alert alert-info" role="alert">
-                    <i class="bi bi-info-circle me-2"></i>Resultaat voor geselecteerd product
-                </div>
-            <?php endif; ?>
+        <?php if (isset($data['zoekterm'])): ?>
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle me-2"></i>Zoekresultaat voor EAN-code: <code><?= htmlspecialchars($data['zoekterm']); ?></code>
+            </div>
+        <?php endif; ?>
 
-            <?php if (isset($data['zoekterm'])): ?>
-                <div class="alert alert-info" role="alert">
-                    <i class="bi bi-info-circle me-2"></i>Zoekresultaat voor EAN-code: <code><?= htmlspecialchars($data['zoekterm']); ?></code>
-                </div>
-            <?php endif; ?>
-
-            <!-- Rest van je bestaande code blijft hetzelfde... -->
             <!-- Voorraad overzicht -->
             <?php if ($data['heeftGegevens']): ?>
                 <!-- Compacte statistieken -->

@@ -564,6 +564,16 @@ class MagazijnvoorraadModel
             // Start transactie voor consistentie
             $this->db->query('START TRANSACTION');
             
+            // Eerst controleren of product bestaat
+            $this->db->query('SELECT ProductID FROM Product WHERE ProductID = :product_id');
+            $this->db->bind(':product_id', $productId);
+            $productExists = $this->db->single();
+            
+            if (!$productExists) {
+                $this->db->query('ROLLBACK');
+                throw new Exception('Product niet gevonden');
+            }
+            
             // Eerst verwijderen uit voedselopslag als het bestaat
             try {
                 $this->db->query('DELETE FROM Voedselopslag WHERE ProductID = :product_id');
@@ -580,16 +590,9 @@ class MagazijnvoorraadModel
             $success = $this->db->execute();
             
             if ($success) {
-                // Check of er daadwerkelijk een record is verwijderd
-                if ($this->db->rowCount() > 0) {
-                    $this->db->query('COMMIT');
-                    error_log("Product succesvol verwijderd - ID: $productId");
-                    return true;
-                } else {
-                    $this->db->query('ROLLBACK');
-                    error_log("Geen product gevonden om te verwijderen - ID: $productId");
-                    throw new Exception('Product niet gevonden');
-                }
+                $this->db->query('COMMIT');
+                error_log("Product succesvol verwijderd - ID: $productId");
+                return true;
             } else {
                 $this->db->query('ROLLBACK');
                 throw new Exception('Kon product niet verwijderen uit database');
