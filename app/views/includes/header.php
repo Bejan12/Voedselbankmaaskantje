@@ -62,6 +62,17 @@ if (session_status() === PHP_SESSION_NONE) {
         .dropdown-menu {
             min-width: 200px;
         }
+
+        /* Styling for user dropdown */
+        .navbar-nav .dropdown-toggle::after {
+            display: none; /* Hide default dropdown arrow */
+        }
+
+        .dropdown-item-text {
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -125,12 +136,5 @@ if (session_status() === PHP_SESSION_NONE) {
 </nav>
 <!-- Bootstrap 5 JS (for dropdowns) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-            </ul>
-        </div>
-    </div>
-    <!-- Bootstrap 5 JS (for dropdowns) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
