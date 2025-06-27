@@ -4,11 +4,18 @@
     <div class="row">
         <div class="col-12">
             <!-- Header sectie -->
-            <div class="mb-3">
-                <h2 class="text-dark mb-1">
-                    <i class="bi bi-boxes me-2 text-primary"></i><?php echo $data['title']; ?>
-                </h2>
-                <p class="subtitle mb-0">Beheer en monitor de magazijnvoorraad</p>
+            <div class="mb-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-dark mb-1">
+                        <i class="bi bi-boxes me-2 text-primary"></i><?php echo $data['title']; ?>
+                    </h2>
+                    <p class="subtitle mb-0">Beheer en monitor de magazijnvoorraad</p>
+                </div>
+                <div>
+                    <a href="<?= URLROOT; ?>/magazijnvoorraad/nieuwProduct" class="btn btn-success">
+                        <i class="bi bi-plus-circle me-1"></i>Nieuw Product
+                    </a>
+                </div>
             </div>
 
             <!-- Zoek panel -->
@@ -106,6 +113,12 @@
                 </div>
             <?php endif; ?>
 
+            <?php if (isset($data['success'])): ?>
+                <div class="alert alert-success" role="alert">
+                    <i class="bi bi-check-circle me-2"></i><?= $data['success']; ?>
+                </div>
+            <?php endif; ?>
+
             <?php if (isset($data['geselecteerdProduct'])): ?>
                 <div class="alert alert-info" role="alert">
                     <i class="bi bi-info-circle me-2"></i>Resultaat voor geselecteerd product
@@ -118,6 +131,7 @@
                 </div>
             <?php endif; ?>
 
+            <!-- Rest van je bestaande code blijft hetzelfde... -->
             <!-- Voorraad overzicht -->
             <?php if ($data['heeftGegevens']): ?>
                 <!-- Compacte statistieken -->

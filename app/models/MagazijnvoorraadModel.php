@@ -141,4 +141,119 @@ class MagazijnvoorraadModel
             return null;
         }
     }
+
+    /**
+     * Haalt alle categorieën op
+     */
+    public function getAlleCategorieën()
+    {
+        try {
+            $this->db->query('
+                SELECT CategorieID, Naam 
+                FROM Categorie 
+                ORDER BY Naam ASC
+            ');
+            
+            return $this->db->resultSet();
+        } catch (Exception $e) {
+            error_log("Fout bij ophalen categorieën: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Haalt alle leveranciers op
+     */
+    public function getAlleLeveranciers()
+    {
+        try {
+            $this->db->query('
+                SELECT LeverancierID, Bedrijfsnaam 
+                FROM Leverancier 
+                ORDER BY Bedrijfsnaam ASC
+            ');
+            
+            return $this->db->resultSet();
+        } catch (Exception $e) {
+            error_log("Fout bij ophalen leveranciers: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Haalt alle allergieën op
+     */
+    public function getAlleAllergieën()
+    {
+        try {
+            $this->db->query('
+                SELECT AllergieID, Naam 
+                FROM Allergie 
+                ORDER BY Naam ASC
+            ');
+            
+            return $this->db->resultSet();
+        } catch (Exception $e) {
+            error_log("Fout bij ophalen allergieën: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Voegt een nieuw product toe
+     */
+    public function voegProductToe($leverancier_id, $allergie_id, $categorie_id, $productnaam, $ean, $aantal_voorraad)
+    {
+        try {
+            // Gebruik de stored procedure als die bestaat
+            try {
+                $this->db->query('CALL VoegProductToe(:leverancier_id, :allergie_id, :categorie_id, :productnaam, :ean, :aantal_voorraad)');
+                $this->db->bind(':leverancier_id', $leverancier_id);
+                $this->db->bind(':allergie_id', $allergie_id);
+                $this->db->bind(':categorie_id', $categorie_id);
+                $this->db->bind(':productnaam', $productnaam);
+                $this->db->bind(':ean', $ean);
+                $this->db->bind(':aantal_voorraad', $aantal_voorraad);
+                
+                return $this->db->execute();
+            } catch (Exception $e) {
+                // Als stored procedure niet werkt, gebruik normale INSERT
+                error_log("Stored procedure failed, using normal INSERT: " . $e->getMessage());
+                
+                $this->db->query('
+                    INSERT INTO Product (LeverancierID, AllergieID, CategorieID, ProductNaam, EAN, AantalInVoorraad) 
+                    VALUES (:leverancier_id, :allergie_id, :categorie_id, :productnaam, :ean, :aantal_voorraad)
+                ');
+                
+                $this->db->bind(':leverancier_id', $leverancier_id);
+                $this->db->bind(':allergie_id', $allergie_id);
+                $this->db->bind(':categorie_id', $categorie_id);
+                $this->db->bind(':productnaam', $productnaam);
+                $this->db->bind(':ean', $ean);
+                $this->db->bind(':aantal_voorraad', $aantal_voorraad);
+                
+                $success = $this->db->execute();
+                
+                // Voeg ook toe aan voedselopslag tabel
+                if ($success) {
+                    try {
+                        $this->db->query('
+                            INSERT INTO Voedselopslag (ProductID, AantalInMagazijn, LaatsteAanleverDatum) 
+                            VALUES (LAST_INSERT_ID(), :aantal_voorraad, CURDATE())
+                        ');
+                        $this->db->bind(':aantal_voorraad', $aantal_voorraad);
+                        $this->db->execute();
+                    } catch (Exception $e) {
+                        error_log("Fout bij toevoegen aan voedselopslag: " . $e->getMessage());
+                        // Dit is niet kritiek, dus we gaan door
+                    }
+                }
+                
+                return $success;
+            }
+        } catch (Exception $e) {
+            error_log("Fout bij toevoegen product: " . $e->getMessage());
+            return false;
+        }
+    }
 }
