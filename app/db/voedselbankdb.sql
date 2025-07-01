@@ -3,15 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
-<<<<<<< HEAD
 -- Gegenereerd op: 27 jun 2025 om 07:46
 -- Serverversie: 8.2.0
 -- PHP-versie: 8.3.11
-=======
--- Gegenereerd op: 27 jun 2025 om 09:41
--- Serverversie: 9.1.0
--- PHP-versie: 8.3.14
->>>>>>> eindproductzakka
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -26,11 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `voedselbankdb`
 --
-<<<<<<< HEAD
 CREATE DATABASE IF NOT EXISTS `voedselbankdb` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 USE `voedselbankdb`;
-=======
->>>>>>> eindproductzakka
 
 DELIMITER $$
 --
@@ -104,24 +95,7 @@ CREATE TABLE IF NOT EXISTS `allergie` (
   `Naam` varchar(50) NOT NULL,
   PRIMARY KEY (`AllergieID`),
   UNIQUE KEY `Naam` (`Naam`)
-<<<<<<< HEAD
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-=======
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Gegevens worden geëxporteerd voor tabel `allergie`
---
-
-INSERT INTO `allergie` (`AllergieID`, `Naam`) VALUES
-(1, 'Gluten'),
-(2, 'Pinda\'s'),
-(3, 'Schaaldieren'),
-(4, 'Hazelnoten'),
-(5, 'Lactose'),
-(6, 'Eieren'),
-(7, 'Soja');
->>>>>>> eindproductzakka
 
 -- --------------------------------------------------------
 
@@ -166,20 +140,7 @@ CREATE TABLE IF NOT EXISTS `contact` (
   `Email` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`ContactID`),
   KEY `GebruikerID` (`GebruikerID`)
-<<<<<<< HEAD
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-=======
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Gegevens worden geëxporteerd voor tabel `contact`
---
-
-INSERT INTO `contact` (`ContactID`, `GebruikerID`, `Telefoon`, `Email`) VALUES
-(1, 1, '0412-111111', 'peter.abraham@voedselbank.nl'),
-(2, 2, '0412-222222', 'marie.jansen@voedselbank.nl'),
-(3, 3, '0412-345678', 'jan.pieters@ah.nl');
->>>>>>> eindproductzakka
 
 -- --------------------------------------------------------
 
@@ -211,22 +172,7 @@ CREATE TABLE IF NOT EXISTS `gebruiker` (
   PRIMARY KEY (`GebruikerID`),
   UNIQUE KEY `Gebruikersnaam` (`Gebruikersnaam`),
   KEY `PersoonID` (`PersoonID`)
-<<<<<<< HEAD
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-=======
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Gegevens worden geëxporteerd voor tabel `gebruiker`
---
-
-INSERT INTO `gebruiker` (`GebruikerID`, `PersoonID`, `Gebruikersnaam`, `WachtwoordHash`, `IsGeblokkeerd`) VALUES
-(1, 1, 'admin', 0x5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8, 0),
-(2, 2, 'marie_magazijn', 0x5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8, 0),
-(3, 3, 'jan_leverancier', 0x5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8, 0),
-(4, 4, 'maria_klant', 0x5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8, 0),
-(5, 5, 'jan_klant', 0x5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8, 0);
->>>>>>> eindproductzakka
 
 -- --------------------------------------------------------
 
@@ -242,18 +188,6 @@ CREATE TABLE IF NOT EXISTS `gebruikerrol` (
   KEY `RolID` (`RolID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-<<<<<<< HEAD
-=======
---
--- Gegevens worden geëxporteerd voor tabel `gebruikerrol`
---
-
-INSERT INTO `gebruikerrol` (`GebruikerID`, `RolID`) VALUES
-(1, 1),
-(2, 2),
-(3, 3);
-
->>>>>>> eindproductzakka
 -- --------------------------------------------------------
 
 --
@@ -272,22 +206,7 @@ CREATE TABLE IF NOT EXISTS `klant` (
   `Vegetarisch` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`KlantID`),
   KEY `IDX_Klant_GebruikerID` (`GebruikerID`)
-<<<<<<< HEAD
 ) ;
-=======
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Gegevens worden geëxporteerd voor tabel `klant`
---
-
-INSERT INTO `klant` (`KlantID`, `GebruikerID`, `AantalVolwassenen`, `AantalKinderen`, `AantalBabys`, `GeenVarkensvlees`, `Veganistisch`, `Vegetarisch`) VALUES
-(1, 4, 2, 1, 0, 0, 0, 1),
-(2, 5, 1, 2, 1, 1, 0, 0),
-(3, 1, 2, 0, 0, 0, 0, 0),
-(4, 1, 2, 3, 0, 1, 1, 0),
-(5, 1, 1, 0, 1, 0, 0, 0);
->>>>>>> eindproductzakka
 
 -- --------------------------------------------------------
 
@@ -303,19 +222,6 @@ CREATE TABLE IF NOT EXISTS `klantallergie` (
   KEY `AllergieID` (`AllergieID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-<<<<<<< HEAD
-=======
---
--- Gegevens worden geëxporteerd voor tabel `klantallergie`
---
-
-INSERT INTO `klantallergie` (`KlantID`, `AllergieID`) VALUES
-(2, 1),
-(2, 5),
-(4, 2),
-(5, 5);
-
->>>>>>> eindproductzakka
 -- --------------------------------------------------------
 
 --
@@ -325,31 +231,21 @@ INSERT INTO `klantallergie` (`KlantID`, `AllergieID`) VALUES
 DROP TABLE IF EXISTS `leverancier`;
 CREATE TABLE IF NOT EXISTS `leverancier` (
   `LeverancierID` int NOT NULL AUTO_INCREMENT,
+  `LeverancierNummer` varchar(6) NOT NULL,
   `GebruikerID` int NOT NULL,
+  `LeverancierTypeID` int NOT NULL,
   `Bedrijfsnaam` varchar(100) NOT NULL,
   `Adres` varchar(200) DEFAULT NULL,
   `ContactNaam` varchar(100) DEFAULT NULL,
   `ContactEmail` varchar(100) DEFAULT NULL,
   `ContactTelefoon` varchar(20) DEFAULT NULL,
   `EerstvolgendeLevering` datetime DEFAULT NULL,
+  `Status` enum('gepland','voorbereiden','onderweg','geleverd') DEFAULT 'gepland',
   PRIMARY KEY (`LeverancierID`),
-  KEY `GebruikerID` (`GebruikerID`)
-<<<<<<< HEAD
+  UNIQUE KEY `LeverancierNummer_UNIQUE` (`LeverancierNummer`),
+  KEY `GebruikerID` (`GebruikerID`),
+  KEY `LeverancierTypeID` (`LeverancierTypeID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-=======
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Gegevens worden geëxporteerd voor tabel `leverancier`
---
-
-INSERT INTO `leverancier` (`LeverancierID`, `GebruikerID`, `Bedrijfsnaam`, `Adres`, `ContactNaam`, `ContactEmail`, `ContactTelefoon`, `EerstvolgendeLevering`) VALUES
-(1, 3, 'Albert Heijn Maaskantje', 'Hoofdstraat 12, 5371AB Maaskantje', 'Jan Pieters', 'jan.pieters@ah.nl', '0412-345678', '2025-06-30 09:00:00'),
-(2, 1, 'Jumbo Supermarkten', 'Marktplein 5, 5371CD Maaskantje', 'Marie van der Berg', 'marie.vandenberg@jumbo.com', '0412-567890', '2025-07-02 14:30:00'),
-(3, 1, 'Boerderij De Hof', 'Hofweg 25, 5371EF Maaskantje', 'Piet Janssen', 'piet@boerderijdehof.nl', '0412-123456', '2025-07-01 08:00:00'),
-(4, 1, 'Bakkerij Van Dijk', 'Kerkstraat 8, 5371GH Maaskantje', 'Kees van Dijk', 'info@bakkerijvandijk.nl', '0412-789012', '2025-06-29 07:00:00'),
-(5, 1, 'Groothandel Maaskantje', 'Industrieweg 15, 5371IJ Maaskantje', 'Sandra Verhagen', 's.verhagen@groothandel.nl', '0412-345123', '2025-07-03 10:00:00');
->>>>>>> eindproductzakka
 
 -- --------------------------------------------------------
 
@@ -367,24 +263,7 @@ CREATE TABLE IF NOT EXISTS `persoon` (
   `Email` varchar(100) DEFAULT NULL,
   `Adres` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`PersoonID`)
-<<<<<<< HEAD
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-=======
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Gegevens worden geëxporteerd voor tabel `persoon`
---
-
-INSERT INTO `persoon` (`PersoonID`, `Voornaam`, `Achternaam`, `Geboortedatum`, `Telefoon`, `Email`, `Adres`) VALUES
-(1, 'Peter', 'Abraham', '1965-03-15', '0412-111111', 'peter.abraham@voedselbank.nl', 'Hoofdstraat 1, 5371AA Maaskantje'),
-(2, 'Marie', 'Jansen', '1972-08-22', '0412-222222', 'marie.jansen@voedselbank.nl', 'Kerkstraat 5, 5371BB Maaskantje'),
-(3, 'Jan', 'Pieters', '1980-01-10', '0412-345678', 'jan.pieters@ah.nl', 'Winkelstraat 12, 5371CC Maaskantje'),
-(4, 'Maria', 'van Dongen', '1985-06-15', '06-12345678', 'maria.vandongen@email.nl', 'Dorpsstraat 12, 5371AB Maaskantje'),
-(5, 'Jan', 'de Vries', '1978-11-03', '06-23456789', 'jan.devries@email.nl', 'Schoolstraat 8, 5371CD Maaskantje'),
-(6, 'Petra', 'Hendriks', '1990-04-20', '06-34567890', 'petra.hendriks@email.nl', 'Molenweg 15, 5371EF Maaskantje'),
-(7, 'Ahmed', 'Hassan', '1982-09-12', '06-45678901', 'ahmed.hassan@email.nl', 'Nieuwstraat 22, 5371GH Maaskantje');
->>>>>>> eindproductzakka
 
 -- --------------------------------------------------------
 
@@ -408,32 +287,7 @@ CREATE TABLE IF NOT EXISTS `product` (
   KEY `AllergieID` (`AllergieID`),
   KEY `CategorieID` (`CategorieID`),
   KEY `IDX_Product_EAN` (`EAN`)
-<<<<<<< HEAD
 ) ;
-=======
-) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Gegevens worden geëxporteerd voor tabel `product`
---
-
-INSERT INTO `product` (`ProductID`, `LeverancierID`, `AllergieID`, `CategorieID`, `ProductNaam`, `EAN`, `AantalInVoorraad`) VALUES
-(1, 1, NULL, 1, 'Aardappelen vastkokend 2kg', '8711200012345', 25),
-(2, 1, NULL, 1, 'Bananen 1kg', '8711200023456', 30),
-(3, 2, 5, 3, 'Melk halfvol 1L', '8710398054321', 40),
-(4, 4, 1, 4, 'Wit brood heel', '8711327065432', 15),
-(5, 3, NULL, 1, 'Wortelen 1kg', '8711200076543', 20),
-(6, 2, NULL, 6, 'Spaghetti 500g', '8712566087654', 35),
-(7, 1, 5, 2, 'Jonge kaas plakken', '8711200098765', 18),
-(8, 5, NULL, 5, 'Appelsap 1L', '8710398009876', 28),
-(9, 4, 1, 8, 'Koekjes naturel', '8711327010987', 22),
-(10, 3, NULL, 1, 'Appels Elstar 1kg', '8711200021098', 45),
-(11, 2, NULL, 7, 'Tomatensoep blik', '8712566032109', 50),
-(12, 1, 6, 3, 'Eieren 12 stuks', '8711200043210', 12),
-(13, 5, NULL, 6, 'Rijst 1kg', '8710398054322', 38),
-(14, 4, 1, 4, 'Volkoren brood', '8711327065433', 10),
-(15, 3, NULL, 1, 'Uien 2kg', '8711200076544', 33);
->>>>>>> eindproductzakka
 
 -- --------------------------------------------------------
 
@@ -498,7 +352,6 @@ CREATE TABLE IF NOT EXISTS `voedselopslag` (
   `AantalInMagazijn` int NOT NULL,
   `LaatsteAanleverDatum` date DEFAULT NULL,
   PRIMARY KEY (`ProductID`)
-<<<<<<< HEAD
 ) ;
 
 -- --------------------------------------------------------
@@ -547,11 +400,41 @@ CREATE TABLE IF NOT EXISTS `werknemer` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 COMMIT;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+-- Nieuwe tabel voor LeverancierType
+DROP TABLE IF EXISTS `leverancier_type`;
+CREATE TABLE IF NOT EXISTS `leverancier_type` (
+  `LeverancierTypeID` int NOT NULL AUTO_INCREMENT,
+  `TypeNaam` varchar(50) NOT NULL,
+  PRIMARY KEY (`LeverancierTypeID`),
+  UNIQUE KEY `TypeNaam` (`TypeNaam`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- ...existing code... (all your table structures)
+-- Voeg standaard types toe
+INSERT INTO `leverancier_type` (`LeverancierTypeID`, `TypeNaam`) VALUES
+(1, 'Groothandel'),
+(2, 'Boer'),
+(3, 'Supermarkt'),
+(4, 'Bakkerij');
+
+
+DROP TABLE IF EXISTS `leverancier`;
+CREATE TABLE IF NOT EXISTS `leverancier` (
+  `LeverancierID` int NOT NULL AUTO_INCREMENT,
+  `LeverancierNummer` varchar(6) NOT NULL,
+  `GebruikerID` int NOT NULL,
+  `LeverancierTypeID` int NOT NULL,
+  `Bedrijfsnaam` varchar(100) NOT NULL,
+  `Adres` varchar(200) DEFAULT NULL,
+  `ContactNaam` varchar(100) DEFAULT NULL,
+  `ContactEmail` varchar(100) DEFAULT NULL,
+  `ContactTelefoon` varchar(20) DEFAULT NULL,
+  `EerstvolgendeLevering` datetime DEFAULT NULL,
+  `Status` enum('gepland','voorbereiden','onderweg','geleverd') DEFAULT 'gepland',
+  PRIMARY KEY (`LeverancierID`),
+  UNIQUE KEY `LeverancierNummer_UNIQUE` (`LeverancierNummer`),
+  KEY `GebruikerID` (`GebruikerID`),
+  KEY `LeverancierTypeID` (`LeverancierTypeID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Testdata voor Allergie tabel
 INSERT IGNORE INTO `allergie` (`AllergieID`, `Naam`) VALUES
@@ -588,12 +471,12 @@ INSERT IGNORE INTO `gebruikerrol` (`GebruikerID`, `RolID`) VALUES
 (3, 3); -- Jan is Vrijwilliger
 
 -- Testdata voor Leverancier tabel
-INSERT IGNORE INTO `leverancier` (`LeverancierID`, `GebruikerID`, `Bedrijfsnaam`, `Adres`, `ContactNaam`, `ContactEmail`, `ContactTelefoon`, `EerstvolgendeLevering`) VALUES
-(1, 3, 'Albert Heijn Maaskantje', 'Hoofdstraat 12, 5371AB Maaskantje', 'Jan Pieters', 'jan.pieters@ah.nl', '0412-345678', '2025-06-30 09:00:00'),
-(2, 1, 'Jumbo Supermarkten', 'Marktplein 5, 5371CD Maaskantje', 'Marie van der Berg', 'marie.vandenberg@jumbo.com', '0412-567890', '2025-07-02 14:30:00'),
-(3, 1, 'Boerderij De Hof', 'Hofweg 25, 5371EF Maaskantje', 'Piet Janssen', 'piet@boerderijdehof.nl', '0412-123456', '2025-07-01 08:00:00'),
-(4, 1, 'Bakkerij Van Dijk', 'Kerkstraat 8, 5371GH Maaskantje', 'Kees van Dijk', 'info@bakkerijvandijk.nl', '0412-789012', '2025-06-29 07:00:00'),
-(5, 1, 'Groothandel Maaskantje', 'Industrieweg 15, 5371IJ Maaskantje', 'Sandra Verhagen', 's.verhagen@groothandel.nl', '0412-345123', '2025-07-03 10:00:00');
+INSERT IGNORE INTO `leverancier` (`LeverancierID`, `LeverancierNummer`, `GebruikerID`, `LeverancierTypeID`, `Bedrijfsnaam`, `Adres`, `ContactNaam`, `ContactEmail`, `ContactTelefoon`, `EerstvolgendeLevering`, `Status`) VALUES
+(1, '123456', 3, 3, 'Albert Heijn Maaskantje', 'Hoofdstraat 12, 5371AB Maaskantje', 'Jan Pieters', 'jan.pieters@ah.nl', '0412-345678', '2025-06-30 09:00:00', 'gepland'),
+(2, '234567', 1, 3, 'Jumbo Supermarkten', 'Marktplein 5, 5371CD Maaskantje', 'Marie van der Berg', 'marie.vandenberg@jumbo.com', '0412-567890', '2025-07-02 14:30:00', 'voorbereiden'),
+(3, '345678', 1, 2, 'Boerderij De Hof', 'Hofweg 25, 5371EF Maaskantje', 'Piet Janssen', 'piet@boerderijdehof.nl', '0412-123456', '2025-07-01 08:00:00', 'onderweg'),
+(4, '456789', 1, 4, 'Bakkerij Van Dijk', 'Kerkstraat 8, 5371GH Maaskantje', 'Kees van Dijk', 'info@bakkerijvandijk.nl', '0412-789012', '2025-06-29 07:00:00', 'gepland'),
+(5, '567890', 1, 1, 'Groothandel Maaskantje', 'Industrieweg 15, 5371IJ Maaskantje', 'Sandra Verhagen', 's.verhagen@groothandel.nl', '0412-345123', '2025-07-03 10:00:00', 'voorbereiden');
 
 -- Testdata voor Product tabel
 INSERT IGNORE INTO `product` (`ProductID`, `LeverancierID`, `AllergieID`, `CategorieID`, `ProductNaam`, `EAN`, `AantalInVoorraad`) VALUES
@@ -630,15 +513,6 @@ INSERT IGNORE INTO `klantallergie` (`KlantID`, `AllergieID`) VALUES
 
 -- Testdata voor Voedselopslag tabel
 INSERT IGNORE INTO `voedselopslag` (`ProductID`, `AantalInMagazijn`, `LaatsteAanleverDatum`) VALUES
-=======
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Gegevens worden geëxporteerd voor tabel `voedselopslag`
---
-
-INSERT INTO `voedselopslag` (`ProductID`, `AantalInMagazijn`, `LaatsteAanleverDatum`) VALUES
->>>>>>> eindproductzakka
 (1, 25, '2025-06-25'),
 (2, 30, '2025-06-26'),
 (3, 40, '2025-06-24'),
@@ -655,39 +529,14 @@ INSERT INTO `voedselopslag` (`ProductID`, `AantalInMagazijn`, `LaatsteAanleverDa
 (14, 10, '2025-06-27'),
 (15, 33, '2025-06-25');
 
-<<<<<<< HEAD
 -- Testdata voor Voedselpakket tabel
 INSERT IGNORE INTO `voedselpakket` (`VoedselpakketID`, `KlantID`, `DatumSamenstelling`, `DatumUitgifte`) VALUES
-=======
--- --------------------------------------------------------
-
---
--- Tabelstructuur voor tabel `voedselpakket`
---
-
-DROP TABLE IF EXISTS `voedselpakket`;
-CREATE TABLE IF NOT EXISTS `voedselpakket` (
-  `VoedselpakketID` int NOT NULL AUTO_INCREMENT,
-  `KlantID` int NOT NULL,
-  `DatumSamenstelling` date NOT NULL,
-  `DatumUitgifte` date DEFAULT NULL,
-  PRIMARY KEY (`VoedselpakketID`),
-  KEY `IDX_Voedselpakket_KlantID` (`KlantID`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Gegevens worden geëxporteerd voor tabel `voedselpakket`
---
-
-INSERT INTO `voedselpakket` (`VoedselpakketID`, `KlantID`, `DatumSamenstelling`, `DatumUitgifte`) VALUES
->>>>>>> eindproductzakka
 (1, 1, '2025-06-26', '2025-06-27'),
 (2, 2, '2025-06-26', '2025-06-27'),
 (3, 3, '2025-06-26', '2025-06-27'),
 (4, 4, '2025-06-26', NULL),
 (5, 5, '2025-06-26', NULL);
 
-<<<<<<< HEAD
 -- Testdata voor VoedselpakketProduct tabel
 INSERT IGNORE INTO `voedselpakketproduct` (`VoedselpakketID`, `ProductID`, `Aantal`) VALUES
 (1, 1, 1), -- Maria krijgt aardappelen
@@ -717,66 +566,7 @@ INSERT IGNORE INTO `werknemer` (`WerknemerID`, `GebruikerID`) VALUES
 (2, 2); -- Marie Jansen
 
 COMMIT;
-=======
--- --------------------------------------------------------
-
---
--- Tabelstructuur voor tabel `voedselpakketproduct`
---
-
-DROP TABLE IF EXISTS `voedselpakketproduct`;
-CREATE TABLE IF NOT EXISTS `voedselpakketproduct` (
-  `VoedselpakketID` int NOT NULL,
-  `ProductID` int NOT NULL,
-  `Aantal` int NOT NULL,
-  PRIMARY KEY (`VoedselpakketID`,`ProductID`),
-  KEY `ProductID` (`ProductID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Gegevens worden geëxporteerd voor tabel `voedselpakketproduct`
---
-
-INSERT INTO `voedselpakketproduct` (`VoedselpakketID`, `ProductID`, `Aantal`) VALUES
-(1, 1, 1),
-(1, 3, 2),
-(1, 4, 1),
-(2, 1, 1),
-(2, 6, 1),
-(2, 8, 1),
-(3, 2, 2),
-(3, 7, 1),
-(3, 11, 2),
-(4, 1, 2),
-(4, 5, 1),
-(4, 13, 1),
-(5, 10, 1),
-(5, 12, 1);
-
--- --------------------------------------------------------
-
---
--- Tabelstructuur voor tabel `werknemer`
---
-
-DROP TABLE IF EXISTS `werknemer`;
-CREATE TABLE IF NOT EXISTS `werknemer` (
-  `WerknemerID` int NOT NULL AUTO_INCREMENT,
-  `GebruikerID` int NOT NULL,
-  PRIMARY KEY (`WerknemerID`),
-  KEY `GebruikerID` (`GebruikerID`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Gegevens worden geëxporteerd voor tabel `werknemer`
---
-
-INSERT INTO `werknemer` (`WerknemerID`, `GebruikerID`) VALUES
-(1, 1),
-(2, 2);
-COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
->>>>>>> eindproductzakka

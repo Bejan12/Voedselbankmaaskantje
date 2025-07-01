@@ -12,7 +12,7 @@ define('DB_PASS', '');
  * De naam van de virtualhost
  */
 
-define('URLROOT', 'http://examenzakka/');
+define('URLROOT', 'http://examen');
 
 /**
  * Het pad naar de folder app
