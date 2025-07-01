@@ -5,6 +5,13 @@
 
 class Database
 {
+    /**
+     * Haal het laatste ID op na een insert
+     */
+    public function lastInsertId()
+    {
+        return $this->dbHandler->lastInsertId();
+    }
     private $dbHost = DB_HOST;
     private $dbName = DB_NAME;
     private $dbUser = DB_USER;

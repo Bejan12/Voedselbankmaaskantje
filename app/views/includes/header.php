@@ -81,14 +81,29 @@
     <nav class="navbar">
         <img src="<?= URLROOT ?>/public/img/voedselbank_logo.png" alt="Voedselbank Logo" class="logo">
         <div class="nav-links">
-            <a href="<?= URLROOT ?>/homepages/index" class="<?= ($_SERVER['REQUEST_URI'] == '/' ? 'active' : '') ?>">Dashboard</a>
-            <a href="#">Overzicht accounts</a>
-            <a href="#">Overzicht Leveranciers</a>
-            <a href="#">Overzicht Voorraadbeheer</a>
-            <a href="<?= URLROOT ?>/voedselpakket/index" class="active">Overzicht voedselpakket</a>
-            <a href="#">Overzicht klanten</a>
+            <a href="<?= URLROOT ?>/homepages/index" class="<?= (strpos($_SERVER['REQUEST_URI'], '/homepages') !== false ? 'active' : '') ?>">Dashboard</a>
+            <a href="#">Accounts</a>
+            <a href="#">Leveranciers</a>
+            <a href="#">Voorraadbeheer</a>
+            <a href="<?= URLROOT ?>/voedselpakketoverzicht/index" class="<?= (strpos($_SERVER['REQUEST_URI'], '/voedselpakketoverzicht') !== false ? 'active' : '') ?>">Voedselpakketten</a>
+            <a href="<?= URLROOT ?>/voedselpakkettoevoegen/index" class="<?= (strpos($_SERVER['REQUEST_URI'], '/voedselpakkettoevoegen') !== false ? 'active' : '') ?>">Voedselpakket toevoegen</a>
+            <a href="#">Klanten</a>
+        </div>
+        <div class="hamburger" id="hamburgerMenu">
+            <span></span><span></span><span></span>
         </div>
     </nav>
+    <script>
+    // Hamburger menu functionaliteit
+    document.addEventListener('DOMContentLoaded', function() {
+        const hamburger = document.getElementById('hamburgerMenu');
+        const navLinks = document.querySelector('.nav-links');
+        hamburger.addEventListener('click', function() {
+            navLinks.classList.toggle('active');
+            hamburger.classList.toggle('open');
+        });
+    });
+    </script>
 
 </body>
 </html>

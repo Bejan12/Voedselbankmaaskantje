@@ -28,7 +28,7 @@
                 <div class="vbn-subtitle">Samen tegen voedselverspilling en armoede</div>
                 <p class="lead mb-3">Voedselbank Maaskantje zet zich in om voedseloverschotten te verdelen onder mensen die het hard nodig hebben. Met de hulp van vrijwilligers en donateurs zorgen wij ervoor dat niemand in onze regio zonder eten hoeft te zitten.</p>
                 <p class="mb-3">Onze missie is om armoede te bestrijden en voedselverspilling tegen te gaan. We werken samen met lokale supermarkten, leveranciers en particulieren om voedsel te verzamelen en eerlijk te verdelen.</p>
-                <a href="/overzicht-voedselpakket" class="vbn-btn">Naar overzicht voedselpakket</a>
+                <a href="<?= URLROOT ?>/voedselpakketoverzicht/index" class="vbn-btn">Naar overzicht voedselpakket</a>
             </div>
             <div class="vbn-section text-center">
                 <h2 class="vbn-title mb-3">Ik zoek hulp</h2>
