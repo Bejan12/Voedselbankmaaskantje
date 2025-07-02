@@ -44,7 +44,7 @@ class Klanten extends BaseController
             ) {
                 $data = [
                     'form' => $_POST,
-                    'error' => 'Vul alle verplichte velden in.'
+                    'error' => 'Vul alle verplichte velden in om de klant toe te voegen.'
                 ];
                 $this->view('klanten/add', $data);
                 return;
@@ -66,7 +66,7 @@ class Klanten extends BaseController
 
             if ($result) {
                 $_SESSION['melding'] = "Klant succesvol toegevoegd.";
-                header('Location: /klanten');
+                header('Location: ' . URLROOT . '/klanten');
                 exit;
             } else {
                 $data = [
@@ -83,35 +83,65 @@ class Klanten extends BaseController
     public function edit($klantId)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Verzamel en valideer POST-data
-            $data = [
-                'voornaam' => trim($_POST['voornaam'] ?? ''),
-                'achternaam' => trim($_POST['achternaam'] ?? ''),
-                'adres' => trim($_POST['adres'] ?? ''),
-                'telefoon' => trim($_POST['telefoon'] ?? ''),
-                'email' => trim($_POST['email'] ?? ''),
-                'aantal_volwassenen' => trim($_POST['aantal_volwassenen'] ?? ''),
-                'aantal_kinderen' => trim($_POST['aantal_kinderen'] ?? ''),
-                'aantal_babys' => trim($_POST['aantal_babys'] ?? ''),
-                'geen_varkensvlees' => isset($_POST['geen_varkensvlees']) ? 1 : 0,
-                'veganistisch' => isset($_POST['veganistisch']) ? 1 : 0,
-                'vegetarisch' => isset($_POST['vegetarisch']) ? 1 : 0
+            $voornaam = trim($_POST['voornaam'] ?? '');
+            $achternaam = trim($_POST['achternaam'] ?? '');
+            $adres = trim($_POST['adres'] ?? '');
+            $telefoon = trim($_POST['telefoon'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+            $aantalVolwassenen = trim($_POST['aantal_volwassenen'] ?? '');
+            $aantalKinderen = trim($_POST['aantal_kinderen'] ?? '');
+            $aantalBabys = trim($_POST['aantal_babys'] ?? '');
+            $geenVarkensvlees = isset($_POST['geen_varkensvlees']) ? 1 : 0;
+            $veganistisch = isset($_POST['veganistisch']) ? 1 : 0;
+            $vegetarisch = isset($_POST['vegetarisch']) ? 1 : 0;
+
+            if (
+                empty($voornaam) || empty($achternaam) || empty($adres) ||
+                empty($telefoon) || empty($email) ||
+                $aantalVolwassenen === '' || $aantalKinderen === '' || $aantalBabys === '' ||
+                !filter_var($email, FILTER_VALIDATE_EMAIL)
+            ) {
+                $data = [
+                    'form' => $_POST,
+                    'error' => 'Vul alle verplichte velden in om de klant toe te voegen.'
+                ];
+                $this->view('klanten/edit', $data);
+                return;
+            }
+
+            $updateData = [
+                'voornaam' => $voornaam,
+                'achternaam' => $achternaam,
+                'adres' => $adres,
+                'telefoon' => $telefoon,
+                'email' => $email,
+                'aantal_volwassenen' => $aantalVolwassenen,
+                'aantal_kinderen' => $aantalKinderen,
+                'aantal_babys' => $aantalBabys,
+                'geen_varkensvlees' => $geenVarkensvlees,
+                'veganistisch' => $veganistisch,
+                'vegetarisch' => $vegetarisch
             ];
 
-            $result = $this->klantenModel->updateKlant($klantId, $data);
+            $result = $this->klantenModel->updateKlant($klantId, $updateData);
 
             if ($result) {
-                $_SESSION['melding'] = "Klant succesvol gewijzigd.";
+                $_SESSION['melding'] = "Klantgegevens succesvol bijgewerkt.";
+                header('Location: ' . URLROOT . '/klanten');
+                exit;
             } else {
-                $_SESSION['foutmelding'] = "Wijzigen mislukt. Klant bestaat mogelijk niet.";
+                $data = [
+                    'form' => $_POST,
+                    'error' => 'Wijzigen mislukt. Klant bestaat mogelijk niet.'
+                ];
+                $this->view('klanten/edit', $data);
+                return;
             }
-            header('Location: /klanten');
-            exit;
         } else {
             $klant = $this->klantenModel->getKlantById($klantId);
             if (!$klant) {
                 $_SESSION['foutmelding'] = "Klant niet gevonden.";
-                header('Location: /klanten');
+                header('Location: ' . URLROOT . '/klanten');
                 exit;
             }
             $data = [
@@ -138,11 +168,17 @@ class Klanten extends BaseController
         $result = $this->klantenModel->deleteKlant($klantId);
 
         if ($result['success']) {
-            $_SESSION['melding'] = $result['message'];
+            // Toon altijd de melding "Klant succesvol verwijderd." als het gelukt is
+            $_SESSION['melding'] = 'Klant succesvol verwijderd.';
         } else {
-            $_SESSION['foutmelding'] = $result['message'];
+            // Specifieke foutmelding tonen als er actieve reserveringen/openstaande verplichtingen zijn
+            if ($result['message'] === 'Klant kan niet worden verwijderd vanwege een probleem in het systeem') {
+                $_SESSION['foutmelding'] = 'Klant kan niet worden verwijderd vanwege een probleem in het systeem';
+            } else {
+                $_SESSION['foutmelding'] = $result['message'];
+            }
         }
-        header('Location: /klanten');
+        header('Location: ' . URLROOT . '/klanten');
         exit;
     }
 
@@ -162,6 +198,7 @@ class Klanten extends BaseController
         // Haal pakketten op voor deze klant
         $pakketten = $this->klantenModel->getAfgerondeVoedselpakkettenByKlant($klantId);
 
+        // Als er geen pakketten zijn, geef melding en redirect na 3 seconden
         if (empty($pakketten)) {
             $data = [
                 'melding' => "Deze klant heeft nog geen voedselpakketten ontvangen.",
@@ -172,6 +209,7 @@ class Klanten extends BaseController
             return;
         }
 
+        // Toon overzicht van alle afgenomen pakketten
         $data = [
             'pakketten' => $pakketten,
             'melding' => null,

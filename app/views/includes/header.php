@@ -112,7 +112,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     <a class="nav-link" href="<?php echo URLROOT; ?>/magazijnvoorraad/index">Overzicht Voorraadbeheer</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?php echo URLROOT; ?>/voedselpakket/index">Overzicht voedselpakket</a>
+                    <a class="nav-link" href="<?php echo URLROOT; ?>/voedselpakketoverzicht/index">Overzicht voedselpakket</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="<?php echo URLROOT; ?>/klanten/index">Overzicht klanten</a>

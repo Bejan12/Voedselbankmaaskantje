@@ -1,80 +1,136 @@
 <?php require_once APPROOT . '/views/includes/header.php'; ?>
 
 <style>
-    .klanten-container {
-        margin-top: 120px;
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 4px 24px rgba(20,25,59,0.08);
-        padding: 32px 32px 24px 32px;
+    .container {
+        margin-top: 20px;
         max-width: 900px;
         margin-left: auto;
         margin-right: auto;
+        padding: 20px;
     }
+
+    .title {
+        text-align: center;
+        font-weight: bold;
+        margin-bottom: 30px;
+        color: #14193B;
+    }
+
+    .alert {
+        padding: 12px 20px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+
+    .alert-warning {
+        color: #856404;
+        background-color: #fff3cd;
+        border-color: #ffeaa7;
+    }
+
+    .alert-info {
+        color: #0c5460;
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+    }
+
     .pakket-card {
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(20,25,59,0.08);
-        margin-bottom: 24px;
-        border: 1px solid #FF7F32;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        border: 1px solid #7386FF;
+        overflow: hidden;
     }
-    .pakket-card .card-header {
-        background-color: #FF7F32;
-        color: #fff;
+
+    .pakket-header {
+        background-color: #7386FF;
+        color: white;
+        padding: 15px 20px;
         font-weight: 600;
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
-        font-size: 1.1rem;
+        font-size: 16px;
     }
-    .pakket-card .card-body {
+
+    .pakket-body {
+        padding: 20px;
         background: #fafafa;
-        border-bottom-left-radius: 10px;
-        border-bottom-right-radius: 10px;
     }
-    .btn-orange {
-        background-color: #FF7F32;
-        color: #fff;
+
+    .pakket-body strong {
+        color: #14193B;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .pakket-body ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+
+    .pakket-body li {
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    .btn-primary {
+        background-color: #28a745;
+        color: white;
         border: none;
-        border-radius: 6px;
-        padding: 10px 28px;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: background 0.2s;
-        box-shadow: 0 2px 8px rgba(255,127,50,0.08);
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 20px;
     }
-    .btn-orange:hover, .btn-orange:focus {
-        background-color: #e86c1a;
-        color: #fff;
+
+    .btn-primary:hover {
+        background-color: #218838;
+        text-decoration: none;
+        color: white;
     }
-    .alert-warning, .alert-danger, .alert-success, .alert-info {
-        border-radius: 6px;
-        font-size: 1rem;
-        margin-bottom: 24px;
+
+    .back-link {
+        display: inline-block;
+        color: #007bff;
+        text-decoration: none;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
     }
 </style>
 
-<div class="klanten-container">
-    <h2>Afgenomen voedselpakketten</h2>
+<div class="container">
+    <a href="<?= URLROOT; ?>klanten" class="back-link">← Terug naar overzicht</a>
+    
+    <h1 class="title">Afgenomen voedselpakketten</h1>
+    
     <?php if (!empty($melding)): ?>
         <div class="alert alert-warning"><?= $melding ?></div>
         <script>
             setTimeout(function() {
-                window.location.href = "<?= URLROOT; ?>klanten/afgerondepakketten";
+                window.location.href = "<?= URLROOT; ?>klanten";
             }, 3000);
         </script>
     <?php elseif (empty($pakketten)): ?>
         <div class="alert alert-info">Deze klant heeft nog geen voedselpakketten ontvangen.</div>
         <script>
             setTimeout(function() {
-                window.location.href = "<?= URLROOT; ?>klanten/afgerondepakketten";
+                window.location.href = "<?= URLROOT; ?>klanten";
             }, 3000);
         </script>
     <?php else: ?>
         <?php foreach ($pakketten as $pakket): ?>
-            <div class="card pakket-card">
-                <div class="card-header">
+            <div class="pakket-card">
+                <div class="pakket-header">
                     Datum uitgifte: <?= htmlspecialchars($pakket->DatumUitgifte) ?>
                 </div>
-                <div class="card-body">
+                <div class="pakket-body">
                     <strong>Producten:</strong>
                     <ul>
                         <?php foreach (explode(',', $pakket->producten) as $product): ?>
@@ -84,7 +140,7 @@
                 </div>
             </div>
         <?php endforeach; ?>
-        <a href="<?= URLROOT; ?>klanten/afgerondepakketten" class="btn btn-orange mt-3">Terug naar overzicht</a>
+        <a href="<?= URLROOT; ?>klanten" class="btn-primary">Terug naar overzicht</a>
     <?php endif; ?>
 </div>
 

@@ -6,12 +6,22 @@
 <div class="modal fade" id="voegPakketToeModal" tabindex="-1" aria-labelledby="voegPakketToeLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <form method="post" action="<?= URLROOT; ?>/voedselpakket/toevoegen">
+      <form method="post" action="<?= URLROOT; ?>/voedselpakketoverzicht/toevoegen">
         <div class="modal-header">
           <h5 class="modal-title" id="voegPakketToeLabel">Voedselpakket toevoegen</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
         </div>
         <div class="modal-body">
+          <?php if (!empty($data['errors'])): ?>
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                <?php foreach ($data['errors'] as $error): ?>
+                  <li><?= htmlspecialchars($error) ?></li>
+                <?php endforeach; ?>
+              </ul>
+            </div>
+          <?php endif; ?>
+          
           <div class="mb-3">
             <label for="klant" class="form-label">Klant (gezin)</label>
             <select name="klant" id="klant" class="form-select" required>
@@ -22,8 +32,9 @@
             </select>
           </div>
           <div class="mb-3">
-            <label for="datum" class="form-label">Datum samenstelling</label>
-            <input type="date" name="datum" id="datum" class="form-control" required>
+            <label for="datum_samenstelling" class="form-label">Datum samenstelling</label>
+            <input type="date" name="datum_samenstelling" id="datum_samenstelling" class="form-control" 
+                   value="<?= date('Y-m-d') ?>" min="<?= date('Y-m-d') ?>" max="2027-12-31" required>
           </div>
           <div class="mb-3">
             <label for="producten" class="form-label">Producten in pakket</label>

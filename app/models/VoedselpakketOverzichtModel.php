@@ -110,7 +110,7 @@ class VoedselpakketOverzichtModel
     }
 
     /**
-     * Voeg nieuw voedselpakket toe
+     * Voeg nieuw voedselpakket toe aan database
      * @param int $klantId
      * @param string $datum
      * @param array $producten
@@ -120,30 +120,47 @@ class VoedselpakketOverzichtModel
     public function voegVoedselpakketToe($klantId, $datum, $producten, $aantallen): bool
     {
         try {
+            // Start transaction voor consistentie
+            $this->db->query("START TRANSACTION");
+            $this->db->execute();
+            
             // Voeg voedselpakket toe
-            $this->db->query("INSERT INTO voedselpakket (KlantID, DatumSamenstelling) VALUES (:klantId, :datum)");
+            $this->db->query("INSERT INTO voedselpakket (KlantID, DatumSamenstelling, DatumUitgifte) VALUES (:klantId, :datum, NULL)");
             $this->db->bind(':klantId', $klantId);
             $this->db->bind(':datum', $datum);
-            $result = $this->db->execute();
+            $success = $this->db->execute();
             
-            if ($result) {
-                // Haal het nieuwe ID op
-                $voedselpakketId = $this->db->dbHandler->lastInsertId();
-                
-                // Voeg producten toe
-                for ($i = 0; $i < count($producten); $i++) {
-                    $this->db->query("INSERT INTO voedselpakketproduct (VoedselpakketID, ProductID, Aantal) VALUES (:voedselpakketId, :productId, :aantal)");
-                    $this->db->bind(':voedselpakketId', $voedselpakketId);
-                    $this->db->bind(':productId', $producten[$i]);
-                    $this->db->bind(':aantal', $aantallen[$i]);
-                    $this->db->execute();
-                }
-                
-                return true;
+            if (!$success) {
+                throw new Exception("Kon voedselpakket niet toevoegen");
             }
             
-            return false;
+            // Haal het nieuwe voedselpakket ID op
+            $this->db->query("SELECT LAST_INSERT_ID() as id");
+            $result = $this->db->single();
+            $voedselpakketId = $result->id;
+            
+            // Voeg producten toe aan voedselpakketproduct tabel
+            for ($i = 0; $i < count($producten); $i++) {
+                $this->db->query("INSERT INTO voedselpakketproduct (VoedselpakketID, ProductID, Aantal) VALUES (:voedselpakketId, :productId, :aantal)");
+                $this->db->bind(':voedselpakketId', $voedselpakketId);
+                $this->db->bind(':productId', $producten[$i]);
+                $this->db->bind(':aantal', $aantallen[$i]);
+                $productSuccess = $this->db->execute();
+                
+                if (!$productSuccess) {
+                    throw new Exception("Kon product niet toevoegen aan voedselpakket");
+                }
+            }
+            
+            // Commit transaction
+            $this->db->query("COMMIT");
+            $this->db->execute();
+            
+            return true;
         } catch (Exception $e) {
+            // Rollback transaction bij fout
+            $this->db->query("ROLLBACK");
+            $this->db->execute();
             error_log(date('[Y-m-d H:i:s]') . ' Fout in voegVoedselpakketToe: ' . $e->getMessage());
             return false;
         }

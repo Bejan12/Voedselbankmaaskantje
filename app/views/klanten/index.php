@@ -1,153 +1,231 @@
 <?php require_once APPROOT . '/views/includes/header.php'; ?>
 
 <style>
-    .klanten-container {
-        margin-top: 120px;
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 4px 24px rgba(20,25,59,0.08);
-        padding: 32px 32px 24px 32px;
-        max-width: 900px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-    .klanten-header-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 32px;
-    }
-    .klanten-header-row h3 {
+    /* Zorg ervoor dat de pagina altijd de volledige hoogte heeft */
+    html, body {
+        height: 100%;
         margin: 0;
-        font-size: 2rem;
-        color: #14193B;
-        font-weight: 700;
-        letter-spacing: 1px;
+        padding: 0;
     }
-    .btn-orange {
-        background-color: #FF7F32;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        padding: 10px 28px;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: background 0.2s;
-        box-shadow: 0 2px 8px rgba(255,127,50,0.08);
+    
+    /* Container voor de hele pagina inhoud */
+    .container {
+        min-height: calc(100vh - 200px); /* Trek navbar en footer hoogte af */
+        padding-bottom: 40px; /* Extra ruimte voor de footer */
+        flex: 1; /* Neemt beschikbare ruimte in */
+        margin-top: 20px;
     }
-    .btn-orange:hover, .btn-orange:focus {
-        background-color: #e86c1a;
-        color: #fff;
-    }
-    .table-orange th {
-        background-color: #FF7F32;
-        color: #fff;
+
+    .title {
         text-align: center;
-        font-weight: 600;
-        border-top-left-radius: 6px;
-        border-top-right-radius: 6px;
-        border-bottom: 2px solid #e86c1a;
+        font-weight: bold;
+        margin-bottom: 30px;
     }
-    .table-orange td {
-        text-align: center;
+
+    /* Alert styling for flash messages */
+    .alert {
+        padding: 12px 20px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+
+    .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+
+    .alert-success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+    }
+
+    .alert-warning {
+        color: #856404;
+        background-color: #fff3cd;
+        border-color: #ffeaa7;
+    }
+
+    .btn-add {
+        display: inline-block;
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .btn-add:hover {
+        background-color: #218838;
+        text-decoration: none;
+        color: white;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        margin: 0 auto;
+    }
+
+    .styled-table {
+        width: 100%;
+        min-width: 1000px;
+        border-collapse: collapse;
+        font-size: 14px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        background: #fff;
+    }
+
+    .styled-table thead {
+        background-color: #7386FF;
+        color: white;
+    }
+
+    .styled-table th,
+    .styled-table td {
+        padding: 8px;
+        border: 1px solid #dddddd;
+        text-align: left;
         vertical-align: middle;
-        background: #fafafa;
     }
-    .btn-primary {
-        background-color: #fff;
-        color: #FF7F32;
-        border: 2px solid #FF7F32;
-        border-radius: 6px;
-        font-weight: 500;
-        padding: 4px 12px;
-        font-size: 0.8rem;
-        transition: background 0.2s, color 0.2s;
+
+    .styled-table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
     }
-    .btn-primary:hover, .btn-primary:focus {
-        background-color: #FF7F32;
-        color: #fff;
+
+    .action-icons {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: flex-start;
+        height: 100%;
     }
-    .btn-danger {
-        background-color: #ff3b3b;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        font-weight: 500;
-        padding: 4px 12px;
-        font-size: 0.8rem;
-        transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-        box-shadow: 0 1px 4px rgba(255,59,59,0.15);
+
+    .icon-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px;
+        font-size: 1.2em;
+        color: inherit;
+        text-decoration: none;
+        border-radius: 4px;
+        height: 100%;
+        min-width: 30px;
     }
-    .btn-danger:hover, .btn-danger:focus {
-        background-color: #d32f2f;
-        color: #fff;
-        box-shadow: 0 2px 8px rgba(255,59,59,0.25);
+
+    .icon-link:hover {
+        background-color: #f0f0f0;
+        text-decoration: none;
+        color: #495057;
     }
-    .alert-warning, .alert-danger, .alert-success {
-        border-radius: 6px;
-        font-size: 1rem;
-        margin-bottom: 24px;
+
+    .text-danger {
+        color: #dc3545 !important;
+    }
+
+    .bi {
+        font-size: 1.2em;
     }
 </style>
 
-<div class="klanten-container">
-    <div class="klanten-header-row">
-        <h3><?= $data['title']; ?></h3>
-        <a href="<?= URLROOT; ?>/klanten/add" class="btn btn-orange">Klant toevoegen</a>
-    </div>
+<div class="container mt-4">
+    <h1 class="title"><?= $data['title']; ?></h1>
 
-    <?php if (!empty($data['success'])): ?>
-        <div class="alert alert-success"><?= $data['success']; ?></div>
+    <?php if (!empty($data['melding'])): ?>
+        <div class="alert alert-success" id="success-alert"><?= $data['melding']; ?></div>
+    <?php endif; ?>
+    <?php if (!empty($data['foutmelding'])): ?>
+        <div class="alert alert-danger" id="error-alert"><?= $data['foutmelding']; ?></div>
     <?php endif; ?>
 
-    <?php if (!empty($data['error'])): ?>
-        <div class="alert alert-warning">
-            <?= $data['error']; ?>
-        </div>
+    <a href="<?= URLROOT; ?>/klanten/add" class="btn-add">Klant toevoegen</a>
+
+    <?php if (empty($data['klanten'])): ?>
+        <div class="alert alert-warning">Er zijn nog geen klanten beschikbaar.</div>
         <script>
             setTimeout(function() {
                 window.location.href = "<?= URLROOT; ?>homepages/index";
             }, 3000);
         </script>
-    <?php endif; ?>
-
-    <?php if (empty($data['error'])): ?>
-        <?php if (!empty($data['melding'])): ?>
-            <div class="alert alert-success"><?= $data['melding']; ?></div>
-        <?php endif; ?>
-        <?php if (!empty($data['foutmelding'])): ?>
-            <div class="alert alert-danger"><?= $data['foutmelding']; ?></div>
-        <?php endif; ?>
-        <table class="table table-bordered table-orange mt-3">
-            <thead>
-                <tr>
-                    <th>Naam</th>
-                    <th>E-mailadres</th>
-                    <th>Telefoonnummer</th>
-                    <th>Aantal Volwassenen</th>
-                    <th>Aantal Kinderen</th>
-                    <th>Aantal Baby's</th>
-                    <th>Acties</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($data['klanten'] as $klant): ?>
+    <?php else: ?>
+        <div class="table-container">
+            <table class="styled-table">
+                <thead>
                     <tr>
-                        <td><?= htmlspecialchars($klant->Voornaam . ' ' . $klant->Achternaam); ?></td>
-                        <td><?= htmlspecialchars($klant->Email); ?></td>
-                        <td><?= htmlspecialchars($klant->Telefoon); ?></td>
-                        <td><?= htmlspecialchars($klant->AantalVolwassenen); ?></td>
-                        <td><?= htmlspecialchars($klant->AantalKinderen); ?></td>
-                        <td><?= htmlspecialchars($klant->AantalBabys); ?></td>
-                        <td>
-                            <a href="<?= URLROOT; ?>klanten/edit/<?= $klant->KlantID; ?>" class="btn btn-primary btn-sm">Wijzig</a>
-                            <a href="<?= URLROOT; ?>klanten/verwijder/<?= $klant->KlantID; ?>" class="btn btn-danger btn-sm" onclick="return bevestigDelete();">Verwijder</a>
-                        </td>
+                        <th>Naam</th>
+                        <th>E-mailadres</th>
+                        <th>Telefoonnummer</th>
+                        <th>Aantal Volwassenen</th>
+                        <th>Aantal Kinderen</th>
+                        <th>Aantal Baby's</th>
+                        <th style="width: 150px;">Acties</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($data['klanten'] as $klant): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($klant->Voornaam . ' ' . $klant->Achternaam); ?></td>
+                            <td><?= htmlspecialchars($klant->Email); ?></td>
+                            <td><?= htmlspecialchars($klant->Telefoon); ?></td>
+                            <td><?= htmlspecialchars($klant->AantalVolwassenen); ?></td>
+                            <td><?= htmlspecialchars($klant->AantalKinderen); ?></td>
+                            <td><?= htmlspecialchars($klant->AantalBabys); ?></td>
+                            <td>
+                                <div class="action-icons">
+                                    <a href="<?= URLROOT; ?>klanten/edit/<?= $klant->KlantID; ?>" title="Wijzig" class="icon-link">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <a href="<?= URLROOT; ?>klanten/pakketten/<?= $klant->KlantID; ?>" title="Bekijk pakketten" class="icon-link" style="color:#7386FF;">
+                                        <i class="bi bi-box-seam"></i>
+                                    </a>
+                                    <a href="<?= URLROOT; ?>klanten/verwijder/<?= $klant->KlantID; ?>" title="Verwijder" class="icon-link text-danger" onclick="return bevestigDelete();">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     <?php endif; ?>
 </div>
+
+<script>
+    // Auto-hide success and error messages after 3 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const successAlert = document.getElementById('success-alert');
+        const errorAlert = document.getElementById('error-alert');
+        
+        if (successAlert) {
+            setTimeout(function() {
+                successAlert.style.transition = 'opacity 0.5s ease-out';
+                successAlert.style.opacity = '0';
+                setTimeout(function() {
+                    successAlert.style.display = 'none';
+                }, 500);
+            }, 3000);
+        }
+        
+        if (errorAlert) {
+            setTimeout(function() {
+                errorAlert.style.transition = 'opacity 0.5s ease-out';
+                errorAlert.style.opacity = '0';
+                setTimeout(function() {
+                    errorAlert.style.display = 'none';
+                }, 500);
+            }, 3000);
+        }
+    });
+
+    function bevestigDelete() {
+        return confirm('Weet je zeker dat je deze klant wilt verwijderen?');
+    }
+</script>
 
 <?php require_once APPROOT . '/views/includes/footer.php'; ?>

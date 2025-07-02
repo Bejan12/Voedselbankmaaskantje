@@ -45,452 +45,29 @@ if (isset($_GET['success'])) {
 }
 ?>
 <style>
-/* --- Professionele, moderne en responsive stijl voor Voedselbank Maaskantje --- */
-body {
-    background: #f6f7fb;
-    font-family: 'Instrument Sans', Arial, sans-serif;
-}
-.card {
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(20,25,59,0.13);
-    border: none;
-    background: #fff;
-    transition: transform 0.2s;
-}
-.card:hover {
-    transform: translateY(-4px) scale(1.01);
-}
-.card-title {
-    color: #14193B;
-    font-weight: 700;
-}
-.btn-primary, .btn-success, .btn-warning, .btn-danger {
-    border-radius: 8px;
-    font-weight: 600;
-    padding: 10px 22px;
-    transition: all 0.3s;
-    box-shadow: 0 2px 8px rgba(20,25,59,0.07);
-}
-.btn-primary {
-    background-color: #EE7B00;
-    border: none;
-}
-.btn-primary:hover {
-    background-color: #14193B;
-    color: #fff;
-}
-.btn-success {
-    background-color: #28a745;
-    border: none;
-}
-.btn-success:hover {
-    background-color: #218838;
-}
-.btn-warning {
-    background-color: #ffc107;
-    border: none;
-    color: #333;
-}
-.btn-warning:hover {
-    background-color: #e0a800;
-    color: #fff;
-}
-.btn-danger {
-    background-color: #dc3545;
-    border: none;
-}
-.btn-danger:hover {
-    background-color: #b52a37;
-    color: #fff;
-}
-.btn-action-group .btn-danger {
-    background-color: #dc3545;
-    color: #fff;
-    border: none;
-    min-width: 90px;
-    font-size: 1em;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(220,53,69,0.07);
-    transition: all 0.2s;
-}
-.btn-action-group .btn-danger:hover {
-    background-color: #b52a37;
-    color: #fff;
-    transform: translateY(-2px) scale(1.04);
-}
-.btn-action-group .btn-warning {
-    background-color: #ffc107;
-    color: #333;
-    border: none;
-    min-width: 90px;
-    font-size: 1em;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(238,123,0,0.07);
-    transition: all 0.2s;
-}
-.btn-action-group .btn-warning:hover {
-    background-color: #e0a800;
-    color: #fff;
-    transform: translateY(-2px) scale(1.04);
-}
-.table {
-    margin-bottom: 0;
-    border-radius: 14px;
-    overflow: hidden;
-    background: #fff;
-    font-size: 1.08em;
-    box-shadow: 0 2px 12px rgba(20,25,59,0.07);
-    table-layout: fixed;
-}
-.table th, .table td {
-    white-space: normal;
-    overflow-wrap: break-word;
-    text-overflow: ellipsis;
-    padding: 1.1em 0.7em;
-    vertical-align: middle;
-    font-size: 1.08em;
-    line-height: 1.5;
-    text-align: center;
-}
-.table thead th {
-    background: #f3f4f7;
-    color: #14193B;
-    font-weight: 700;
-    border-bottom: 2.5px solid #EE7B00;
-    font-size: 1.12em;
-    letter-spacing: 0.02em;
-    text-align: center;
-}
-.table-striped tbody tr:nth-of-type(odd) {
-    background-color: #f8f9fa;
-}
-.table-striped tbody tr:nth-of-type(even) {
-    background-color: #f3f4f7;
-}
-.table-bordered td, .table-bordered th {
-    border: 1.5px solid #e0e0e0;
-}
-.table tbody tr {
-    transition: background 0.2s;
-}
-.table tbody tr:hover {
-    background: #fff7ed;
-    box-shadow: 0 2px 8px rgba(238,123,0,0.08);
-    z-index: 2;
-    position: relative;
-}
-.badge {
-    font-size: 1em;
-    padding: 0.5em 1em;
-    border-radius: 1em;
-    letter-spacing: 0.03em;
-}
-.badge.bg-secondary {
-    background: #6c757d !important;
-    color: #fff;
-}
-.badge.bg-success {
-    background: #28a745 !important;
-    color: #fff;
-}
-.badge.bg-danger {
-    background: #dc3545 !important;
-    color: #fff;
-}
-.alert {
-    border-radius: 0.7em;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-    font-size: 1.1em;
-    margin-bottom: 1.2em;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-    animation: fadeInDown 0.5s;
-}
-@keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-.form-control, .form-select {
-    border-radius: 8px;
-    border: 2px solid #e9ecef;
-    padding: 10px 15px;
-    transition: border-color 0.3s;
-    font-size: 1.05em;
-}
-.form-control:focus, .form-select:focus {
-    border-color: #EE7B00;
-    box-shadow: 0 0 0 2px #ee7b0033;
-}
-.btn-secondary {
-    background-color: #6c757d;
-    border: none;
-    margin-left: 10px;
-}
-.btn-secondary:hover {
-    background-color: #5a6268;
-    transform: translateY(-2px);
-}
-/* Hamburger menu */
-.hamburger {
-    display: none;
-    flex-direction: column;
-    cursor: pointer;
-    margin-left: auto;
-    margin-right: 10px;
-    width: 32px;
-    height: 32px;
-    justify-content: center;
-    align-items: center;
-    z-index: 1001;
-}
-.hamburger span {
-    height: 4px;
-    width: 100%;
-    background: #EE7B00;
-    margin: 4px 0;
-    border-radius: 2px;
-    transition: all 0.3s;
-}
-.hamburger.open span:nth-child(1) {
-    transform: translateY(8px) rotate(45deg);
-}
-.hamburger.open span:nth-child(2) {
-    opacity: 0;
-}
-.hamburger.open span:nth-child(3) {
-    transform: translateY(-8px) rotate(-45deg);
-}
-@media (max-width: 1400px) {
-    .container-main { max-width: 99vw; }
-    .table { min-width: 1100px; }
-}
-@media (max-width: 1200px) {
-    .table { min-width: 900px; }
-}
-@media (max-width: 991px) {
-    .navbar .nav-links {
-        display: none;
-        flex-direction: column;
-        background: #fff;
-        position: absolute;
-        top: 80px;
-        right: 0;
-        width: 220px;
-        box-shadow: 0 8px 32px rgba(20,25,59,0.13);
-        z-index: 1000;
-        padding: 20px 0;
+    .badge-yes {
+        background-color: #198754;
+        padding: 0.5em 1em;
+        border-radius: 1rem;
+        color: white;
+        font-weight: 500;
     }
-    .navbar .nav-links.active {
-        display: flex;
+    .badge-no {
+        background-color: #dc3545;
+        padding: 0.5em 1em;
+        border-radius: 1rem;
+        color: white;
+        font-weight: 500;
     }
-    .hamburger {
-        display: flex;
+    .table th {
+        white-space: nowrap;
     }
-    .btn, .btn-primary, .btn-success, .btn-warning, .btn-danger {
-        width: 100%;
-        margin-bottom: 10px;
+    .form-section {
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
-    .btn-secondary {
-        margin-left: 0;
-    }
-    .container-main {
-        padding: 0 8px;
-    }
-    .table {
-        min-width: 700px;
-        font-size: 0.98em;
-    }
-}
-@media (max-width: 900px) {
-    .table { min-width: 700px; font-size: 0.97em; }
-    .btn, .btn-primary, .btn-success, .btn-warning, .btn-danger {
-        width: 100%;
-        margin-bottom: 10px;
-        font-size: 1.05em;
-    }
-    .btn-action-group { flex-direction: column; gap: 0.3em; }
-    .table th, .table td { font-size: 0.97em; padding: 0.7em 0.4em; }
-}
-@media (max-width: 600px) {
-    .table { min-width: 400px; font-size: 0.93em; }
-    .table th, .table td { font-size: 0.93em; padding: 0.5em 0.2em; }
-    .btn-action-group { flex-direction: column; gap: 0.2em; }
-}
-/* Verbeterde responsive tabel voor mobiel */
-
-/* Verbeterde responsive tabel voor mobiel en tablet met Bootstrap-styling */
-@media (max-width: 700px) {
-    .table-responsive {
-        overflow-x: unset !important;
-        width: 100%;
-        padding: 0;
-    }
-    .table, .table thead, .table tbody, .table th, .table td, .table tr {
-        display: block;
-        width: 100%;
-    }
-    .table thead {
-        display: none;
-    }
-    .table tr {
-        margin-bottom: 1.2em;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(20,25,59,0.07);
-        padding: 0.7em 0.5em;
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-    }
-    .table td {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.7em 0.5em;
-        border: none;
-        border-bottom: 1px solid #f3f4f7;
-        font-size: 1em;
-        width: 100%;
-        position: relative;
-    }
-    .table td:last-child {
-        border-bottom: none;
-    }
-    .table td:before {
-        content: attr(data-label);
-        font-weight: 700;
-        color: #EE7B00;
-        flex-basis: 50%;
-        text-align: left;
-        padding-right: 1em;
-        font-size: 0.98em;
-    }
-    .btn-action-group {
-        flex-direction: column;
-        gap: 0.2em;
-        width: 100%;
-    }
-}
-
-/* Bootstrap utility: table-responsive always on */
-.table-responsive {
-    width: 100%;
-    margin-bottom: 1rem;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-/* Zorg dat de tabel netjes oogt op mobiel/tablet */
-@media (max-width: 991px) {
-    .table th, .table td {
-        font-size: 0.97em;
-        padding: 0.7em 0.4em;
-    }
-}
-
-/* Responsive utility classes and table improvements */
-.page-space {
-    margin-top: 48px;
-    margin-bottom: 48px;
-}
-
-/* Responsive tables: always scrollable on small screens */
-.table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-.table th, .table td {
-    vertical-align: middle !important;
-    word-break: break-word;
-    white-space: normal;
-}
-
-/* Responsive font sizes for headings and table text */
-h1, h2, h3, h4, h5, h6 {
-    word-break: break-word;
-}
-
-@media (max-width: 1200px) {
-    .table th, .table td {
-        font-size: 1rem;
-        padding: 0.6rem 0.4rem;
-    }
-}
-
-@media (max-width: 992px) {
-    .table th, .table td {
-        font-size: 0.95rem;
-        padding: 0.5rem 0.3rem;
-    }
-    .btn, .form-control, .form-select {
-        font-size: 0.98rem;
-    }
-    .card-header h2, .card-header h3, .card-header h4 {
-        font-size: 1.2rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .container, .container-fluid {
-        padding-left: 8px;
-        padding-right: 8px;
-    }
-    .table th, .table td {
-        font-size: 0.9rem;
-        padding: 0.4rem 0.2rem;
-    }
-    .btn, .form-control, .form-select {
-        font-size: 0.95rem;
-    }
-    .card-header h2, .card-header h3, .card-header h4 {
-        font-size: 1.1rem;
-    }
-}
-
-/* Responsive buttons: full width on mobile */
-@media (max-width: 576px) {
-    .btn, .btn-group {
-        width: 100%;
-        margin-bottom: 0.5rem;
-    }
-    .d-flex.justify-content-between, .d-flex.justify-content-end {
-        flex-direction: column !important;
-        align-items: stretch !important;
-    }
-}
-
-/* Responsive card padding */
-.card-body, .card-header {
-    padding-left: 1.2rem;
-    padding-right: 1.2rem;
-}
-@media (max-width: 576px) {
-    .card-body, .card-header {
-        padding-left: 0.6rem;
-        padding-right: 0.6rem;
-    }
-}
-
-/* Responsive alert text */
-.alert {
-    font-size: 1rem;
-    word-break: break-word;
-}
-
-/* Responsive form labels */
-.form-label {
-    font-size: 1rem;
-}
-
-/* Extra: table striped for better readability on mobile */
-@media (max-width: 576px) {
-    .table-striped > tbody > tr:nth-of-type(odd) {
-        --bs-table-accent-bg: #f8f9fa;
-    }
-}
-
 </style>
 <div class="container mt-5 mb-5">
     <div class="row justify-content-center">
@@ -504,7 +81,7 @@ h1, h2, h3, h4, h5, h6 {
                 <script>
                   // Redirect na tonen foutmelding
                   setTimeout(function() {
-                    window.location.href = '<?= URLROOT; ?>/voedselpakket';
+                    window.location.href = window.location.pathname;
                   }, 2000);
                 </script>
             <?php endif; ?>
@@ -605,10 +182,10 @@ h1, h2, h3, h4, h5, h6 {
                             <tr data-pakketid="<?= $pakket->VoedselpakketID ?>">
                                 <td class="fw-bold text-primary" data-label="Pakketnr">#<?= (int)$pakket->VoedselpakketID ?></td>
                                 <td class="text-start ps-3" data-label="Gezin"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:120px;"><?= htmlspecialchars($pakket->gezinsnaam) ?></span></td>
-                                <td class="text-start ps-3" data-label="Omschrijv."><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:180px;"><?= htmlspecialchars($pakket->Omschrijving) ?></span></td>
-                                <td data-label="Volw."><?= (int)$pakket->AantalVolwassenen ?></td>
-                                <td data-label="Kind."><?= (int)$pakket->AantalKinderen ?></td>
-                                <td data-label="Baby's"><?= (int)$pakket->AantalBabys ?></td>
+                                <td class="text-start ps-3" data-label="Omschrijv."><span class="editable-cell" data-type="omschrijving" data-pakketid="<?= $pakket->VoedselpakketID ?>" style="cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:180px;"><?= htmlspecialchars($pakket->Omschrijving) ?></span></td>
+                                <td data-label="Volw."><span class="editable-cell" data-type="volw" data-pakketid="<?= $pakket->VoedselpakketID ?>" style="cursor:pointer;"><?= (int)$pakket->AantalVolwassenen ?></span></td>
+                                <td data-label="Kind."><span class="editable-cell" data-type="kind" data-pakketid="<?= $pakket->VoedselpakketID ?>" style="cursor:pointer;"><?= (int)$pakket->AantalKinderen ?></span></td>
+                                <td data-label="Baby's"><span class="editable-cell" data-type="babys" data-pakketid="<?= $pakket->VoedselpakketID ?>" style="cursor:pointer;"><?= (int)$pakket->AantalBabys ?></span></td>
                                 <td class="text-start ps-3" data-label="Details">
                                   <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:200px; cursor:pointer; color:#0d6efd; text-decoration:underline;" onclick="toonDetailsModal('<?= htmlspecialchars(addslashes($pakket->gezinsnaam)) ?>', '<?= htmlspecialchars(addslashes($pakket->Omschrijving)) ?>', '<?= $pakket->Details !== null ? htmlspecialchars(addslashes($pakket->Details)) : '-' ?>')">
                                     <?= $pakket->Details !== null ? htmlspecialchars($pakket->Details) : '<span class="text-muted">-</span>' ?>
@@ -691,7 +268,7 @@ h1, h2, h3, h4, h5, h6 {
             <div class="modal fade" id="voegPakketToeModal" tabindex="-1" aria-labelledby="voegPakketToeLabel" aria-hidden="true">
               <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
-                  <form method="post" action="<?= URLROOT; ?>/voedselpakket/toevoegen">
+                  <form method="post" action="">
                     <div class="modal-header bg-primary text-white">
                       <h5 class="modal-title" id="voegPakketToeLabel">Voedselpakket toevoegen</h5>
                       <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Sluiten"></button>
@@ -857,11 +434,6 @@ h1, h2, h3, h4, h5, h6 {
                 }, 3000);
             }
         });
-        
-        // Check voor absolute URL redirects en fix die
-        if (window.location.href.indexOf('http://voedselpakket/') !== -1) {
-            window.location.href = '<?= URLROOT; ?>/voedselpakket';
-        }
     });
     function checkMelkUitverkocht(checkbox, productnaam) {
         if (productnaam === 'melk halfvol 1l' && checkbox.checked) {
@@ -911,11 +483,20 @@ h1, h2, h3, h4, h5, h6 {
             const rows = document.querySelectorAll('.table-responsive table tbody tr');
             rows.forEach(function(row) {
                 if (row.dataset && row.dataset.pakketid == id) {
-                    row.children[1].textContent = document.getElementById('wijzig_omschrijving').value;
-                    row.children[2].textContent = document.getElementById('wijzig_volwassenen').value;
-                    row.children[3].textContent = document.getElementById('wijzig_kinderen').value;
-                    row.children[4].textContent = document.getElementById('wijzig_babys').value;
-                    row.children[7].textContent = (function(d){let dt=new Date(d);return dt.toLocaleDateString('nl-NL');})(document.getElementById('wijzig_datum').value);
+                    // Omschrijving
+                    let omschrijvingCell = row.querySelector('.editable-cell[data-type="omschrijving"]');
+                    if (omschrijvingCell) omschrijvingCell.textContent = document.getElementById('wijzig_omschrijving').value;
+                    // Volwassenen
+                    let volwCell = row.querySelector('.editable-cell[data-type="volw"]');
+                    if (volwCell) volwCell.textContent = document.getElementById('wijzig_volwassenen').value;
+                    // Kinderen
+                    let kindCell = row.querySelector('.editable-cell[data-type="kind"]');
+                    if (kindCell) kindCell.textContent = document.getElementById('wijzig_kinderen').value;
+                    // Babys
+                    let babysCell = row.querySelector('.editable-cell[data-type="babys"]');
+                    if (babysCell) babysCell.textContent = document.getElementById('wijzig_babys').value;
+                    // Datum
+                    row.children[8].textContent = (function(d){let dt=new Date(d);return dt.toLocaleDateString('nl-NL');})(document.getElementById('wijzig_datum').value);
                 }
             });
             setTimeout(() => { meldingDiv.innerHTML = ''; const modal = bootstrap.Modal.getInstance(document.getElementById('wijzigPakketModal')); modal.hide(); }, 2000);
@@ -973,9 +554,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($foutmelding)) {
         }
     }
     $omschrijving = htmlspecialchars($_POST['omschrijving']);
-    $volw = (int)$_POST['volwassenen'];
-    $kind = (int)$_POST['kinderen'];
-    $babys = (int)$_POST['babys'];
+    $volw = min(20, max(0, (int)$_POST['volwassenen']));
+    $kind = min(20, max(0, (int)$_POST['kinderen']));
+    $babys = min(20, max(0, (int)$_POST['babys']));
     $beschikbaar = isset($_POST['beschikbaar']) && $_POST['beschikbaar'] == '1';
     $datum = isset($_POST['datum_samenstelling']) ? $_POST['datum_samenstelling'] : date('Y-m-d');
     $datum_nl = date('d-m-Y', strtotime($datum));
@@ -985,7 +566,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($foutmelding)) {
     foreach ($productenArr as $i => $pid) {
         foreach ($producten as $p) {
             if ($p->ProductID == $pid) {
-                $aantal = isset($aantallenArr[$i]) ? (int)$aantallenArr[$i] : 1;
+                $aantal = isset($aantallenArr[$i]) ? min(20, max(0, (int)$aantallenArr[$i])) : 1;
                 $details[] = htmlspecialchars($p->ProductNaam) . ' (' . $aantal . 'x)';
             }
         }
@@ -999,14 +580,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($foutmelding)) {
     if ($row && $row->maxid) {
         $huidigeMax = (int)$row->maxid + 1;
     }
-    echo '<script>document.addEventListener("DOMContentLoaded",function(){
-      var tbody = document.querySelector(".table-responsive table tbody");
-      if(tbody){
-        var row = document.createElement("tr");
-        row.setAttribute("data-pakketid", "' . $huidigeMax . '");
-        row.innerHTML = `<td>' . $huidigeMax . '</td><td>' . $klantNaam . '</td><td>' . $omschrijving . '</td><td>' . $volw . '</td><td>' . $kind . '</td><td>' . $babys . '</td><td>' . $detailsStr . '</td><td>' . ($beschikbaar ? '<span class=\'badge-yes\'>Ja</span>' : '<span class=\'badge-no\'>Nee</span>') . '</td><td>' . $datum_nl . '</td><td><button class=\'btn btn-sm btn-outline-primary me-1\' onclick=\'openWijzigModal("' . $huidigeMax . '", ' . ($beschikbaar ? 'true' : 'false') . ', "' . addslashes($omschrijving) . '", ' . $volw . ', ' . $kind . ', ' . $babys . ', "' . $datum . '")\'>Wijzigen</button> <button class=\'btn btn-sm btn-outline-danger\' onclick=\'openVerwijderModal("' . $huidigeMax . '")\'>Verwijderen</button></td>`;
-        tbody.prepend(row);
-      }
-    });</script>';
+    // Bouw de JS string veilig op
+    $js = '<script>document.addEventListener("DOMContentLoaded",function(){';
+    $js .= 'var tbody = document.querySelector(".table-responsive table tbody");';
+    $js .= 'if(tbody){';
+    $js .= 'var row = document.createElement("tr");';
+    $js .= 'row.setAttribute("data-pakketid", "' . $huidigeMax . '");';
+    $js .= 'row.innerHTML = '
+        . '\n  <td class="fw-bold text-primary" data-label="Pakketnr">#' . $huidigeMax . '</td>'
+        . '<td class="text-start ps-3" data-label="Gezin"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:120px;">' . $klantNaam . '</span></td>'
+        . '<td class="text-start ps-3" data-label="Omschrijv."><span class="editable-cell" data-type="omschrijving" data-pakketid="' . $huidigeMax . '" style="cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:180px;">' . $omschrijving . '</span></td>'
+        . '<td data-label="Volw."><span class="editable-cell" data-type="volw" data-pakketid="' . $huidigeMax . '" style="cursor:pointer;">' . $volw . '</span></td>'
+        . '<td data-label="Kind."><span class="editable-cell" data-type="kind" data-pakketid="' . $huidigeMax . '" style="cursor:pointer;">' . $kind . '</span></td>'
+        . '<td data-label="Baby\'s"><span class="editable-cell" data-type="babys" data-pakketid="' . $huidigeMax . '" style="cursor:pointer;">' . $babys . '</span></td>'
+        . '<td class="text-start ps-3" data-label="Details">'
+        . '<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:200px; cursor:pointer; color:#0d6efd; text-decoration:underline;" onclick=\'toonDetailsModal(\'' . addslashes($klantNaam) . '\', \' ' . addslashes($omschrijving) . '\', \' ' . addslashes($detailsStr) . '\')\'>' . $detailsStr . '</span>'
+        . '</td>'
+        . '<td data-label="Beschik.">' . ($beschikbaar ? '<span class="badge-yes">Ja</span>' : '<span class="badge-no">Nee</span>') . '</td>'
+        . '<td data-label="Datum">' . $datum_nl . '</td>'
+        . '<td data-label="Actie">'
+        . '<button class="btn btn-sm btn-outline-primary me-1" title="Wijzigen" onclick="openWijzigModal(\'' . $huidigeMax . '\', ' . ($beschikbaar ? 'true' : 'false') . ', \' ' . addslashes($omschrijving) . '\', ' . $volw . ', ' . $kind . ', ' . $babys . ', \' ' . $datum . '\')"><span class="bi bi-pencil-square"></span></button>'
+        . '<button class="btn btn-sm btn-outline-danger" title="Verwijderen" onclick="openVerwijderModal(\'' . $huidigeMax . '\', ' . $huidigeMax . ', false)"><span class="bi bi-trash"></span></button>'
+        . '</td>';
+    $js .= 'tbody.prepend(row);';
+    $js .= 'var msg = document.createElement("div");';
+    $js .= 'msg.className = "alert alert-success text-center shadow-sm";';
+    $js .= 'msg.textContent = "Voedselpakket succesvol toegevoegd";';
+    $js .= 'msg.style.position = "fixed";';
+    $js .= 'msg.style.top = "30px";';
+    $js .= 'msg.style.left = "50%";';
+    $js .= 'msg.style.transform = "translateX(-50%)";';
+    $js .= 'msg.style.zIndex = "9999";';
+    $js .= 'document.body.appendChild(msg);';
+    $js .= 'setTimeout(function(){ msg.style.opacity = "0"; msg.style.transition = "opacity 0.5s"; setTimeout(function(){ msg.remove(); }, 500); }, 3000);';
+    $js .= '}';
+    $js .= '});</script>';
+    echo $js;
 }
 ?>

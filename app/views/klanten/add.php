@@ -1,153 +1,235 @@
 <?php require_once APPROOT . '/views/includes/header.php'; ?>
 
 <style>
-    .klanten-container {
-        margin-top: 120px;
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 4px 24px rgba(20,25,59,0.08);
-        padding: 32px 32px 24px 32px;
+    .container {
+        margin-top: 20px;
         max-width: 600px;
         margin-left: auto;
         margin-right: auto;
+        padding: 20px;
     }
-    .klanten-header-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 32px;
-    }
-    .klanten-header-row h3 {
-        margin: 0;
-        font-size: 2rem;
+
+    .title {
+        text-align: center;
+        font-weight: bold;
+        margin-bottom: 30px;
         color: #14193B;
-        font-weight: 700;
-        letter-spacing: 1px;
     }
-    .btn-orange {
-        background-color: #FF7F32;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        padding: 10px 28px;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: background 0.2s;
-        box-shadow: 0 2px 8px rgba(255,127,50,0.08);
+
+    .form-container {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 30px;
     }
-    .btn-orange:hover, .btn-orange:focus {
-        background-color: #e86c1a;
-        color: #fff;
+
+    .form-group {
+        margin-bottom: 20px;
     }
+
     .form-label {
         color: #14193B;
         font-weight: 600;
-        margin-bottom: 2px;
+        margin-bottom: 5px;
         display: block;
-        text-align: left;
     }
-    .form-group {
-        margin-bottom: 18px;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-    }
+
     .form-control {
-        border-radius: 6px;
-        border: 1px solid #e0e0e0;
-        font-size: 1rem;
+        width: 100%;
         padding: 10px 12px;
-        background: #fafafa;
-        transition: border-color 0.2s;
-        margin-top: 0;
-    }
-    .form-control:focus {
-        border-color: #FF7F32;
-        box-shadow: 0 0 0 0.2rem rgba(255,127,50,0.15);
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
         background: #fff;
+        box-sizing: border-box;
     }
+
+    .form-control:focus {
+        border-color: #7386FF;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(115,134,255,0.2);
+    }
+
+    .form-check-container {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-check-input {
+        margin: 0;
+    }
+
     .form-check-label {
         font-weight: 500;
         color: #333;
+        margin: 0;
     }
-    .form-check-input:checked {
-        background-color: #FF7F32;
-        border-color: #FF7F32;
+
+    .btn-container {
+        margin-top: 30px;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-start;
     }
-    .alert-danger {
-        border-radius: 6px;
-        font-size: 1rem;
-        margin-bottom: 24px;
+
+    .btn-primary {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-weight: bold;
+        text-decoration: none;
+        cursor: pointer;
     }
+
+    .btn-primary:hover {
+        background-color: #218838;
+    }
+
     .btn-secondary {
-        border-radius: 6px;
-        font-weight: 600;
-        padding: 10px 28px;
-        margin-left: 8px;
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-weight: bold;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        text-decoration: none;
+        color: white;
+    }
+
+    .alert {
+        padding: 12px 20px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+
+    .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+
+    .back-link {
+        display: inline-block;
+        color: #007bff;
+        text-decoration: none;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
     }
 </style>
 
-<div class="klanten-container">
-    <div class="klanten-header-row">
-        <h3>Klant toevoegen</h3>
-        <a href="<?= URLROOT; ?>klanten/index" class="btn btn-orange">Terug</a>
-    </div>
-    <?php if (!empty($data['error'])): ?>
-        <div class="alert alert-danger"><?= $data['error']; ?></div>
-    <?php endif; ?>
-    <form method="post" action="">
-        <div class="form-group">
-            <label for="voornaam" class="form-label">Voornaam*</label>
-            <input type="text" class="form-control" id="voornaam" name="voornaam" value="<?= htmlspecialchars($data['form']['voornaam'] ?? '') ?>" required>
-        </div>
-        <div class="form-group">
-            <label for="achternaam" class="form-label">Achternaam*</label>
-            <input type="text" class="form-control" id="achternaam" name="achternaam" value="<?= htmlspecialchars($data['form']['achternaam'] ?? '') ?>" required>
-        </div>
-        <div class="form-group">
-            <label for="adres" class="form-label">Adres*</label>
-            <input type="text" class="form-control" id="adres" name="adres" value="<?= htmlspecialchars($data['form']['adres'] ?? '') ?>" required>
-        </div>
-        <div class="form-group">
-            <label for="telefoon" class="form-label">Telefoonnummer*</label>
-            <input type="text" class="form-control" id="telefoon" name="telefoon" value="<?= htmlspecialchars($data['form']['telefoon'] ?? '') ?>" required>
-        </div>
-        <div class="form-group">
-            <label for="email" class="form-label">E-mailadres*</label>
-            <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($data['form']['email'] ?? '') ?>" required>
-        </div>
-        <div class="form-group">
-            <label for="aantal_volwassenen" class="form-label">Aantal volwassenen*</label>
-            <input type="number" class="form-control" id="aantal_volwassenen" name="aantal_volwassenen" min="0" value="<?= htmlspecialchars($data['form']['aantal_volwassenen'] ?? '') ?>" required>
-        </div>
-        <div class="form-group">
-            <label for="aantal_kinderen" class="form-label">Aantal kinderen*</label>
-            <input type="number" class="form-control" id="aantal_kinderen" name="aantal_kinderen" min="0" value="<?= htmlspecialchars($data['form']['aantal_kinderen'] ?? '') ?>" required>
-        </div>
-        <div class="form-group">
-            <label for="aantal_babys" class="form-label">Aantal baby's*</label>
-            <input type="number" class="form-control" id="aantal_babys" name="aantal_babys" min="0" value="<?= htmlspecialchars($data['form']['aantal_babys'] ?? '') ?>" required>
-        </div>
-        <div class="form-group">
-            <label class="form-label">Specifieke wensen</label>
-            <div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="geen_varkensvlees" name="geen_varkensvlees" value="1" <?= !empty($data['form']['geen_varkensvlees']) ? 'checked' : '' ?>>
-                    <label class="form-check-label" for="geen_varkensvlees">Geen varkensvlees</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="veganistisch" name="veganistisch" value="1" <?= !empty($data['form']['veganistisch']) ? 'checked' : '' ?>>
-                    <label class="form-check-label" for="veganistisch">Veganistisch</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="vegetarisch" name="vegetarisch" value="1" <?= !empty($data['form']['vegetarisch']) ? 'checked' : '' ?>>
-                    <label class="form-check-label" for="vegetarisch">Vegetarisch</label>
+<div class="container">
+    <a href="<?= URLROOT; ?>klanten/index" class="back-link">← Terug naar overzicht</a>
+    
+    <h1 class="title">Klant toevoegen</h1>
+    
+    <div class="form-container">
+        <?php if (!empty($data['error'])): ?>
+            <div class="alert alert-danger">
+                <?= htmlspecialchars($data['error']); ?>
+            </div>
+        <?php endif; ?>
+        
+        <form method="post" action="">
+            <div class="form-group">
+                <label for="voornaam" class="form-label">Voornaam*</label>
+                <input type="text" class="form-control" id="voornaam" name="voornaam" 
+                       value="<?= htmlspecialchars($data['form']['voornaam'] ?? '') ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="achternaam" class="form-label">Achternaam*</label>
+                <input type="text" class="form-control" id="achternaam" name="achternaam" 
+                       value="<?= htmlspecialchars($data['form']['achternaam'] ?? '') ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="adres" class="form-label">Adres*</label>
+                <input type="text" class="form-control" id="adres" name="adres" 
+                       value="<?= htmlspecialchars($data['form']['adres'] ?? '') ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="telefoon" class="form-label">Telefoonnummer*</label>
+                <input type="text" class="form-control" id="telefoon" name="telefoon" 
+                       value="<?= htmlspecialchars($data['form']['telefoon'] ?? '') ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email" class="form-label">E-mailadres*</label>
+                <input type="email" class="form-control" id="email" name="email" 
+                       value="<?= htmlspecialchars($data['form']['email'] ?? '') ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="aantal_volwassenen" class="form-label">Aantal volwassenen*</label>
+                <input type="number" class="form-control" id="aantal_volwassenen" name="aantal_volwassenen" 
+                       min="0" value="<?= htmlspecialchars($data['form']['aantal_volwassenen'] ?? '') ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="aantal_kinderen" class="form-label">Aantal kinderen*</label>
+                <input type="number" class="form-control" id="aantal_kinderen" name="aantal_kinderen" 
+                       min="0" value="<?= htmlspecialchars($data['form']['aantal_kinderen'] ?? '') ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="aantal_babys" class="form-label">Aantal baby's*</label>
+                <input type="number" class="form-control" id="aantal_babys" name="aantal_babys" 
+                       min="0" value="<?= htmlspecialchars($data['form']['aantal_babys'] ?? '') ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Specifieke wensen</label>
+                <div class="form-check-container">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="geen_varkensvlees" 
+                               name="geen_varkensvlees" value="1" 
+                               <?= !empty($data['form']['geen_varkensvlees']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="geen_varkensvlees">Geen varkensvlees</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="veganistisch" 
+                               name="veganistisch" value="1" 
+                               <?= !empty($data['form']['veganistisch']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="veganistisch">Veganistisch</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="vegetarisch" 
+                               name="vegetarisch" value="1" 
+                               <?= !empty($data['form']['vegetarisch']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="vegetarisch">Vegetarisch</label>
+                    </div>
                 </div>
             </div>
-        </div>
-        <button type="submit" class="btn btn-orange">Opslaan</button>
-        <a href="<?= URLROOT; ?>klanten/index" class="btn btn-secondary">Annuleren</a>
-    </form>
+            
+            <div class="btn-container">
+                <button type="submit" class="btn-primary">Opslaan</button>
+                <a href="<?= URLROOT; ?>klanten/index" class="btn-secondary">Annuleren</a>
+            </div>
+        </form>
+    </div>
 </div>
 
 <?php require_once APPROOT . '/views/includes/footer.php'; ?>
