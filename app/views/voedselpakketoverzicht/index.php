@@ -1,5 +1,50 @@
-<?php require_once APPROOT . '/views/includes/header.php'; ?>
 <?php
+require_once APPROOT . '/views/includes/header.php';
+require_once APPROOT . '/libraries/Database.php';
+$db = new Database();
+$melding = isset($melding) ? $melding : '';
+$foutmelding = isset($foutmelding) ? $foutmelding : '';
+$datumError = isset($datumError) ? $datumError : '';
+$modalOpen = false;
+$allergieMelding = '';
+$datumError = '';
+
+// Ophalen klanten en producten voor het formulier
+$db->query("SELECT k.KlantID, CONCAT(p.Voornaam, ' ', p.Achternaam) AS gezinsnaam FROM klant k JOIN gebruiker g ON k.GebruikerID = g.GebruikerID JOIN persoon p ON g.PersoonID = p.PersoonID");
+$klanten = $db->resultSet();
+$db->query("SELECT ProductID, ProductNaam FROM product");
+$producten = $db->resultSet();
+
+// Succesmelding popup na toevoegen (frontend, alleen als POST en geen melk halfvol 1l)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($foutmelding) && isset($producten)) {
+    $productenArr = isset($_POST['producten']) ? $_POST['producten'] : [];
+    $melkHalfvolGekozen = false;
+    if (is_array($productenArr) && is_array($producten)) {
+        foreach ($productenArr as $pid) {
+            foreach ($producten as $p) {
+                if ($p->ProductID == $pid && strtolower($p->ProductNaam) === 'melk halfvol 1l') {
+                    $melkHalfvolGekozen = true;
+                }
+            }
+        }
+    }
+    if (!$melkHalfvolGekozen) {
+        ?>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let popup = document.createElement('div');
+            popup.className = 'position-fixed top-50 start-50 translate-middle bg-success text-white border rounded shadow p-4';
+            popup.style.zIndex = 3000;
+            popup.style.minWidth = '350px';
+            popup.innerHTML = `<h5 class='mb-3 text-center'><span class='bi bi-emoji-smile'></span> Pakket succesvol toegevoegd</h5><div class='text-center mb-2'>Het voedselpakket is succesvol toegevoegd aan het overzicht.</div><div class='text-center'><button class='btn btn-light' onclick='this.parentNode.parentNode.remove()'>Sluiten</button></div>`;
+            document.body.appendChild(popup);
+            setTimeout(function(){ if (popup) popup.remove(); }, 3000);
+        });
+        </script>
+        <?php
+    }
+}
+
 require_once APPROOT . '/libraries/Database.php';
 $db = new Database();
 $melding = isset($melding) ? $melding : '';
@@ -44,6 +89,7 @@ if (isset($_GET['success'])) {
     $melding = 'Voedselpakket is succesvol aangemaakt';
 }
 ?>
+
 <style>
     .badge-yes {
         background-color: #198754;
@@ -59,8 +105,96 @@ if (isset($_GET['success'])) {
         color: white;
         font-weight: 500;
     }
-    .table th {
-        white-space: nowrap;
+    .responsive-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 1rem;
+        table-layout: fixed;
+        background: #f7f8ff;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 4px 24px 0 rgba(115,134,255,0.10);
+    }
+    .responsive-table th, .responsive-table td {
+        white-space: normal;
+        font-size: 1rem;
+        padding: 0.75rem 0.75rem;
+        max-width: 100vw;
+        min-width: 0;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        vertical-align: middle;
+        background-clip: padding-box;
+        border: none;
+    }
+    .responsive-table th {
+        background: #7386FF;
+        color: #fff;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        border-bottom: 2px solid #7386FF;
+    }
+    .responsive-table td {
+        background: #fff;
+        color: #222;
+        border-bottom: 1px solid #e3e6f0;
+    }
+    .responsive-table tr:last-child td {
+        border-bottom: none;
+    }
+    @media (max-width: 991.98px) {
+        .responsive-table thead {
+            display: none;
+        }
+        .responsive-table, .responsive-table tbody, .responsive-table tr, .responsive-table td {
+            display: block;
+            width: 100%;
+        }
+        .responsive-table tr {
+            margin-bottom: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 12px rgba(115,134,255,0.10);
+            background: #fff;
+            border: 1px solid #e3e6f0;
+            padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+        }
+        .responsive-table td {
+            border: none;
+            border-bottom: 1px solid #e3e6f0;
+            position: relative;
+            padding-left: 1rem;
+            min-height: 44px;
+            max-width: 100vw;
+            min-width: 0;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            background-clip: padding-box;
+        }
+        .responsive-table td:last-child {
+            border-bottom: none;
+        }
+        .responsive-table td:before {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: bold;
+            color: #7386FF;
+            font-size: 0.98em;
+            content: attr(data-label);
+            text-align: left;
+            white-space: normal;
+        }
+        .responsive-table td .badge-yes, .responsive-table td .badge-no {
+            font-size: 0.95em;
+        }
+    }
+    .table-responsive {
+        overflow-x: auto;
+        max-width: 100vw;
+        background: linear-gradient(90deg, #7386FF 0 10%, #f7f8ff 100%);
+        border-radius: 1rem;
+        box-shadow: 0 4px 24px 0 rgba(115,134,255,0.10);
+        padding: 0.5rem 0.5rem 0 0.5rem;
     }
     .form-section {
         background-color: #f8f9fa;
@@ -71,7 +205,7 @@ if (isset($_GET['success'])) {
 </style>
 <div class="container mt-5 mb-5">
     <div class="row justify-content-center">
-        <div class="col-12 col-lg-10 col-xl-9">
+        <div class="col-12">
             <h2 class="mb-4 text-center fw-bold text-primary">Overzicht Voedselpakketten</h2>
             <!-- Meldingen -->
             <?php if (!empty($datumError)): ?>
@@ -109,7 +243,7 @@ if (isset($_GET['success'])) {
                     <div class="col-12 col-md-5">
                         <label for="datum" class="form-label">Filter op datum samenstelling</label>
                         <input type="date" name="datum" id="datum" class="form-control"
-                               value="<?= isset($_GET['datum']) ? htmlspecialchars($_GET['datum']) : '' ?>">
+                               value="<?= isset($_GET['datum']) ? htmlspecialchars($_GET['datum']) : '' ?>" min="2023-01-01" max="2027-12-31">
                     </div>
                     <div class="col-12 col-md-2 d-grid">
                         <button type="submit" class="btn btn-primary">Filter</button>
@@ -120,25 +254,20 @@ if (isset($_GET['success'])) {
             <div class="d-flex justify-content-end mb-2">
                 <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#voegPakketToeModal">Voedselpakket toevoegen</button>
             </div>
-            <div class="table-responsive rounded shadow-sm">
-                <table class="table table-bordered table-hover align-middle mb-0">
+            <div class="table-responsive rounded shadow-sm p-0" style="overflow-x:auto; max-width:100vw;">
+                <table class="table table-bordered table-hover align-middle mb-0 w-100 responsive-table" style="min-width:700px;">
                     <thead class="table-light text-center">
                         <tr>
-<thead class="table-light text-center small">
-    <tr>
-        <th>Pakketnr</th>
-        <th>Gezin</th>
-        <th>Omschrijv.</th>
-        <th>Volw.</th>
-        <th>Kind.</th>
-        <th>Baby's</th>
-        <th>Details</th>
-        <th>Beschik.</th>
-        <th>Datum</th>
-        <th>Actie</th>
-    </tr>
-</thead>
-
+                            <th>Pakketnr</th>
+                            <th>Gezin</th>
+                            <th>Omschrijv.</th>
+                            <th>Volw.</th>
+                            <th>Kind.</th>
+                            <th>Baby's</th>
+                            <th>Details</th>
+                            <th>Beschik.</th>
+                            <th>Datum</th>
+                            <th>Actie</th>
                         </tr>
                     </thead>
                     <tbody class="text-center">
@@ -180,45 +309,35 @@ if (isset($_GET['success'])) {
                         usort($voedselpakketten, function($a, $b) { return $b->VoedselpakketID - $a->VoedselpakketID; });
                         foreach ($voedselpakketten as $pakket): ?>
                             <tr data-pakketid="<?= $pakket->VoedselpakketID ?>">
-                                <td class="fw-bold text-primary" data-label="Pakketnr">#<?= (int)$pakket->VoedselpakketID ?></td>
-                                <td class="text-start ps-3" data-label="Gezin"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:120px;"><?= htmlspecialchars($pakket->gezinsnaam) ?></span></td>
-                                <td class="text-start ps-3" data-label="Omschrijv."><span class="editable-cell" data-type="omschrijving" data-pakketid="<?= $pakket->VoedselpakketID ?>" style="cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:180px;"><?= htmlspecialchars($pakket->Omschrijving) ?></span></td>
-                                <td data-label="Volw."><span class="editable-cell" data-type="volw" data-pakketid="<?= $pakket->VoedselpakketID ?>" style="cursor:pointer;"><?= (int)$pakket->AantalVolwassenen ?></span></td>
-                                <td data-label="Kind."><span class="editable-cell" data-type="kind" data-pakketid="<?= $pakket->VoedselpakketID ?>" style="cursor:pointer;"><?= (int)$pakket->AantalKinderen ?></span></td>
-                                <td data-label="Baby's"><span class="editable-cell" data-type="babys" data-pakketid="<?= $pakket->VoedselpakketID ?>" style="cursor:pointer;"><?= (int)$pakket->AantalBabys ?></span></td>
-                                <td class="text-start ps-3" data-label="Details">
-                                  <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:200px; cursor:pointer; color:#0d6efd; text-decoration:underline;" onclick="toonDetailsModal('<?= htmlspecialchars(addslashes($pakket->gezinsnaam)) ?>', '<?= htmlspecialchars(addslashes($pakket->Omschrijving)) ?>', '<?= $pakket->Details !== null ? htmlspecialchars(addslashes($pakket->Details)) : '-' ?>')">
-                                    <?= $pakket->Details !== null ? htmlspecialchars($pakket->Details) : '<span class="text-muted">-</span>' ?>
+                                <td data-label="Pakketnr" class="fw-bold text-primary">#<?= (int)$pakket->VoedselpakketID ?></td>
+                                <td data-label="Gezin" class="text-start ps-3"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:120px;"><?= htmlspecialchars($pakket->gezinsnaam) ?></span></td>
+                                <td data-label="Omschrijv." class="text-start ps-3">
+                                  <?php
+                                    $omschrijving = $pakket->Omschrijving;
+                                    $datum = $pakket->DatumSamenstelling;
+                                    if ($datum === '0000-00-00' || empty($datum) || $datum === null) {
+                                        $corrigeerdeDatum = 'N.V.T.';
+                                    } else {
+                                        $corrigeerdeDatum = date('d-m-Y', strtotime($datum));
+                                    }
+                                    $corrigeerdeOmschrijving = preg_replace('/\d{4}-\d{2}-\d{2}|0000-00-00/', $corrigeerdeDatum, $omschrijving);
+                                  ?>
+                                  <span style="cursor:pointer; color:#0d6efd; text-decoration:underline;" onclick="toonOmschrijvingPopup('<?= htmlspecialchars(addslashes($corrigeerdeOmschrijving)) ?>')">
+                                    <?= htmlspecialchars($corrigeerdeOmschrijving) ?>
                                   </span>
                                 </td>
-            <!-- Modal details -->
-            <div class="modal fade" id="detailsPakketModal" tabindex="-1" aria-labelledby="detailsPakketLabel" aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                  <div class="modal-header bg-info text-white">
-                    <h5 class="modal-title" id="detailsPakketLabel">Pakket details</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Sluiten"></button>
-                  </div>
-                  <div class="modal-body p-4">
-                    <div><strong>Gezin:</strong> <span id="detailsGezin"></span></div>
-                    <div><strong>Omschrijving:</strong> <span id="detailsOmschrijving"></span></div>
-                    <div class="mt-3"><strong>Inhoud pakket:</strong><br><span id="detailsInhoud"></span></div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sluiten</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-<script>
-  function toonDetailsModal(gezin, omschrijving, inhoud) {
-    document.getElementById('detailsGezin').textContent = gezin;
-    document.getElementById('detailsOmschrijving').textContent = omschrijving;
-    document.getElementById('detailsInhoud').textContent = inhoud;
-    const modal = new bootstrap.Modal(document.getElementById('detailsPakketModal'));
-    modal.show();
-  }
-</script>
+                                <td data-label="Volw."><?= (int)$pakket->AantalVolwassenen ?></td>
+                                <td data-label="Kind."><?= (int)$pakket->AantalKinderen ?></td>
+                                <td data-label="Baby's"><?= (int)$pakket->AantalBabys ?></td>
+                                <td data-label="Details" class="text-start ps-3">
+                                  <?php if ($pakket->Details !== null): ?>
+                                    <span style="cursor:pointer; color:#0d6efd; text-decoration:underline;" onclick="toonDetailsPopup('<?= htmlspecialchars(addslashes($pakket->Details)) ?>')">
+                                      <?= htmlspecialchars($pakket->Details) ?>
+                                    </span>
+                                  <?php else: ?>
+                                    <span class="text-muted">-</span>
+                                  <?php endif; ?>
+                                </td>
                                 <td data-label="Beschik.">
                                   <?php if ($pakket->Beschikbaar): ?>
                                     <span class="badge-yes" style="font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; font-weight: 500;">Ja</span>
@@ -226,7 +345,16 @@ if (isset($_GET['success'])) {
                                     <span class="badge badge-no" style="font-size: 0.75rem; padding: 4px 10px; text-transform: lowercase;">nee</span>
                                   <?php endif; ?>
                                 </td>
-                                <td data-label="Datum"><?= date('d-m-Y', strtotime($pakket->DatumSamenstelling)) ?></td>
+                                <td data-label="Datum">
+                                  <?php
+                                    $datum = $pakket->DatumSamenstelling;
+                                    if ($datum === '0000-00-00' || empty($datum) || $datum === null) {
+                                        echo '<span class="text-muted">-</span>';
+                                    } else {
+                                        echo date('d-m-Y', strtotime($datum));
+                                    }
+                                  ?>
+                                </td>
                                 <td data-label="Actie">
                                     <button class="btn btn-sm btn-outline-primary me-1" title="Wijzigen" onclick="openWijzigModal('<?= $pakket->VoedselpakketID ?>', <?= $pakket->Beschikbaar ? 'true' : 'false' ?>, '<?= htmlspecialchars(addslashes($pakket->Omschrijving)) ?>', <?= (int)$pakket->AantalVolwassenen ?>, <?= (int)$pakket->AantalKinderen ?>, <?= (int)$pakket->AantalBabys ?>, '<?= date('Y-m-d', strtotime($pakket->DatumSamenstelling)) ?>')"><span class='bi bi-pencil-square'></span></button>
                                     <button class="btn btn-sm btn-outline-danger" title="Verwijderen" onclick="openVerwijderModal('<?= $pakket->VoedselpakketID ?>', <?= (int)$pakket->VoedselpakketID ?>, <?= $pakket->VoedselpakketID == 1 ? 'true' : 'false' ?>)"><span class='bi bi-trash'></span></button>
@@ -289,7 +417,7 @@ if (isset($_GET['success'])) {
                           </div>
                           <div class="mb-3">
                             <label for="datum_samenstelling" class="form-label">Datum samenstelling <span class="text-danger">*</span></label>
-                            <input type="date" name="datum_samenstelling" id="datum_samenstelling" class="form-control" value="<?= date('Y-m-d') ?>" required>
+                            <input type="date" name="datum_samenstelling" id="datum_samenstelling" class="form-control" value="<?= date('Y-m-d') ?>" required min="2023-01-01" max="2027-12-31">
                           </div>
                           <div class="mb-3">
                             <label for="omschrijving" class="form-label">Omschrijving <span class="text-danger">*</span></label>
@@ -298,15 +426,15 @@ if (isset($_GET['success'])) {
                           <div class="row mb-3">
                             <div class="col">
                               <label for="volwassenen" class="form-label">Volw. <span class="text-danger">*</span></label>
-                              <input type="number" name="volwassenen" id="volwassenen" class="form-control" min="0" required>
+                              <input type="number" name="volwassenen" id="volwassenen" class="form-control" min="0" max="20" required>
                             </div>
                             <div class="col">
                               <label for="kinderen" class="form-label">Kind. <span class="text-danger">*</span></label>
-                              <input type="number" name="kinderen" id="kinderen" class="form-control" min="0" required>
+                              <input type="number" name="kinderen" id="kinderen" class="form-control" min="0" max="20" required>
                             </div>
                             <div class="col">
                               <label for="babys" class="form-label">Baby's <span class="text-danger">*</span></label>
-                              <input type="number" name="babys" id="babys" class="form-control" min="0" required>
+                              <input type="number" name="babys" id="babys" class="form-control" min="0" max="20" required>
                             </div>
                           </div>
                           <div class="mb-3">
@@ -367,26 +495,26 @@ if (isset($_GET['success'])) {
                       <div id="wijzigMeldingContainer"></div>
                       <input type="hidden" name="wijzigpakketid" id="wijzigpakketid">
                       <div class="mb-3">
-                        <label for="wijzig_omschrijving" class="form-label">Omschrijving <span class="text-danger">*</span></label>
-                        <input type="text" name="wijzig_omschrijving" id="wijzig_omschrijving" class="form-control" required>
+                        <label for="wijzig_omschrijving" class="form-label">Omschrijving</label>
+                        <input type="text" name="wijzig_omschrijving" id="wijzig_omschrijving" class="form-control" value="" readonly tabindex="-1" style="background:#f7f8ff; color:#7386FF; font-weight:600; cursor:not-allowed;">
                       </div>
                       <div class="row mb-3">
                         <div class="col">
                           <label for="wijzig_volwassenen" class="form-label">Volw. <span class="text-danger">*</span></label>
-                          <input type="number" name="wijzig_volwassenen" id="wijzig_volwassenen" class="form-control" min="0" required>
+                          <input type="number" name="wijzig_volwassenen" id="wijzig_volwassenen" class="form-control" min="0" max="20" required>
                         </div>
                         <div class="col">
                           <label for="wijzig_kinderen" class="form-label">Kind. <span class="text-danger">*</span></label>
-                          <input type="number" name="wijzig_kinderen" id="wijzig_kinderen" class="form-control" min="0" required>
+                          <input type="number" name="wijzig_kinderen" id="wijzig_kinderen" class="form-control" min="0" max="20" required>
                         </div>
                         <div class="col">
                           <label for="wijzig_babys" class="form-label">Baby's <span class="text-danger">*</span></label>
-                          <input type="number" name="wijzig_babys" id="wijzig_babys" class="form-control" min="0" required>
+                          <input type="number" name="wijzig_babys" id="wijzig_babys" class="form-control" min="0" max="20" required>
                         </div>
                       </div>
                       <div class="mb-3">
                         <label for="wijzig_datum" class="form-label">Datum samenstelling <span class="text-danger">*</span></label>
-                        <input type="date" name="wijzig_datum" id="wijzig_datum" class="form-control" required>
+                        <input type="date" name="wijzig_datum" id="wijzig_datum" class="form-control" required min="2023-01-01" max="2027-12-31">
                       </div>
                     </div>
                     <div class="modal-footer">
@@ -458,6 +586,12 @@ if (isset($_GET['success'])) {
     function openWijzigModal(id, beschikbaar, omschrijving, volw, kind, babys, datum) {
         document.getElementById('wijzigpakketid').value = id;
         document.getElementById('wijzig_omschrijving').value = omschrijving;
+        document.getElementById('wijzig_omschrijving').setAttribute('readonly', 'readonly');
+        document.getElementById('wijzig_omschrijving').setAttribute('tabindex', '-1');
+        document.getElementById('wijzig_omschrijving').style.background = '#f7f8ff';
+        document.getElementById('wijzig_omschrijving').style.color = '#7386FF';
+        document.getElementById('wijzig_omschrijving').style.fontWeight = '600';
+        document.getElementById('wijzig_omschrijving').style.cursor = 'not-allowed';
         document.getElementById('wijzig_volwassenen').value = volw;
         document.getElementById('wijzig_kinderen').value = kind;
         document.getElementById('wijzig_babys').value = babys;
@@ -466,6 +600,7 @@ if (isset($_GET['success'])) {
         const modal = new bootstrap.Modal(document.getElementById('wijzigPakketModal'));
         modal.show();
         document.getElementById('wijzigPakketForm').dataset.beschikbaar = beschikbaar ? '1' : '0';
+        setTimeout(function(){ document.getElementById('wijzig_omschrijving').focus(); }, 300);
     }
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('wijzigPakketForm').onsubmit = function(e) {
@@ -483,26 +618,66 @@ if (isset($_GET['success'])) {
             const rows = document.querySelectorAll('.table-responsive table tbody tr');
             rows.forEach(function(row) {
                 if (row.dataset && row.dataset.pakketid == id) {
-                    // Omschrijving
-                    let omschrijvingCell = row.querySelector('.editable-cell[data-type="omschrijving"]');
-                    if (omschrijvingCell) omschrijvingCell.textContent = document.getElementById('wijzig_omschrijving').value;
-                    // Volwassenen
-                    let volwCell = row.querySelector('.editable-cell[data-type="volw"]');
-                    if (volwCell) volwCell.textContent = document.getElementById('wijzig_volwassenen').value;
-                    // Kinderen
-                    let kindCell = row.querySelector('.editable-cell[data-type="kind"]');
-                    if (kindCell) kindCell.textContent = document.getElementById('wijzig_kinderen').value;
-                    // Babys
-                    let babysCell = row.querySelector('.editable-cell[data-type="babys"]');
-                    if (babysCell) babysCell.textContent = document.getElementById('wijzig_babys').value;
-                    // Datum
-                    row.children[8].textContent = (function(d){let dt=new Date(d);return dt.toLocaleDateString('nl-NL');})(document.getElementById('wijzig_datum').value);
+                    // Alleen de juiste kolommen aanpassen
+                    // Omschrijving NIET aanpassen!
+                    row.children[3].textContent = document.getElementById('wijzig_volwassenen').value;
+                    row.children[4].textContent = document.getElementById('wijzig_kinderen').value;
+                    row.children[5].textContent = document.getElementById('wijzig_babys').value;
+                    // Datum alleen aanpassen als niet 0000-00-00
+                    const nieuweDatum = document.getElementById('wijzig_datum').value;
+                    if (nieuweDatum && nieuweDatum !== '0000-00-00') {
+                        row.children[8].textContent = (function(d){let dt=new Date(d);return dt.toLocaleDateString('nl-NL');})(nieuweDatum);
+                    }
                 }
             });
             setTimeout(() => { meldingDiv.innerHTML = ''; const modal = bootstrap.Modal.getInstance(document.getElementById('wijzigPakketModal')); modal.hide(); }, 2000);
             return false;
         };
     });
+    // Details popup
+    function toonDetailsPopup(details) {
+        // Zoek de rij waarop geklikt is voor meer info
+        let tr = event.target.closest('tr');
+        let pakketnr = tr ? tr.querySelector('td').textContent : '';
+        let gezin = tr ? tr.children[1].innerText : '';
+        let omschrijving = tr ? tr.children[2].innerText : '';
+        let volw = tr ? tr.children[3].innerText : '';
+        let kind = tr ? tr.children[4].innerText : '';
+        let babys = tr ? tr.children[5].innerText : '';
+        let beschikbaar = tr ? tr.children[7].innerText : '';
+        let datum = tr ? tr.children[8].innerText : '';
+
+        let popup = document.createElement('div');
+        popup.className = 'position-fixed top-50 start-50 translate-middle bg-white border rounded shadow p-4';
+        popup.style.zIndex = 3000;
+        popup.style.minWidth = '400px';
+        popup.style.maxWidth = '90vw';
+        popup.innerHTML = `
+            <h5 class='mb-3'>Details van voedselpakket</h5>
+            <table class='table table-bordered mb-3'>
+                <tr><th>Pakketnr</th><td>${pakketnr}</td></tr>
+                <tr><th>Gezin</th><td>${gezin}</td></tr>
+                <tr><th>Omschrijving</th><td>${omschrijving}</td></tr>
+                <tr><th>Volwassenen</th><td>${volw}</td></tr>
+                <tr><th>Kinderen</th><td>${kind}</td></tr>
+                <tr><th>Baby's</th><td>${babys}</td></tr>
+                <tr><th>Beschikbaar</th><td>${beschikbaar}</td></tr>
+                <tr><th>Datum samenstelling</th><td>${datum}</td></tr>
+                <tr><th>Producten in pakket</th><td>${details}</td></tr>
+            </table>
+            <div class='text-end'><button class='btn btn-primary' onclick='this.parentNode.parentNode.remove()'>Sluiten</button></div>
+        `;
+        document.body.appendChild(popup);
+    }
+    // Omschrijving popup
+    function toonOmschrijvingPopup(omschrijving) {
+        let popup = document.createElement('div');
+        popup.className = 'position-fixed top-50 start-50 translate-middle bg-white border rounded shadow p-4';
+        popup.style.zIndex = 3000;
+        popup.style.minWidth = '350px';
+        popup.innerHTML = `<h5>Omschrijving</h5><div class='mb-3'>${omschrijving}</div><button class='btn btn-primary' onclick='this.parentNode.remove()'>Sluiten</button>`;
+        document.body.appendChild(popup);
+    }
     function openVerwijderModal(pakketid, pakketnr, isAdmin) {
         document.getElementById('verwijderpakketid').value = pakketid;
         document.getElementById('verwijderMeldingContainer').innerHTML = '';
@@ -554,19 +729,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($foutmelding)) {
         }
     }
     $omschrijving = htmlspecialchars($_POST['omschrijving']);
-    $volw = min(20, max(0, (int)$_POST['volwassenen']));
-    $kind = min(20, max(0, (int)$_POST['kinderen']));
-    $babys = min(20, max(0, (int)$_POST['babys']));
+    $volw = (int)$_POST['volwassenen'];
+    $kind = (int)$_POST['kinderen'];
+    $babys = (int)$_POST['babys'];
+    // Validatie max 20
+    if ($volw > 20 || $kind > 20 || $babys > 20) {
+        echo '<script>alert("Er kunnen niet meer dan 20 mensen mee per pakket.");</script>';
+        return;
+    }
     $beschikbaar = isset($_POST['beschikbaar']) && $_POST['beschikbaar'] == '1';
     $datum = isset($_POST['datum_samenstelling']) ? $_POST['datum_samenstelling'] : date('Y-m-d');
-    $datum_nl = date('d-m-Y', strtotime($datum));
+    // Toon geen 0000-00-00, leeg of streepje als ongeldige datum
+    if ($datum === '0000-00-00' || empty($datum) || $datum === null) {
+        $datum_nl = '<span class="text-muted">-</span>';
+    } else {
+        $datum_nl = date('d-m-Y', strtotime($datum));
+    }
     $productenArr = isset($_POST['producten']) ? $_POST['producten'] : [];
     $aantallenArr = array_map('trim', explode(',', $_POST['aantallen']));
     $details = [];
     foreach ($productenArr as $i => $pid) {
         foreach ($producten as $p) {
             if ($p->ProductID == $pid) {
-                $aantal = isset($aantallenArr[$i]) ? min(20, max(0, (int)$aantallenArr[$i])) : 1;
+                $aantal = isset($aantallenArr[$i]) ? (int)$aantallenArr[$i] : 1;
                 $details[] = htmlspecialchars($p->ProductNaam) . ' (' . $aantal . 'x)';
             }
         }
@@ -580,41 +765,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($foutmelding)) {
     if ($row && $row->maxid) {
         $huidigeMax = (int)$row->maxid + 1;
     }
-    // Bouw de JS string veilig op
-    $js = '<script>document.addEventListener("DOMContentLoaded",function(){';
-    $js .= 'var tbody = document.querySelector(".table-responsive table tbody");';
-    $js .= 'if(tbody){';
-    $js .= 'var row = document.createElement("tr");';
-    $js .= 'row.setAttribute("data-pakketid", "' . $huidigeMax . '");';
-    $js .= 'row.innerHTML = '
-        . '\n  <td class="fw-bold text-primary" data-label="Pakketnr">#' . $huidigeMax . '</td>'
-        . '<td class="text-start ps-3" data-label="Gezin"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:120px;">' . $klantNaam . '</span></td>'
-        . '<td class="text-start ps-3" data-label="Omschrijv."><span class="editable-cell" data-type="omschrijving" data-pakketid="' . $huidigeMax . '" style="cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:180px;">' . $omschrijving . '</span></td>'
-        . '<td data-label="Volw."><span class="editable-cell" data-type="volw" data-pakketid="' . $huidigeMax . '" style="cursor:pointer;">' . $volw . '</span></td>'
-        . '<td data-label="Kind."><span class="editable-cell" data-type="kind" data-pakketid="' . $huidigeMax . '" style="cursor:pointer;">' . $kind . '</span></td>'
-        . '<td data-label="Baby\'s"><span class="editable-cell" data-type="babys" data-pakketid="' . $huidigeMax . '" style="cursor:pointer;">' . $babys . '</span></td>'
-        . '<td class="text-start ps-3" data-label="Details">'
-        . '<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:200px; cursor:pointer; color:#0d6efd; text-decoration:underline;" onclick=\'toonDetailsModal(\'' . addslashes($klantNaam) . '\', \' ' . addslashes($omschrijving) . '\', \' ' . addslashes($detailsStr) . '\')\'>' . $detailsStr . '</span>'
-        . '</td>'
-        . '<td data-label="Beschik.">' . ($beschikbaar ? '<span class="badge-yes">Ja</span>' : '<span class="badge-no">Nee</span>') . '</td>'
-        . '<td data-label="Datum">' . $datum_nl . '</td>'
-        . '<td data-label="Actie">'
-        . '<button class="btn btn-sm btn-outline-primary me-1" title="Wijzigen" onclick="openWijzigModal(\'' . $huidigeMax . '\', ' . ($beschikbaar ? 'true' : 'false') . ', \' ' . addslashes($omschrijving) . '\', ' . $volw . ', ' . $kind . ', ' . $babys . ', \' ' . $datum . '\')"><span class="bi bi-pencil-square"></span></button>'
-        . '<button class="btn btn-sm btn-outline-danger" title="Verwijderen" onclick="openVerwijderModal(\'' . $huidigeMax . '\', ' . $huidigeMax . ', false)"><span class="bi bi-trash"></span></button>'
-        . '</td>';
-    $js .= 'tbody.prepend(row);';
-    $js .= 'var msg = document.createElement("div");';
-    $js .= 'msg.className = "alert alert-success text-center shadow-sm";';
-    $js .= 'msg.textContent = "Voedselpakket succesvol toegevoegd";';
-    $js .= 'msg.style.position = "fixed";';
-    $js .= 'msg.style.top = "30px";';
-    $js .= 'msg.style.left = "50%";';
-    $js .= 'msg.style.transform = "translateX(-50%)";';
-    $js .= 'msg.style.zIndex = "9999";';
-    $js .= 'document.body.appendChild(msg);';
-    $js .= 'setTimeout(function(){ msg.style.opacity = "0"; msg.style.transition = "opacity 0.5s"; setTimeout(function(){ msg.remove(); }, 500); }, 3000);';
-    $js .= '}';
-    $js .= '});</script>';
-    echo $js;
+    echo '<script>document.addEventListener("DOMContentLoaded",function(){
+      var tbody = document.querySelector(".table-responsive table tbody");
+      if(tbody){
+        var row = document.createElement("tr");
+        row.setAttribute("data-pakketid", "' . $huidigeMax . '");
+        row.innerHTML = `<td>' . $huidigeMax . '</td><td>' . $klantNaam . '</td><td>' . $omschrijving . '</td><td>' . $volw . '</td><td>' . $kind . '</td><td>' . $babys . '</td><td>' . $detailsStr . '</td><td>' . ($beschikbaar ? '<span class=\'badge-yes\'>Ja</span>' : '<span class=\'badge-no\'>Nee</span>') . '</td><td>' . $datum_nl . '</td><td><button class=\'btn btn-sm btn-outline-primary me-1\' onclick=\'openWijzigModal("' . $huidigeMax . '", ' . ($beschikbaar ? 'true' : 'false') . ', "' . addslashes($omschrijving) . '", ' . $volw . ', ' . $kind . ', ' . $babys . ', "' . $datum . '")\'>Wijzigen</button> <button class=\'btn btn-sm btn-outline-danger\' onclick=\'openVerwijderModal("' . $huidigeMax . '")\'>Verwijderen</button></td>`;
+        tbody.prepend(row);
+      }
+    });</script>';
 }
 ?>
