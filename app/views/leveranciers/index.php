@@ -63,10 +63,10 @@
                             <td><?php echo htmlspecialchars($leverancier->EerstvolgendeLevering ?? ''); ?></td>
                             <td>
                                 <div class="action-icons">
-                                    <a href="<?php echo URLROOT; ?>/leveranciers/edit/<?php echo $leverancier->LeverancierID; ?>" title="Wijzig" class="icon-link">
+                                    <a href="<?= URLROOT; ?>leveranciers/edit/<?php echo $leverancier->LeverancierID; ?>" title="Wijzig" class="icon-link">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
-                                    <a href="<?php echo URLROOT; ?>/leveranciers/delete/<?php echo $leverancier->LeverancierID; ?>" title="Verwijder" class="icon-link text-danger" onclick="return confirm('Weet je zeker dat je deze leverancier wilt verwijderen?');">
+                                    <a href="<?= URLROOT; ?>leveranciers/delete/<?php echo $leverancier->LeverancierID; ?>" title="Verwijder" class="icon-link text-danger" onclick="return confirm('Weet je zeker dat je deze leverancier wilt verwijderen?');">
                                         <i class="bi bi-trash"></i>
                                     </a>
                                 </div>

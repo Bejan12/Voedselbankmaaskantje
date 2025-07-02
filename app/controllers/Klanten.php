@@ -66,7 +66,7 @@ class Klanten extends BaseController
 
             if ($result) {
                 $_SESSION['melding'] = "Klant succesvol toegevoegd.";
-                header('Location: ' . URLROOT . '/klanten');
+                header('Location: ' . URLROOT . 'klanten');
                 exit;
             } else {
                 $data = [
@@ -127,7 +127,7 @@ class Klanten extends BaseController
 
             if ($result) {
                 $_SESSION['melding'] = "Klantgegevens succesvol bijgewerkt.";
-                header('Location: ' . URLROOT . '/klanten');
+                header('Location: ' . URLROOT . 'klanten');
                 exit;
             } else {
                 $data = [
@@ -141,7 +141,7 @@ class Klanten extends BaseController
             $klant = $this->klantenModel->getKlantById($klantId);
             if (!$klant) {
                 $_SESSION['foutmelding'] = "Klant niet gevonden.";
-                header('Location: ' . URLROOT . '/klanten');
+                header('Location: ' . URLROOT . 'klanten');
                 exit;
             }
             $data = [
@@ -178,7 +178,7 @@ class Klanten extends BaseController
                 $_SESSION['foutmelding'] = $result['message'];
             }
         }
-        header('Location: ' . URLROOT . '/klanten');
+        header('Location: ' . URLROOT . 'klanten');
         exit;
     }
 

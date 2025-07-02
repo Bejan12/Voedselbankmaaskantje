@@ -117,7 +117,7 @@
             <div class="success"><?php echo $data['success']; ?></div>
         <?php endif; ?>
 
-        <form action="<?php echo URLROOT; ?>/accounts/register" method="POST">
+        <form action="<?php echo URLROOT; ?>accounts/register" method="POST">
             <div class="form-group">
                 <label for="voornaam">Voornaam *</label>
                 <input type="text" id="voornaam" name="voornaam" value="<?php echo $data['voornaam']; ?>" required>
@@ -155,7 +155,7 @@
 
             <button type="submit" class="btn">Registreren</button>
         </form>
-        <p class="mt-3"><a href="<?php echo URLROOT; ?>/accounts/login">Heb je al een account? Log dan in</a></p>
+        <p class="mt-3"><a href="<?php echo URLROOT; ?>accounts/login">Heb je al een account? Log dan in</a></p>
     </div>
 
     <script>

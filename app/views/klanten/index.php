@@ -143,7 +143,7 @@
         <div class="alert alert-danger" id="error-alert"><?= $data['foutmelding']; ?></div>
     <?php endif; ?>
 
-    <a href="<?= URLROOT; ?>/klanten/add" class="btn-add">Klant toevoegen</a>
+    <a href="<?= URLROOT; ?>klanten/add" class="btn-add">Klant toevoegen</a>
 
     <?php if (empty($data['klanten'])): ?>
         <div class="alert alert-warning">Er zijn nog geen klanten beschikbaar.</div>

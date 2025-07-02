@@ -12,7 +12,7 @@
  */
 require_once APPROOT . '/models/VoedselpakketOverzichtModel.php';
 
-class VoedselpakketOverzicht extends BaseController
+class Voedselpakketoverzicht extends BaseController
 {
     /**
      * Toon het overzicht van voedselpakketten

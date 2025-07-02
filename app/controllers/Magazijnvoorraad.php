@@ -189,7 +189,7 @@ class Magazijnvoorraad extends BaseController
 
                 if ($success) {
                     // Redirect naar overzicht met succesbericht
-                    header('Location: ' . URLROOT . '/magazijnvoorraad?success=' . urlencode('Product "' . $productnaam . '" succesvol toegevoegd'));
+                    header('Location: ' . URLROOT . 'magazijnvoorraad?success=' . urlencode('Product "' . $productnaam . '" succesvol toegevoegd'));
                     exit;
                 } else {
                     throw new Exception('Product kon niet worden opgeslagen in de database');
@@ -211,7 +211,7 @@ class Magazijnvoorraad extends BaseController
             }
         } else {
             // Redirect als niet POST
-            header('Location: ' . URLROOT . '/magazijnvoorraad/nieuwProduct');
+            header('Location: ' . URLROOT . 'magazijnvoorraad/nieuwProduct');
             exit;
         }
     }
@@ -440,7 +440,7 @@ class Magazijnvoorraad extends BaseController
             $product = $this->magazijnvoorraadModel->getProductVoorWijziging($productId);
             
             if (!$product) {
-                header('Location: ' . URLROOT . '/magazijnvoorraad?error=' . urlencode('Product niet gevonden'));
+                header('Location: ' . URLROOT . 'magazijnvoorraad?error=' . urlencode('Product niet gevonden'));
                 exit;
             }
 
@@ -460,7 +460,7 @@ class Magazijnvoorraad extends BaseController
             $this->view('magazijnvoorraad/wijzigproduct', $data);
 
         } catch (Exception $e) {
-            header('Location: ' . URLROOT . '/magazijnvoorraad?error=' . urlencode('Fout bij laden product: ' . $e->getMessage()));
+            header('Location: ' . URLROOT . 'magazijnvoorraad?error=' . urlencode('Fout bij laden product: ' . $e->getMessage()));
             exit;
         }
     }
@@ -484,7 +484,7 @@ class Magazijnvoorraad extends BaseController
             // Haal originele product op voor fallback
             $originalProduct = $this->magazijnvoorraadModel->getProductVoorWijziging($productId);
             if (!$originalProduct) {
-                header('Location: ' . URLROOT . '/magazijnvoorraad?error=' . urlencode('Product niet gevonden'));
+                header('Location: ' . URLROOT . 'magazijnvoorraad?error=' . urlencode('Product niet gevonden'));
                 exit;
             }
 
@@ -578,7 +578,7 @@ class Magazijnvoorraad extends BaseController
 
                 if ($success) {
                     // Redirect naar overzicht met succesbericht
-                    header('Location: ' . URLROOT . '/magazijnvoorraad?success=' . urlencode('Product "' . $productnaam . '" succesvol gewijzigd'));
+                    header('Location: ' . URLROOT . 'magazijnvoorraad?success=' . urlencode('Product "' . $productnaam . '" succesvol gewijzigd'));
                     exit;
                 } else {
                     throw new Exception('Product kon niet worden gewijzigd in de database');
@@ -601,7 +601,7 @@ class Magazijnvoorraad extends BaseController
             }
         } else {
             // Redirect als niet POST
-            header('Location: ' . URLROOT . '/magazijnvoorraad');
+            header('Location: ' . URLROOT . 'magazijnvoorraad');
             exit;
         }
     }
@@ -612,7 +612,7 @@ class Magazijnvoorraad extends BaseController
             $productId = (int) $_POST['product_id'];
             
             if ($productId <= 0) {
-                header('Location: ' . URLROOT . '/magazijnvoorraad?error=' . urlencode('Ongeldig product ID'));
+                header('Location: ' . URLROOT . 'magazijnvoorraad?error=' . urlencode('Ongeldig product ID'));
                 exit;
             }
             
@@ -620,7 +620,7 @@ class Magazijnvoorraad extends BaseController
                 // Haal product gegevens op voor logging en foutmeldingen
                 $product = $this->magazijnvoorraadModel->getProductVoorVerwijdering($productId);
                 if (!$product) {
-                    header('Location: ' . URLROOT . '/magazijnvoorraad?error=' . urlencode('Product niet gevonden'));
+                    header('Location: ' . URLROOT . 'magazijnvoorraad?error=' . urlencode('Product niet gevonden'));
                     exit;
                 }
                 
@@ -635,7 +635,7 @@ class Magazijnvoorraad extends BaseController
                     }
                     
                     error_log("Product kan niet verwijderd worden - gekoppeld aan voedselpakketten: " . $product->ProductNaam);
-                    header('Location: ' . URLROOT . '/magazijnvoorraad?error=' . urlencode($errorMsg));
+                    header('Location: ' . URLROOT . 'magazijnvoorraad?error=' . urlencode($errorMsg));
                     exit;
                 }
                 
@@ -645,7 +645,7 @@ class Magazijnvoorraad extends BaseController
                 if ($success) {
                     $successMsg = 'Product "' . $product->ProductNaam . '" succesvol verwijderd';
                     error_log("Product succesvol verwijderd: " . $product->ProductNaam);
-                    header('Location: ' . URLROOT . '/magazijnvoorraad?success=' . urlencode($successMsg));
+                    header('Location: ' . URLROOT . 'magazijnvoorraad?success=' . urlencode($successMsg));
                     exit;
                 } else {
                     throw new Exception('Product kon niet worden verwijderd');
@@ -653,13 +653,13 @@ class Magazijnvoorraad extends BaseController
                 
             } catch (Exception $e) {
                 error_log("Controller error bij verwijderen product: " . $e->getMessage());
-                header('Location: ' . URLROOT . '/magazijnvoorraad?error=' . urlencode($e->getMessage()));
+                header('Location: ' . URLROOT . 'magazijnvoorraad?error=' . urlencode($e->getMessage()));
                 exit;
             }
             
         } else {
             // Redirect als niet POST of geen product_id
-            header('Location: ' . URLROOT . '/magazijnvoorraad?error=' . urlencode('Ongeldige verwijder aanvraag'));
+            header('Location: ' . URLROOT . 'magazijnvoorraad?error=' . urlencode('Ongeldige verwijder aanvraag'));
             exit;
         }
     }

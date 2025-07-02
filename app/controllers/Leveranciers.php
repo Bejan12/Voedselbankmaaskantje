@@ -30,7 +30,7 @@ class Leveranciers extends BaseController
                 $data = [
                     'title' => 'Geen Leveranciers',
                     'error_message' => 'Er zijn nog geen leveranciers, probeer het later opnieuw!',
-                    'redirect_url' => URLROOT . '/homepages/index'
+                    'redirect_url' => URLROOT . 'homepages/index'
                 ];
                 $this->view('leveranciers/error', $data);
                 return;
@@ -48,7 +48,7 @@ class Leveranciers extends BaseController
             $data = [
                 'title' => 'Database Error',
                 'error_message' => 'Er zijn nog geen leveranciers, probeer het later opnieuw!',
-                'redirect_url' => URLROOT . '/homepages/index'
+                'redirect_url' => URLROOT . 'homepages/index'
             ];
 
             $this->view('leveranciers/error', $data);
@@ -86,7 +86,7 @@ class Leveranciers extends BaseController
 
                 $this->view('leveranciers/add', $data);
             } catch (Exception $e) {
-                header('Location: ' . URLROOT . '/leveranciers');
+                header('Location: ' . URLROOT . 'leveranciers');
                 exit();
             }
         }
@@ -196,11 +196,11 @@ class Leveranciers extends BaseController
                     $this->view('leveranciers/add', $data);
                 }
             } catch (Exception $e) {
-                header('Location: ' . URLROOT . '/leveranciers');
+                header('Location: ' . URLROOT . 'leveranciers');
                 exit();
             }
         } else {
-            header('Location: ' . URLROOT . '/leveranciers/nieuw');
+            header('Location: ' . URLROOT . 'leveranciers/nieuw');
             exit();
         }
     }
@@ -209,7 +209,7 @@ class Leveranciers extends BaseController
     {
         if (!is_numeric($id)) {
             if (ob_get_level()) ob_end_clean();
-            header('Location: ' . URLROOT . '/leveranciers');
+            header('Location: ' . URLROOT . 'leveranciers');
             exit();
         }
 
@@ -221,7 +221,7 @@ class Leveranciers extends BaseController
                 
                 if (!$leverancier) {
                     if (ob_get_level()) ob_end_clean();
-                    header('Location: ' . URLROOT . '/leveranciers');
+                    header('Location: ' . URLROOT . 'leveranciers');
                     exit();
                 }
 
@@ -257,7 +257,7 @@ class Leveranciers extends BaseController
                 $this->view('leveranciers/edit', $data);
             } catch (Exception $e) {
                 if (ob_get_level()) ob_end_clean();
-                header('Location: ' . URLROOT . '/leveranciers');
+                header('Location: ' . URLROOT . 'leveranciers');
                 exit();
             }
         }
@@ -373,7 +373,7 @@ class Leveranciers extends BaseController
                 if (!$leverancier) {
                     SessionHelper::setFlash('leverancier_message', 'Leverancier niet gevonden.', 'danger');
                     if (ob_get_level()) ob_end_clean();
-                    header('Location: ' . URLROOT . '/leveranciers');
+                    header('Location: ' . URLROOT . 'leveranciers');
                     exit();
                 }
 
@@ -381,7 +381,7 @@ class Leveranciers extends BaseController
                 if (!$this->leverancierModel->canDeleteLeverancier($id)) {
                     SessionHelper::setFlash('leverancier_message', 'Leverancier kan niet verwijderd worden omdat deze al onderweg is!', 'danger');
                     if (ob_get_level()) ob_end_clean();
-                    header('Location: ' . URLROOT . '/leveranciers');
+                    header('Location: ' . URLROOT . 'leveranciers');
                     exit();
                 }
 
@@ -395,7 +395,7 @@ class Leveranciers extends BaseController
             }
         }
         if (ob_get_level()) ob_end_clean();
-        header('Location: ' . URLROOT . '/leveranciers');
+        header('Location: ' . URLROOT . 'leveranciers');
         exit();
     }
 }

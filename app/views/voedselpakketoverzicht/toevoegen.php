@@ -6,7 +6,7 @@
 <div class="modal fade" id="voegPakketToeModal" tabindex="-1" aria-labelledby="voegPakketToeLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <form method="post" action="">
+      <form method="post" action="<?= URLROOT; ?>voedselpakketoverzicht/index">
         <div class="modal-header">
           <h5 class="modal-title" id="voegPakketToeLabel">Voedselpakket toevoegen</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>

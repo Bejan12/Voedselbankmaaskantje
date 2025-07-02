@@ -31,7 +31,7 @@
                                         Bekijk en beheer het overzicht van alle producten in voorraad. 
                                         Monitor voorraadniveaus en zoek specifieke producten.
                                     </p>
-                                    <a href="<?= URLROOT; ?>/magazijnvoorraad" class="btn btn-primary btn-lg w-100">
+                                    <a href="<?= URLROOT; ?>magazijnvoorraad" class="btn btn-primary btn-lg w-100">
                                         <i class="bi bi-eye me-2"></i>Voorraad Bekijken
                                     </a>
                                 </div>
@@ -66,7 +66,7 @@
                                     <p class="card-text text-muted mb-4">
                                         Werk aan het samenstellen en beheren van voedselpakketten voor klanten.
                                     </p>
-                                    <a href="<?= URLROOT; ?>/voedselpakket" class="btn btn-warning btn-lg w-100">
+                                    <a href="<?= URLROOT; ?>voedselpakket" class="btn btn-warning btn-lg w-100">
                                         <i class="bi bi-basket2 me-2"></i>Naar Voedselpakketten
                                     </a>
                                 </div>
@@ -84,7 +84,7 @@
                                         Beheer leveranciersinformatie en contactgegevens. 
                                         Voeg nieuwe leveranciers toe en bewerk bestaande gegevens.
                                     </p>
-                                    <a href="<?= URLROOT; ?>/leveranciers" class="btn btn-info btn-lg w-100">
+                                    <a href="<?= URLROOT; ?>leveranciers" class="btn btn-info btn-lg w-100">
                                         <i class="bi bi-building me-2"></i>Leveranciers Beheren
                                     </a>
                                 </div>

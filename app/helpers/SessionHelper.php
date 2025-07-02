@@ -21,7 +21,7 @@ class SessionHelper {
             if (ob_get_level()) {
                 ob_end_clean();
             }
-            header('Location: ' . URLROOT . '/accounts/login');
+            header('Location: ' . URLROOT . 'accounts/login');
             exit();
         }
     }

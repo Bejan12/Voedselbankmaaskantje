@@ -14,7 +14,7 @@ class Accounts extends BaseController
     {
         // Check if user is already logged in, redirect to homepage
         if (isset($_SESSION['user_id'])) {
-            header('Location: ' . URLROOT . '/homepages/index');
+            header('Location: ' . URLROOT . 'homepages/index');
             exit();
         }
         
@@ -101,7 +101,7 @@ class Accounts extends BaseController
         
         // Check if user is already logged in, redirect to homepage
         if (isset($_SESSION['user_id'])) {
-            header('Location: ' . URLROOT . '/homepages/index');
+            header('Location: ' . URLROOT . 'homepages/index');
             exit();
         }
 
@@ -133,7 +133,7 @@ class Accounts extends BaseController
                     $_SESSION['user_email'] = $user->Email;
                     
                     // Redirect to dashboard
-                    header('Location: ' . URLROOT . '/homepages/index');
+                    header('Location: ' . URLROOT . 'homepages/index');
                     exit();
                 } else {
                     $data['error'] = 'Onjuiste email of wachtwoord.';
@@ -168,7 +168,7 @@ class Accounts extends BaseController
         session_destroy();
         
         // Redirect to homepage
-        header('Location: ' . URLROOT . '/homepages/index');
+        header('Location: ' . URLROOT . 'homepages/index');
         exit();
     }
 }

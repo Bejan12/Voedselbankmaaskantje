@@ -54,7 +54,7 @@ class BaseController
         }
         
         if (!SessionHelper::isLoggedIn()) {
-            header('Location: ' . URLROOT . '/accounts/login');
+            header('Location: ' . URLROOT . 'accounts/login');
             exit();
         }
     }

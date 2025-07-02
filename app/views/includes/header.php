@@ -103,25 +103,25 @@ if (session_status() === PHP_SESSION_NONE) {
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="<?php echo URLROOT; ?>/homepages/index">Dashboard</a>
+                    <a class="nav-link" href="<?php echo URLROOT; ?>homepages/index">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?php echo URLROOT; ?>/leveranciers/index">Overzicht Leveranciers</a>
+                    <a class="nav-link" href="<?php echo URLROOT; ?>leveranciers/index">Overzicht Leveranciers</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?php echo URLROOT; ?>/magazijnvoorraad/index">Overzicht Voorraadbeheer</a>
+                    <a class="nav-link" href="<?php echo URLROOT; ?>magazijnvoorraad/index">Overzicht Voorraadbeheer</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?php echo URLROOT; ?>/voedselpakketoverzicht/index">Overzicht voedselpakket</a>
+                    <a class="nav-link" href="<?php echo URLROOT; ?>voedselpakketoverzicht/index">Overzicht voedselpakket</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?php echo URLROOT; ?>/klanten/index">Overzicht klanten</a>
+                    <a class="nav-link" href="<?php echo URLROOT; ?>klanten/index">Overzicht klanten</a>
                 </li>
             </ul>
             <?php if (empty($_SESSION['user_id'])): ?>
                 <div class="d-flex">
-                    <a href="<?php echo URLROOT; ?>/accounts/register" class="btn">Registreren</a>
-                    <a href="<?php echo URLROOT; ?>/accounts/login" class="btn">Inloggen</a>
+                    <a href="<?php echo URLROOT; ?>accounts/register" class="btn">Registreren</a>
+                    <a href="<?php echo URLROOT; ?>accounts/login" class="btn">Inloggen</a>
                 </div>
             <?php else: ?>
                 <ul class="navbar-nav">
@@ -138,7 +138,7 @@ if (session_status() === PHP_SESSION_NONE) {
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item text-danger" href="<?php echo URLROOT; ?>/accounts/logout">Uitloggen</a>
+                                <a class="dropdown-item text-danger" href="<?php echo URLROOT; ?>accounts/logout">Uitloggen</a>
                             </li>
                         </ul>
                     </li>

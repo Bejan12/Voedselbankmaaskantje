@@ -129,7 +129,7 @@
                 <div class="success"><?php echo $data['success']; ?></div>
             <?php endif; ?>
 
-            <form action="<?php echo URLROOT; ?>/accounts/login" method="POST">
+            <form action="<?php echo URLROOT; ?>accounts/login" method="POST">
                 <div class="form-group">
                     <label for="email">Email *</label>
                     <input type="email" id="email" name="email" value="<?php echo $data['email']; ?>" required>
@@ -144,7 +144,7 @@
             </form>
 
             <div class="form-footer">
-                <p><a href="<?php echo URLROOT; ?>/accounts/register">Nog geen account? Registreren</a></p>
+                <p><a href="<?php echo URLROOT; ?>accounts/register">Nog geen account? Registreren</a></p>
             </div>
         </div>
     </div>

@@ -12,7 +12,7 @@
                     <p class="subtitle mb-0">Beheer en monitor de magazijnvoorraad</p>
                 </div>
                 <div>
-                    <a href="<?= URLROOT; ?>/magazijnvoorraad/nieuwProduct" class="btn btn-success">
+                    <a href="<?= URLROOT; ?>magazijnvoorraad/nieuwProduct" class="btn btn-success">
                         <i class="bi bi-plus-circle me-1"></i>Nieuw Product
                     </a>
                 </div>
@@ -270,7 +270,7 @@
                                         
                                         <td class="text-center">
                                         <div class="btn-group btn-group-sm" role="group">
-                                        <a href="<?= URLROOT; ?>/magazijnvoorraad/wijzigProduct/<?= $product->ProductID; ?>" 
+                                        <a href="<?= URLROOT; ?>magazijnvoorraad/wijzigProduct/<?= $product->ProductID; ?>" 
                                          class="btn btn-outline-primary" 
                                          title="Product wijzigen">
                                         <i class="bi bi-pencil"></i>
@@ -474,7 +474,7 @@ h2 {
 function confirmDelete(productId, productNaam) {
     document.getElementById('deleteProductId').value = productId;
     document.getElementById('productToDelete').textContent = productNaam;
-    document.getElementById('deleteForm').action = '<?= URLROOT; ?>/magazijnvoorraad/verwijderProduct';
+    document.getElementById('deleteForm').action = '<?= URLROOT; ?>magazijnvoorraad/verwijderProduct';
     
     const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
     modal.show();

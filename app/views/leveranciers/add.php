@@ -9,7 +9,7 @@
         </div>
         <script>
             setTimeout(function() {
-                window.location.href = "<?php echo URLROOT; ?>/leveranciers";
+                window.location.href = "<?php echo URLROOT; ?>leveranciers";
             }, 5000);
         </script>
     <?php endif; ?>

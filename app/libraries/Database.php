@@ -51,7 +51,7 @@ class Database
              */
             // logger(__LINE__, __METHOD__, __FILE__, $e->getMessage());
             echo "Op dit moment kunnen we u niet helpen... probeer het later nog eens";
-            header('Refresh:30; url=' .URLROOT . '/homepages/index');
+            header('Refresh:30; url=' . URLROOT . 'homepages/index');
         }
     }
 

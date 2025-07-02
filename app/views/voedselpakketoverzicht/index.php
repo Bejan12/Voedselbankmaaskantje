@@ -231,7 +231,7 @@ if (isset($_GET['success'])) {
             <?php endif; ?>
             <!-- Filterformulier -->
             <div class="form-section mb-4">
-                <form method="get" class="row g-3 align-items-end">
+                <form method="get" class="row g-3 align-items-end" action="<?= URLROOT; ?>voedselpakketoverzicht/index">
                     <div class="col-12 col-md-5">
                         <label for="beschikbaar" class="form-label">Beschikbaarheid</label>
                         <select name="beschikbaar" id="beschikbaar" class="form-select">
@@ -396,7 +396,7 @@ if (isset($_GET['success'])) {
             <div class="modal fade" id="voegPakketToeModal" tabindex="-1" aria-labelledby="voegPakketToeLabel" aria-hidden="true">
               <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
-                  <form method="post" action="">
+                  <form method="post" action="<?= URLROOT; ?>voedselpakketoverzicht/index">
                     <div class="modal-header bg-primary text-white">
                       <h5 class="modal-title" id="voegPakketToeLabel">Voedselpakket toevoegen</h5>
                       <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Sluiten"></button>
@@ -625,7 +625,7 @@ if (isset($_GET['success'])) {
                     row.children[5].textContent = document.getElementById('wijzig_babys').value;
                     // Datum alleen aanpassen als niet 0000-00-00
                     const nieuweDatum = document.getElementById('wijzig_datum').value;
-                    if (nieuweDatum && nieuweDatum !== '0000-00-00') {
+                    if (nieuweDatum && nieuweDatum !== '0000-00') {
                         row.children[8].textContent = (function(d){let dt=new Date(d);return dt.toLocaleDateString('nl-NL');})(nieuweDatum);
                     }
                 }

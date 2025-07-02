@@ -6,7 +6,7 @@
             <!-- Header sectie -->
             <div class="mb-4">
                 <div class="d-flex align-items-center mb-3">
-                    <a href="<?= URLROOT; ?>/magazijnvoorraad" class="btn btn-outline-secondary me-3">
+                    <a href="<?= URLROOT; ?>magazijnvoorraad" class="btn btn-outline-secondary me-3">
                         <i class="bi bi-arrow-left"></i>
                     </a>
                     <div>
@@ -165,7 +165,7 @@
                         <div class="row mt-4">
                             <div class="col-12">
                                 <div class="d-flex justify-content-between">
-                                    <a href="<?= URLROOT; ?>/magazijnvoorraad" class="btn btn-secondary">
+                                    <a href="<?= URLROOT; ?>magazijnvoorraad" class="btn btn-secondary">
                                         <i class="bi bi-x-circle me-1"></i>Annuleren
                                     </a>
                                     <button type="submit" class="btn btn-primary" id="submitBtn">
