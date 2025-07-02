@@ -79,9 +79,21 @@
     </div>
 </div>
 
-<br><br><br><br><br><br><br>
-
 <style>
+    /* Zorg ervoor dat de pagina altijd de volledige hoogte heeft */
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Container voor de hele pagina inhoud */
+    .container {
+        min-height: calc(100vh - 200px); /* Trek navbar en footer hoogte af */
+        padding-bottom: 40px; /* Extra ruimte voor de footer */
+        flex: 1; /* Neemt beschikbare ruimte in */
+    }
+
     .title {
         text-align: center;
         font-weight: bold;

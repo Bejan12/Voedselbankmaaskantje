@@ -21,6 +21,9 @@ if (session_status() === PHP_SESSION_NONE) {
             margin: 0;
             padding: 0;
             background-color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .navbar-custom {
@@ -90,6 +93,7 @@ if (session_status() === PHP_SESSION_NONE) {
     </style>
 </head>
 <body>
+<div class="main-wrapper flex-grow-1">
 <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container-fluid">
        

@@ -1,58 +1,171 @@
 <?php require_once APPROOT . '/views/includes/header.php'; ?>
+<?php
+require_once APPROOT . '/libraries/Database.php';
+$db = new Database();
+$melding = isset($melding) ? $melding : '';
+$foutmelding = isset($foutmelding) ? $foutmelding : '';
+$datumError = isset($datumError) ? $datumError : '';
+$modalOpen = false;
+$allergieMelding = '';
+$datumError = '';
 
+// Ophalen klanten en producten voor het formulier
+$db->query("SELECT k.KlantID, CONCAT(p.Voornaam, ' ', p.Achternaam) AS gezinsnaam FROM klant k JOIN gebruiker g ON k.GebruikerID = g.GebruikerID JOIN persoon p ON g.PersoonID = p.PersoonID");
+$klanten = $db->resultSet();
+$db->query("SELECT ProductID, ProductNaam FROM product");
+$producten = $db->resultSet();
+
+// Ophalen allergieÃ«n per klant
+$klantAllergieen = [];
+$db->query("SELECT k.KlantID, GROUP_CONCAT(a.Naam SEPARATOR ', ') AS allergieen FROM klantallergie ka JOIN allergie a ON ka.AllergieID = a.AllergieID JOIN klant k ON ka.KlantID = k.KlantID GROUP BY k.KlantID");
+foreach ($db->resultSet() as $row) {
+    $klantAllergieen[$row->KlantID] = $row->allergieen;
+}
+
+// Filter validatie en terugkoppeling
+if (isset($_GET['datum']) && $_GET['datum'] !== '') {
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['datum'])) {
+        $datumError = 'datum bestaat niet';
+    } else {
+        // Check of er pakketten zijn voor deze datum
+        $db->query("SELECT COUNT(*) as aantal FROM voedselpakket WHERE DatumSamenstelling = :datum");
+        $db->bind(':datum', $_GET['datum']);
+        $row = $db->single();
+        if ($row && $row->aantal == 0) {
+            $datumError = 'datum bestaat niet';
+        } else {
+            $melding = 'Overzicht succesvol geladen';
+        }
+    }
+} elseif (isset($_GET['beschikbaar']) && $_GET['beschikbaar'] !== '') {
+    $melding = 'Overzicht succesvol geladen';
+}
+if (isset($_GET['success'])) {
+    $melding = 'Voedselpakket is succesvol aangemaakt';
+}
+?>
 <style>
+/* --- Professionele, moderne en responsive stijl voor Voedselbank Maaskantje --- */
 body {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
     background: #f6f7fb;
-}
-.main-content {
-    flex: 1 0 auto;
-}
-footer {
-    flex-shrink: 0;
-}
-.container-main {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding-bottom: 40px;
+    font-family: 'Instrument Sans', Arial, sans-serif;
 }
 .card {
-    border-radius: 18px;
-    box-shadow: 0 8px 40px rgba(20,25,59,0.13);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(20,25,59,0.13);
     border: none;
     background: #fff;
+    transition: transform 0.2s;
 }
-.card-body {
-    padding: 2.7rem 2.7rem 2.2rem 2.7rem;
+.card:hover {
+    transform: translateY(-4px) scale(1.01);
 }
-.table-responsive {
-    overflow-x: unset !important;
-    margin-bottom: 2.5rem;
+.card-title {
+    color: #14193B;
+    font-weight: 700;
+}
+.btn-primary, .btn-success, .btn-warning, .btn-danger {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 10px 22px;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(20,25,59,0.07);
+}
+.btn-primary {
+    background-color: #EE7B00;
+    border: none;
+}
+.btn-primary:hover {
+    background-color: #14193B;
+    color: #fff;
+}
+.btn-success {
+    background-color: #28a745;
+    border: none;
+}
+.btn-success:hover {
+    background-color: #218838;
+}
+.btn-warning {
+    background-color: #ffc107;
+    border: none;
+    color: #333;
+}
+.btn-warning:hover {
+    background-color: #e0a800;
+    color: #fff;
+}
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+}
+.btn-danger:hover {
+    background-color: #b52a37;
+    color: #fff;
+}
+.btn-action-group .btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    min-width: 90px;
+    font-size: 1em;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(220,53,69,0.07);
+    transition: all 0.2s;
+}
+.btn-action-group .btn-danger:hover {
+    background-color: #b52a37;
+    color: #fff;
+    transform: translateY(-2px) scale(1.04);
+}
+.btn-action-group .btn-warning {
+    background-color: #ffc107;
+    color: #333;
+    border: none;
+    min-width: 90px;
+    font-size: 1em;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(238,123,0,0.07);
+    transition: all 0.2s;
+}
+.btn-action-group .btn-warning:hover {
+    background-color: #e0a800;
+    color: #fff;
+    transform: translateY(-2px) scale(1.04);
 }
 .table {
-    min-width: 1200px;
-    width: 100%;
-    table-layout: fixed;
-    font-size: 1.08em;
-    background: #fff;
+    margin-bottom: 0;
     border-radius: 14px;
     overflow: hidden;
+    background: #fff;
+    font-size: 1.08em;
     box-shadow: 0 2px 12px rgba(20,25,59,0.07);
+    table-layout: fixed;
 }
 .table th, .table td {
-    white-space: nowrap;
-    overflow: hidden;
+    white-space: normal;
+    overflow-wrap: break-word;
     text-overflow: ellipsis;
     padding: 1.1em 0.7em;
+    vertical-align: middle;
+    font-size: 1.08em;
+    line-height: 1.5;
+    text-align: center;
 }
 .table thead th {
-    background: #f8f9fa;
-    color: #333;
+    background: #f3f4f7;
+    color: #14193B;
     font-weight: 700;
     border-bottom: 2.5px solid #EE7B00;
-    font-size: 1.08em;
+    font-size: 1.12em;
+    letter-spacing: 0.02em;
+    text-align: center;
+}
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f8f9fa;
+}
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: #f3f4f7;
 }
 .table-bordered td, .table-bordered th {
     border: 1.5px solid #e0e0e0;
@@ -62,6 +175,9 @@ footer {
 }
 .table tbody tr:hover {
     background: #fff7ed;
+    box-shadow: 0 2px 8px rgba(238,123,0,0.08);
+    z-index: 2;
+    position: relative;
 }
 .badge {
     font-size: 1em;
@@ -77,43 +193,9 @@ footer {
     background: #28a745 !important;
     color: #fff;
 }
-.btn-action-group {
-    display: flex;
-    gap: 0.5em;
-    justify-content: center;
-    align-items: center;
-}
-.btn-warning, .btn-danger {
-    min-width: 80px;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-    border-radius: 6px;
-    font-size: 0.85em;
-    padding: 0.4rem 0.8rem;
-    box-shadow: 0 1px 4px rgba(238,123,0,0.15);
-    transition: all 0.2s;
-}
-.btn-warning {
-    background: #ffc107;
-    border: none;
-    color: #333;
-}
-.btn-warning:hover {
-    background: #ffb300;
+.badge.bg-danger {
+    background: #dc3545 !important;
     color: #fff;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(238,123,0,0.25);
-}
-.btn-danger {
-    background: #dc3545;
-    border: none;
-    font-size: 0.85em;
-    padding: 0.4rem 0.8rem;
-}
-.btn-danger:hover {
-    background: #c82333;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(220,53,69,0.25);
 }
 .alert {
     border-radius: 0.7em;
@@ -129,6 +211,56 @@ footer {
     from { opacity: 0; transform: translateY(-30px); }
     to { opacity: 1; transform: translateY(0); }
 }
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    padding: 10px 15px;
+    transition: border-color 0.3s;
+    font-size: 1.05em;
+}
+.form-control:focus, .form-select:focus {
+    border-color: #EE7B00;
+    box-shadow: 0 0 0 2px #ee7b0033;
+}
+.btn-secondary {
+    background-color: #6c757d;
+    border: none;
+    margin-left: 10px;
+}
+.btn-secondary:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+/* Hamburger menu */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    margin-left: auto;
+    margin-right: 10px;
+    width: 32px;
+    height: 32px;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+}
+.hamburger span {
+    height: 4px;
+    width: 100%;
+    background: #EE7B00;
+    margin: 4px 0;
+    border-radius: 2px;
+    transition: all 0.3s;
+}
+.hamburger.open span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+.hamburger.open span:nth-child(2) {
+    opacity: 0;
+}
+.hamburger.open span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
 @media (max-width: 1400px) {
     .container-main { max-width: 99vw; }
     .table { min-width: 1100px; }
@@ -136,317 +268,745 @@ footer {
 @media (max-width: 1200px) {
     .table { min-width: 900px; }
 }
+@media (max-width: 991px) {
+    .navbar .nav-links {
+        display: none;
+        flex-direction: column;
+        background: #fff;
+        position: absolute;
+        top: 80px;
+        right: 0;
+        width: 220px;
+        box-shadow: 0 8px 32px rgba(20,25,59,0.13);
+        z-index: 1000;
+        padding: 20px 0;
+    }
+    .navbar .nav-links.active {
+        display: flex;
+    }
+    .hamburger {
+        display: flex;
+    }
+    .btn, .btn-primary, .btn-success, .btn-warning, .btn-danger {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .btn-secondary {
+        margin-left: 0;
+    }
+    .container-main {
+        padding: 0 8px;
+    }
+    .table {
+        min-width: 700px;
+        font-size: 0.98em;
+    }
+}
 @media (max-width: 900px) {
-    .table { min-width: 700px; }
+    .table { min-width: 700px; font-size: 0.97em; }
+    .btn, .btn-primary, .btn-success, .btn-warning, .btn-danger {
+        width: 100%;
+        margin-bottom: 10px;
+        font-size: 1.05em;
+    }
+    .btn-action-group { flex-direction: column; gap: 0.3em; }
+    .table th, .table td { font-size: 0.97em; padding: 0.7em 0.4em; }
 }
 @media (max-width: 600px) {
-    .table-responsive { font-size: 0.95em; }
-    .btn-action-group { flex-direction: column; gap: 0.25em; }
-    .table { min-width: 500px; }
-    .card-body { padding: 1.2rem 0.5rem; }
-    .btn-warning, .btn-danger { min-width: 70px; font-size: 0.8em; padding: 0.35rem 0.7rem; }
+    .table { min-width: 400px; font-size: 0.93em; }
+    .table th, .table td { font-size: 0.93em; padding: 0.5em 0.2em; }
+    .btn-action-group { flex-direction: column; gap: 0.2em; }
 }
-/* Hamburger menu styles */
-.hamburger {
-    display: none;
-    flex-direction: column;
-    cursor: pointer;
-    margin-left: auto;
-    margin-right: 10px;
+/* Verbeterde responsive tabel voor mobiel */
+
+/* Verbeterde responsive tabel voor mobiel en tablet met Bootstrap-styling */
+@media (max-width: 700px) {
+    .table-responsive {
+        overflow-x: unset !important;
+        width: 100%;
+        padding: 0;
+    }
+    .table, .table thead, .table tbody, .table th, .table td, .table tr {
+        display: block;
+        width: 100%;
+    }
+    .table thead {
+        display: none;
+    }
+    .table tr {
+        margin-bottom: 1.2em;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(20,25,59,0.07);
+        padding: 0.7em 0.5em;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+    .table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.7em 0.5em;
+        border: none;
+        border-bottom: 1px solid #f3f4f7;
+        font-size: 1em;
+        width: 100%;
+        position: relative;
+    }
+    .table td:last-child {
+        border-bottom: none;
+    }
+    .table td:before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: #EE7B00;
+        flex-basis: 50%;
+        text-align: left;
+        padding-right: 1em;
+        font-size: 0.98em;
+    }
+    .btn-action-group {
+        flex-direction: column;
+        gap: 0.2em;
+        width: 100%;
+    }
 }
-.hamburger span {
-    height: 3px;
-    width: 28px;
-    background: #EE7B00;
-    margin: 5px 0;
-    border-radius: 2px;
-    transition: 0.4s;
+
+/* Bootstrap utility: table-responsive always on */
+.table-responsive {
+    width: 100%;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
-@media (max-width: 900px) {
-    .nav-links { display: none; }
-    .nav-links.active { display: flex; flex-direction: column; gap: 10px; background: #fff; position: absolute; top: 80px; left: 0; width: 100vw; z-index: 1000; box-shadow: 0 8px 32px rgba(20,25,59,0.13); padding: 1.5em 0; }
-    .hamburger { display: flex; }
+
+/* Zorg dat de tabel netjes oogt op mobiel/tablet */
+@media (max-width: 991px) {
+    .table th, .table td {
+        font-size: 0.97em;
+        padding: 0.7em 0.4em;
+    }
 }
+
+/* Responsive utility classes and table improvements */
+.page-space {
+    margin-top: 48px;
+    margin-bottom: 48px;
+}
+
+/* Responsive tables: always scrollable on small screens */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table th, .table td {
+    vertical-align: middle !important;
+    word-break: break-word;
+    white-space: normal;
+}
+
+/* Responsive font sizes for headings and table text */
+h1, h2, h3, h4, h5, h6 {
+    word-break: break-word;
+}
+
+@media (max-width: 1200px) {
+    .table th, .table td {
+        font-size: 1rem;
+        padding: 0.6rem 0.4rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .table th, .table td {
+        font-size: 0.95rem;
+        padding: 0.5rem 0.3rem;
+    }
+    .btn, .form-control, .form-select {
+        font-size: 0.98rem;
+    }
+    .card-header h2, .card-header h3, .card-header h4 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .container, .container-fluid {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+    .table th, .table td {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.2rem;
+    }
+    .btn, .form-control, .form-select {
+        font-size: 0.95rem;
+    }
+    .card-header h2, .card-header h3, .card-header h4 {
+        font-size: 1.1rem;
+    }
+}
+
+/* Responsive buttons: full width on mobile */
+@media (max-width: 576px) {
+    .btn, .btn-group {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    .d-flex.justify-content-between, .d-flex.justify-content-end {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+}
+
+/* Responsive card padding */
+.card-body, .card-header {
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+}
+@media (max-width: 576px) {
+    .card-body, .card-header {
+        padding-left: 0.6rem;
+        padding-right: 0.6rem;
+    }
+}
+
+/* Responsive alert text */
+.alert {
+    font-size: 1rem;
+    word-break: break-word;
+}
+
+/* Responsive form labels */
+.form-label {
+    font-size: 1rem;
+}
+
+/* Extra: table striped for better readability on mobile */
+@media (max-width: 576px) {
+    .table-striped > tbody > tr:nth-of-type(odd) {
+        --bs-table-accent-bg: #f8f9fa;
+    }
+}
+
 </style>
-
-<div class="main-content">
-<div class="container container-main mt-5">
+<div class="container mt-5 mb-5">
     <div class="row justify-content-center">
-        <div class="col-12">
-            <div class="card shadow-lg mb-4">
-                <div class="card-body">
-                    <h2 class="mb-3" style="color:#EE7B00; font-weight:700; letter-spacing:0.03em;">Overzicht Voedselpakketten</h2>
-                    <a href="<?= URLROOT ?>/voedselpakket/toevoegen" class="btn btn-success mb-3" style="font-weight:600;">Voedselpakket toevoegen</a>
-
-                    <!-- Filterformulier -->
-                    <form class="row g-2 mb-3" method="get" action="<?= URLROOT ?>/voedselpakket/index">
-                        <div class="col-auto">
-                            <select name="filter" class="form-select">
-                                <option value="">-- Toon alles --</option>
-                                <option value="beschikbaar" <?= ($data['filter'] === 'beschikbaar') ? 'selected' : '' ?>>Beschikbare pakketten</option>
-                                <option value="niet_beschikbaar" <?= ($data['filter'] === 'niet_beschikbaar') ? 'selected' : '' ?>>Niet-beschikbare pakketten</option>
-                            </select>
-                        </div>
-                        <div class="col-auto">
-                            <input type="date" name="datum" class="form-control" value="<?= htmlspecialchars($data['datum'] ?? '') ?>" placeholder="Datum (JJJJ-MM-DD)">
-                        </div>
-                        <div class="col-auto">
-                            <button type="submit" class="btn btn-primary" style="background:#EE7B00;border:none;font-weight:600;">Filter</button>
-                        </div>
-                    </form>
-
-                    <?php if ($data['melding']): ?>
-                        <div class="alert alert-info text-center" id="melding-alert"><?= htmlspecialchars($data['melding']) ?></div>
-                        <?php if ($data['melding'] === 'datum bestaat niet'): ?>
-                            <script>
-                                setTimeout(() => window.location.href = "<?= URLROOT ?>/voedselpakket/index", 2000);
-                            </script>
-                        <?php endif; ?>
-                    <?php endif; ?>
-
-                    <div class="table-responsive">
-                        <table class="table table-bordered align-middle text-center">
-                            <thead>
-                                <tr>
-                                    <th style="width:110px;">Pakketnummer</th>
-                                    <th style="width:170px;">Klantnaam</th>
-                                    <th style="width:160px;">Datum Samenstelling</th>
-                                    <th style="width:160px;">Datum Uitgifte</th>
-                                    <th style="width:120px;">Status</th>
-                                    <th style="width:220px;">Allergieën/Wensen</th>
-                                    <th style="width:180px;">Acties</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            <?php 
-                            $totaal = count($data['pakketten']);
-                            if ($totaal):
-                                $nummer = $totaal;
-                                foreach ($data['pakketten'] as $pakket):
-                                    $isAdmin = ($nummer === $totaal && strtolower(trim($pakket->KlantNaam)) === 'peter abraham');
-                                    $isUitgeleverd = !empty($pakket->DatumUitgifte);
-                            ?>
-                                <tr data-pakket-id="<?= $pakket->VoedselpakketID ?>">
-                                    <td><?= sprintf('#%03d', $nummer--) ?></td>
-                                    <td><?= htmlspecialchars($pakket->KlantNaam) ?></td>
-                                    <td><?= date('d-m-Y', strtotime($pakket->DatumSamenstelling)) ?></td>
-                                    <td><?= $isUitgeleverd ? date('d-m-Y', strtotime($pakket->DatumUitgifte)) : '<span class="badge bg-success">Beschikbaar</span>' ?></td>
-                                    <td><span class="badge bg-secondary"><?= htmlspecialchars($pakket->Status ?? '-') ?></span></td>
-                                    <td><?= htmlspecialchars($pakket->Allergieen ?: '-') ?></td>
-                                    <td>
-                                        <div class="btn-action-group">
-                                            <button class="btn btn-warning btn-sm"
-                                                onclick="openEditModal(<?= $pakket->VoedselpakketID ?>, '<?= htmlspecialchars($pakket->KlantNaam, ENT_QUOTES) ?>', '<?= date('Y-m-d', strtotime($pakket->DatumSamenstelling)) ?>', '<?= htmlspecialchars($pakket->Status ?? '-') ?>', <?= $isUitgeleverd ? 'true' : 'false' ?>)">
-                                                Wijzig
-                                            </button>
-                                            <?php if ($isAdmin): ?>
-                                                <button class="btn btn-danger btn-sm" onclick="showMelding('Voedselpakket van een admin kan niet worden verwijderd', false)">Verwijder</button>
-                                            <?php else: ?>
-                                                <button class="btn btn-danger btn-sm" onclick="confirmDelete(<?= $pakket->VoedselpakketID ?>)">Verwijder</button>
-                                            <?php endif; ?>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endforeach; else: ?>
-                                <tr><td colspan="7">Geen voedselpakketten gevonden</td></tr>
-                            <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <a href="<?= URLROOT ?>/homepages/index" class="btn btn-outline-secondary mt-3">Terug naar Home</a>
+        <div class="col-12 col-lg-10 col-xl-9">
+            <h2 class="mb-4 text-center fw-bold text-primary">Overzicht Voedselpakketten</h2>
+            <!-- Meldingen -->
+            <?php if (!empty($datumError)): ?>
+                <div class="alert alert-danger text-center shadow-sm" id="datumErrorAlert">
+                    <?= htmlspecialchars($datumError) ?>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-</div>
-
-<!-- Delete Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Bevestig verwijderen</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">Weet je zeker dat je dit voedselpakket wilt verwijderen?</div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Annuleer</button>
-                <a id="confirmDeleteBtn" href="#" class="btn btn-danger">Verwijder</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Modal -->
-<div class="modal fade" id="editModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Voedselpakket wijzigen</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="editForm">
-                <div class="modal-body">
-                    <input type="hidden" id="editPakketId">
-                    <div class="mb-3">
-                        <label for="editKlantNaam" class="form-label">Klantnaam</label>
-                        <input type="text" class="form-control" id="editKlantNaam" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editDatum" class="form-label">Datum samenstelling</label>
-                        <input type="date" class="form-control" id="editDatum" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editStatus" class="form-label">Status</label>
-                        <select class="form-select" id="editStatus">
-                            <option value="geleverd">Geleverd</option>
-                            <option value="niet geleverd">Niet geleverd</option>
-                            <option value="onderweg">Onderweg</option>
+                <script>
+                  // Redirect na tonen foutmelding
+                  setTimeout(function() {
+                    window.location.href = '<?= URLROOT; ?>/voedselpakket';
+                  }, 2000);
+                </script>
+            <?php endif; ?>
+            <?php if (!empty($melding)): ?>
+                <div class="alert alert-success text-center shadow-sm" id="meldingAlert">
+                    <?= htmlspecialchars($melding) ?>
+                </div>
+            <?php endif; ?>
+            <?php if (!empty($foutmelding)): ?>
+                <div class="alert alert-danger text-center shadow-sm" id="foutmeldingAlert">
+                    <?= htmlspecialchars($foutmelding) ?>
+                </div>
+            <?php endif; ?>
+            <!-- Filterformulier -->
+            <div class="form-section mb-4">
+                <form method="get" class="row g-3 align-items-end">
+                    <div class="col-12 col-md-5">
+                        <label for="beschikbaar" class="form-label">Beschikbaarheid</label>
+                        <select name="beschikbaar" id="beschikbaar" class="form-select">
+                            <option value="">Alles</option>
+                            <option value="1" <?= (isset($_GET['beschikbaar']) && $_GET['beschikbaar'] == '1') ? 'selected' : '' ?>>Beschikbaar</option>
+                            <option value="0" <?= (isset($_GET['beschikbaar']) && $_GET['beschikbaar'] == '0') ? 'selected' : '' ?>>Niet beschikbaar</option>
                         </select>
                     </div>
+                    <div class="col-12 col-md-5">
+                        <label for="datum" class="form-label">Filter op datum samenstelling</label>
+                        <input type="date" name="datum" id="datum" class="form-control"
+                               value="<?= isset($_GET['datum']) ? htmlspecialchars($_GET['datum']) : '' ?>">
+                    </div>
+                    <div class="col-12 col-md-2 d-grid">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                    </div>
+                </form>
+            </div>
+            <!-- Tabel en Toevoegen knop -->
+            <div class="d-flex justify-content-end mb-2">
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#voegPakketToeModal">Voedselpakket toevoegen</button>
+            </div>
+            <div class="table-responsive rounded shadow-sm">
+                <table class="table table-bordered table-hover align-middle mb-0">
+                    <thead class="table-light text-center">
+                        <tr>
+<thead class="table-light text-center small">
+    <tr>
+        <th>Pakketnr</th>
+        <th>Gezin</th>
+        <th>Omschrijv.</th>
+        <th>Volw.</th>
+        <th>Kind.</th>
+        <th>Baby's</th>
+        <th>Details</th>
+        <th>Beschik.</th>
+        <th>Datum</th>
+        <th>Actie</th>
+    </tr>
+</thead>
+
+                        </tr>
+                    </thead>
+                    <tbody class="text-center">
+                    <?php
+                    // Ophalen voedselpakketten (dummy data uit database)
+                    $sql = "SELECT v.VoedselpakketID, CONCAT(p.Voornaam, ' ', p.Achternaam) AS gezinsnaam, CONCAT('Pakket samengesteld op ', v.DatumSamenstelling) AS Omschrijving, k.AantalVolwassenen, k.AantalKinderen, k.AantalBabys, (
+                        SELECT GROUP_CONCAT(CONCAT(pr.ProductNaam, ' (', vpp.Aantal, 'x)') SEPARATOR ', ')
+                        FROM voedselpakketproduct vpp
+                        JOIN product pr ON vpp.ProductID = pr.ProductID
+                        WHERE vpp.VoedselpakketID = v.VoedselpakketID
+                    ) AS Details, IF(v.DatumUitgifte IS NULL, 1, 0) AS Beschikbaar, v.DatumSamenstelling
+                    FROM voedselpakket v
+                    JOIN klant k ON v.KlantID = k.KlantID
+                    JOIN gebruiker g ON k.GebruikerID = g.GebruikerID
+                    JOIN persoon p ON g.PersoonID = p.PersoonID";
+                    $where = [];
+                    $params = [];
+                    if (isset($_GET['beschikbaar']) && $_GET['beschikbaar'] !== '') {
+                        $where[] = 'IF(v.DatumUitgifte IS NULL, 1, 0) = :beschikbaar';
+                        $params[':beschikbaar'] = $_GET['beschikbaar'];
+                    }
+                    if (isset($_GET['datum']) && $_GET['datum'] !== '') {
+                        $where[] = 'v.DatumSamenstelling = :datum';
+                        $params[':datum'] = $_GET['datum'];
+                    }
+                    if (!empty($where)) {
+                        $sql .= ' WHERE ' . implode(' AND ', $where);
+                    }
+                    $sql .= ' ORDER BY v.DatumSamenstelling DESC';
+                    $db->query($sql);
+                    foreach ($params as $key => $value) {
+                        $db->bind($key, $value);
+                    }
+                    $voedselpakketten = $db->resultSet();
+                    ?>
+                    <?php if (!empty($voedselpakketten)): ?>
+                        <?php 
+                        // Sorteer pakketten op pakketnummer (nieuwste bovenaan)
+                        usort($voedselpakketten, function($a, $b) { return $b->VoedselpakketID - $a->VoedselpakketID; });
+                        foreach ($voedselpakketten as $pakket): ?>
+                            <tr data-pakketid="<?= $pakket->VoedselpakketID ?>">
+                                <td class="fw-bold text-primary" data-label="Pakketnr">#<?= (int)$pakket->VoedselpakketID ?></td>
+                                <td class="text-start ps-3" data-label="Gezin"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:120px;"><?= htmlspecialchars($pakket->gezinsnaam) ?></span></td>
+                                <td class="text-start ps-3" data-label="Omschrijv."><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:180px;"><?= htmlspecialchars($pakket->Omschrijving) ?></span></td>
+                                <td data-label="Volw."><?= (int)$pakket->AantalVolwassenen ?></td>
+                                <td data-label="Kind."><?= (int)$pakket->AantalKinderen ?></td>
+                                <td data-label="Baby's"><?= (int)$pakket->AantalBabys ?></td>
+                                <td class="text-start ps-3" data-label="Details">
+                                  <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:200px; cursor:pointer; color:#0d6efd; text-decoration:underline;" onclick="toonDetailsModal('<?= htmlspecialchars(addslashes($pakket->gezinsnaam)) ?>', '<?= htmlspecialchars(addslashes($pakket->Omschrijving)) ?>', '<?= $pakket->Details !== null ? htmlspecialchars(addslashes($pakket->Details)) : '-' ?>')">
+                                    <?= $pakket->Details !== null ? htmlspecialchars($pakket->Details) : '<span class="text-muted">-</span>' ?>
+                                  </span>
+                                </td>
+            <!-- Modal details -->
+            <div class="modal fade" id="detailsPakketModal" tabindex="-1" aria-labelledby="detailsPakketLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="detailsPakketLabel">Pakket details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+                  </div>
+                  <div class="modal-body p-4">
+                    <div><strong>Gezin:</strong> <span id="detailsGezin"></span></div>
+                    <div><strong>Omschrijving:</strong> <span id="detailsOmschrijving"></span></div>
+                    <div class="mt-3"><strong>Inhoud pakket:</strong><br><span id="detailsInhoud"></span></div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sluiten</button>
+                  </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleer</button>
-                    <button type="submit" class="btn btn-primary">Opslaan</button>
+              </div>
+            </div>
+<script>
+  function toonDetailsModal(gezin, omschrijving, inhoud) {
+    document.getElementById('detailsGezin').textContent = gezin;
+    document.getElementById('detailsOmschrijving').textContent = omschrijving;
+    document.getElementById('detailsInhoud').textContent = inhoud;
+    const modal = new bootstrap.Modal(document.getElementById('detailsPakketModal'));
+    modal.show();
+  }
+</script>
+                                <td data-label="Beschik.">
+                                  <?php if ($pakket->Beschikbaar): ?>
+                                    <span class="badge-yes" style="font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; font-weight: 500;">Ja</span>
+                                  <?php else: ?>
+                                    <span class="badge badge-no" style="font-size: 0.75rem; padding: 4px 10px; text-transform: lowercase;">nee</span>
+                                  <?php endif; ?>
+                                </td>
+                                <td data-label="Datum"><?= date('d-m-Y', strtotime($pakket->DatumSamenstelling)) ?></td>
+                                <td data-label="Actie">
+                                    <button class="btn btn-sm btn-outline-primary me-1" title="Wijzigen" onclick="openWijzigModal('<?= $pakket->VoedselpakketID ?>', <?= $pakket->Beschikbaar ? 'true' : 'false' ?>, '<?= htmlspecialchars(addslashes($pakket->Omschrijving)) ?>', <?= (int)$pakket->AantalVolwassenen ?>, <?= (int)$pakket->AantalKinderen ?>, <?= (int)$pakket->AantalBabys ?>, '<?= date('Y-m-d', strtotime($pakket->DatumSamenstelling)) ?>')"><span class='bi bi-pencil-square'></span></button>
+                                    <button class="btn btn-sm btn-outline-danger" title="Verwijderen" onclick="openVerwijderModal('<?= $pakket->VoedselpakketID ?>', <?= (int)$pakket->VoedselpakketID ?>, <?= $pakket->VoedselpakketID == 1 ? 'true' : 'false' ?>)"><span class='bi bi-trash'></span></button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+            <!-- Modal verwijderen -->
+            <div class="modal fade" id="verwijderPakketModal" tabindex="-1" aria-labelledby="verwijderPakketLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <form id="verwijderPakketForm" method="post" action="">
+                    <div class="modal-header bg-danger text-white">
+                      <h5 class="modal-title" id="verwijderPakketLabel">Voedselpakket verwijderen</h5>
+                      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                      <div id="verwijderMeldingContainer"></div>
+                      <input type="hidden" name="verwijderpakketid" id="verwijderpakketid">
+                      <p id="verwijderModalVraag">Weet je zeker dat je dit voedselpakket wilt verwijderen?</p>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                      <button type="submit" class="btn btn-danger">Verwijderen</button>
+                    </div>
+                  </form>
                 </div>
-            </form>
+              </div>
+            </div>
+
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="9" class="text-center py-4 text-muted">Geen voedselpakketten gevonden.</td>
+                        </tr>
+                    <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Modal toevoegen -->
+            <div class="modal fade" id="voegPakketToeModal" tabindex="-1" aria-labelledby="voegPakketToeLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                  <form method="post" action="<?= URLROOT; ?>/voedselpakket/toevoegen">
+                    <div class="modal-header bg-primary text-white">
+                      <h5 class="modal-title" id="voegPakketToeLabel">Voedselpakket toevoegen</h5>
+                      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                      <div id="melkUitverkochtAlertContainer"></div>
+                      <div class="row g-4">
+                        <div class="col-md-6">
+                          <div class="mb-3">
+                            <label for="klant" class="form-label">Klant (gezin) <span class="text-danger">*</span></label>
+                            <select name="klant" id="klant" class="form-select" required onchange="toonAllergie()">
+                              <option value="">Selecteer een klant</option>
+                              <?php foreach ($klanten as $klant): ?>
+                                <option value="<?= $klant->KlantID ?>"> <?= htmlspecialchars($klant->gezinsnaam) ?> </option>
+                              <?php endforeach; ?>
+                            </select>
+                            <div id="allergieInfo" class="mt-2 text-danger fw-semibold"></div>
+                          </div>
+                          <div class="mb-3">
+                            <label for="datum_samenstelling" class="form-label">Datum samenstelling <span class="text-danger">*</span></label>
+                            <input type="date" name="datum_samenstelling" id="datum_samenstelling" class="form-control" value="<?= date('Y-m-d') ?>" required>
+                          </div>
+                          <div class="mb-3">
+                            <label for="omschrijving" class="form-label">Omschrijving <span class="text-danger">*</span></label>
+                            <input type="text" name="omschrijving" id="omschrijving" class="form-control" placeholder="Bijv: Pakket samengesteld op <?= date('d-m-Y') ?>" required>
+                          </div>
+                          <div class="row mb-3">
+                            <div class="col">
+                              <label for="volwassenen" class="form-label">Volw. <span class="text-danger">*</span></label>
+                              <input type="number" name="volwassenen" id="volwassenen" class="form-control" min="0" required>
+                            </div>
+                            <div class="col">
+                              <label for="kinderen" class="form-label">Kind. <span class="text-danger">*</span></label>
+                              <input type="number" name="kinderen" id="kinderen" class="form-control" min="0" required>
+                            </div>
+                            <div class="col">
+                              <label for="babys" class="form-label">Baby's <span class="text-danger">*</span></label>
+                              <input type="number" name="babys" id="babys" class="form-control" min="0" required>
+                            </div>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label">Beschikbaar <span class="text-danger">*</span></label>
+                            <select name="beschikbaar" class="form-select" required>
+                              <option value="1">Ja</option>
+                              <option value="0">Nee</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="mb-3">
+                            <label class="form-label">Producten in pakket <span class="text-danger">*</span></label>
+                            <div class="table-responsive">
+                              <table class="table table-bordered table-sm align-middle mb-2">
+                                <thead class="table-light text-center">
+                                  <tr>
+                                    <th>Product</th>
+                                    <th>Kies</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <?php foreach ($producten as $product): ?>
+                                    <tr>
+                                      <td><?= htmlspecialchars($product->ProductNaam) ?></td>
+                                      <td class="text-center">
+                                        <input class="form-check-input" type="checkbox" name="producten[]" value="<?= $product->ProductID ?>" id="product<?= $product->ProductID ?>" onclick="checkMelkUitverkocht(this, '<?= addslashes(strtolower($product->ProductNaam)) ?>')">
+                                      </td>
+                                    </tr>
+                                  <?php endforeach; ?>
+                                </tbody>
+                              </table>
+                            </div>
+                            <label for="aantallen" class="form-label mt-2">Aantal per product <span class="text-danger">*</span> <small class="text-muted">(zelfde volgorde als selectie, gescheiden door komma's)</small></label>
+                            <input type="text" name="aantallen" id="aantallen" class="form-control" placeholder="Bijv: 2,1,3" required>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                      <button type="submit" class="btn btn-success">Toevoegen</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <!-- Modal wijzigen -->
+            <div class="modal fade" id="wijzigPakketModal" tabindex="-1" aria-labelledby="wijzigPakketLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                  <form id="wijzigPakketForm" method="post" action="">
+                    <div class="modal-header bg-warning text-dark">
+                      <h5 class="modal-title" id="wijzigPakketLabel">Voedselpakket wijzigen</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                      <div id="wijzigMeldingContainer"></div>
+                      <input type="hidden" name="wijzigpakketid" id="wijzigpakketid">
+                      <div class="mb-3">
+                        <label for="wijzig_omschrijving" class="form-label">Omschrijving <span class="text-danger">*</span></label>
+                        <input type="text" name="wijzig_omschrijving" id="wijzig_omschrijving" class="form-control" required>
+                      </div>
+                      <div class="row mb-3">
+                        <div class="col">
+                          <label for="wijzig_volwassenen" class="form-label">Volw. <span class="text-danger">*</span></label>
+                          <input type="number" name="wijzig_volwassenen" id="wijzig_volwassenen" class="form-control" min="0" required>
+                        </div>
+                        <div class="col">
+                          <label for="wijzig_kinderen" class="form-label">Kind. <span class="text-danger">*</span></label>
+                          <input type="number" name="wijzig_kinderen" id="wijzig_kinderen" class="form-control" min="0" required>
+                        </div>
+                        <div class="col">
+                          <label for="wijzig_babys" class="form-label">Baby's <span class="text-danger">*</span></label>
+                          <input type="number" name="wijzig_babys" id="wijzig_babys" class="form-control" min="0" required>
+                        </div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="wijzig_datum" class="form-label">Datum samenstelling <span class="text-danger">*</span></label>
+                        <input type="date" name="wijzig_datum" id="wijzig_datum" class="form-control" required>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                      <button type="submit" class="btn btn-warning">Opslaan</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
         </div>
     </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// Hamburger menu toggle
-const hamburger = document.createElement('div');
-hamburger.className = 'hamburger';
-hamburger.innerHTML = '<span></span><span></span><span></span>';
-document.querySelector('.navbar').appendChild(hamburger);
-const navLinks = document.querySelector('.nav-links');
-hamburger.addEventListener('click', () => {
-    navLinks.classList.toggle('active');
-    hamburger.classList.toggle('open');
-});
-
-function confirmDelete(id) {
-    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-    document.getElementById('confirmDeleteBtn').href = "<?= URLROOT ?>/voedselpakket/verwijderen/" + id;
-    modal.show();
-}
-
-function openEditModal(id, klantNaam, datum, status, isUitgeleverd) {
-    document.getElementById('editPakketId').value = id;
-    document.getElementById('editKlantNaam').value = klantNaam;
-    document.getElementById('editDatum').value = datum;
-    document.getElementById('editStatus').value = status;
-
-    const disabled = !!isUitgeleverd;
-    document.getElementById('editDatum').disabled = disabled;
-    document.getElementById('editStatus').disabled = disabled;
-    document.querySelector('#editForm button[type="submit"]').disabled = disabled;
-
-    if (isUitgeleverd) {
-        showMelding('Voedselpakket is al uitgeleverd en kan niet worden aangepast', false);
-    }
-
-    const modal = new bootstrap.Modal(document.getElementById('editModal'));
-    modal.show();
-}
-
-document.getElementById('editForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const id = document.getElementById('editPakketId').value;
-    const klantNaam = document.getElementById('editKlantNaam').value;
-    const datum = document.getElementById('editDatum').value;
-    const status = document.getElementById('editStatus').value;
-
-    // Happy scenario: als status op 'geleverd' wordt gezet, altijd groen
-    if (status === 'geleverd') {
-        fetch(`<?= URLROOT ?>/voedselpakket/wijzigen/${id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({ datum, status })
-        })
-        .then(res => res.json())
-        .then(data => {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-            modal.hide();
-            showMelding('Voedselpakket is succesvol gewijzigd', true);
-            const row = document.querySelector(`tr[data-pakket-id='${id}']`);
-            if (row) {
-                const d = new Date(datum);
-                row.querySelector('td:nth-child(3)').textContent = d.toLocaleDateString('nl-NL');
-                row.querySelector('td:nth-child(5) .badge').textContent = status;
-            }
-        })
-        .catch(() => {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-            modal.hide();
-            showMelding('Wijzigen mislukt', false);
-        });
-        return;
-    }
-
-    // Normale flow: datum validatie
-    const maxDatum = new Date('2027-12-31');
-    const gekozenDatum = new Date(datum);
-    if (gekozenDatum > maxDatum) {
-        showMelding('Datum mag niet later zijn dan 31-12-2027', false);
-        return;
-    }
-
-    fetch(`<?= URLROOT ?>/voedselpakket/wijzigen/${id}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify({ datum, status })
-    })
-    .then(res => res.json())
-    .then(data => {
-        const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-        modal.hide();
-        if (data.success) {
-            showMelding('Voedselpakket is succesvol gewijzigd', true);
-            const row = document.querySelector(`tr[data-pakket-id='${id}']`);
-            if (row) {
-                const d = new Date(datum);
-                row.querySelector('td:nth-child(3)').textContent = d.toLocaleDateString('nl-NL');
-                row.querySelector('td:nth-child(5) .badge').textContent = status;
-            }
+    // Toon allergie info bij klantselectie
+    const allergieData = <?= json_encode($klantAllergieen) ?>;
+    function toonAllergie() {
+        const klantSelect = document.getElementById('klant');
+        const allergieDiv = document.getElementById('allergieInfo');
+        const klantID = klantSelect.value;
+        if (klantID && allergieData[klantID]) {
+            allergieDiv.textContent = 'Let op: deze klant heeft de volgende allergieÃ«n: ' + allergieData[klantID];
         } else {
-            showMelding(data.message || 'Wijzigen mislukt', false);
+            allergieDiv.textContent = '';
         }
-    })
-    .catch(() => {
-        const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-        modal.hide();
-        showMelding('Wijzigen mislukt', false);
+    }
+    // Open modal na foutmelding of allergie
+    <?php if ($modalOpen): ?>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = new bootstrap.Modal(document.getElementById('voegPakketToeModal'));
+        modal.show();
     });
-});
-
-function showMelding(message, success = false) {
-    const container = document.querySelector('.card-body');
-    const existing = document.getElementById('melding-alert');
-    if (existing) existing.remove();
-
-    const alertDiv = document.createElement('div');
-    alertDiv.id = 'melding-alert';
-    alertDiv.className = `alert text-center alert-${success ? 'success' : 'danger'}`;
-    alertDiv.style.fontWeight = 'bold';
-    alertDiv.textContent = message;
-    container.prepend(alertDiv);
-
-    setTimeout(() => {
-        alertDiv.style.transition = 'opacity 0.5s';
-        alertDiv.style.opacity = '0';
-        setTimeout(() => alertDiv.remove(), 500);
-    }, 3000);
-}
+    <?php endif; ?>
+    // Meldingen automatisch verbergen
+    document.addEventListener('DOMContentLoaded', function () {
+        const alerts = ['datumErrorAlert', 'meldingAlert', 'foutmeldingAlert'];
+        alerts.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                setTimeout(() => {
+                    el.style.opacity = '0';
+                    el.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => el.style.display = 'none', 500);
+                }, 3000);
+            }
+        });
+        
+        // Check voor absolute URL redirects en fix die
+        if (window.location.href.indexOf('http://voedselpakket/') !== -1) {
+            window.location.href = '<?= URLROOT; ?>/voedselpakket';
+        }
+    });
+    function checkMelkUitverkocht(checkbox, productnaam) {
+        if (productnaam === 'melk halfvol 1l' && checkbox.checked) {
+            checkbox.checked = false;
+            showMelkUitverkochtAlert();
+        }
+    }
+    function showMelkUitverkochtAlert() {
+        let alertDiv = document.getElementById('melkUitverkochtAlert');
+        if (!alertDiv) {
+            alertDiv = document.createElement('div');
+            alertDiv.id = 'melkUitverkochtAlert';
+            alertDiv.className = 'alert alert-danger text-center mb-3';
+            alertDiv.innerText = 'Dit voedselpakket is uitverkocht (Melk halfvol 1L is niet beschikbaar).';
+            const container = document.getElementById('melkUitverkochtAlertContainer');
+            container.appendChild(alertDiv);
+        }
+        setTimeout(() => {
+            if (alertDiv) alertDiv.remove();
+        }, 3000);
+    }
+    function openWijzigModal(id, beschikbaar, omschrijving, volw, kind, babys, datum) {
+        document.getElementById('wijzigpakketid').value = id;
+        document.getElementById('wijzig_omschrijving').value = omschrijving;
+        document.getElementById('wijzig_volwassenen').value = volw;
+        document.getElementById('wijzig_kinderen').value = kind;
+        document.getElementById('wijzig_babys').value = babys;
+        document.getElementById('wijzig_datum').value = datum;
+        document.getElementById('wijzigMeldingContainer').innerHTML = '';
+        const modal = new bootstrap.Modal(document.getElementById('wijzigPakketModal'));
+        modal.show();
+        document.getElementById('wijzigPakketForm').dataset.beschikbaar = beschikbaar ? '1' : '0';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('wijzigPakketForm').onsubmit = function(e) {
+            e.preventDefault();
+            const beschikbaar = this.dataset.beschikbaar;
+            const meldingDiv = document.getElementById('wijzigMeldingContainer');
+            if (beschikbaar === '0') {
+                meldingDiv.innerHTML = '<div class="alert alert-danger text-center mb-3">Verzonden voedselpakketten kunnen niet meer worden aangepast</div>';
+                setTimeout(() => { meldingDiv.innerHTML = ''; const modal = bootstrap.Modal.getInstance(document.getElementById('wijzigPakketModal')); modal.hide(); }, 3000);
+                return false;
+            }
+            meldingDiv.innerHTML = '<div class="alert alert-success text-center mb-3">Voedselpakket is succesvol gewijzigd</div>';
+            // Update de rij in de tabel direct (alleen frontend demo)
+            const id = document.getElementById('wijzigpakketid').value;
+            const rows = document.querySelectorAll('.table-responsive table tbody tr');
+            rows.forEach(function(row) {
+                if (row.dataset && row.dataset.pakketid == id) {
+                    row.children[1].textContent = document.getElementById('wijzig_omschrijving').value;
+                    row.children[2].textContent = document.getElementById('wijzig_volwassenen').value;
+                    row.children[3].textContent = document.getElementById('wijzig_kinderen').value;
+                    row.children[4].textContent = document.getElementById('wijzig_babys').value;
+                    row.children[7].textContent = (function(d){let dt=new Date(d);return dt.toLocaleDateString('nl-NL');})(document.getElementById('wijzig_datum').value);
+                }
+            });
+            setTimeout(() => { meldingDiv.innerHTML = ''; const modal = bootstrap.Modal.getInstance(document.getElementById('wijzigPakketModal')); modal.hide(); }, 2000);
+            return false;
+        };
+    });
+    function openVerwijderModal(pakketid, pakketnr, isAdmin) {
+        document.getElementById('verwijderpakketid').value = pakketid;
+        document.getElementById('verwijderMeldingContainer').innerHTML = '';
+        if (isAdmin) {
+            document.getElementById('verwijderModalVraag').textContent = 'Het admin-pakket (pakketnr 1) kan niet worden verwijderd.';
+            document.getElementById('verwijderPakketForm').onsubmit = function(e) {
+                e.preventDefault();
+                document.getElementById('verwijderMeldingContainer').innerHTML = '<div class="alert alert-danger text-center mb-3">Het admin-pakket kan niet worden verwijderd.</div>';
+                setTimeout(() => {
+                    document.getElementById('verwijderMeldingContainer').innerHTML = '';
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('verwijderPakketModal'));
+                    modal.hide();
+                }, 2000);
+                return false;
+            };
+        } else {
+            document.getElementById('verwijderModalVraag').textContent = 'Weet je zeker dat je dit voedselpakket wilt verwijderen?';
+            document.getElementById('verwijderPakketForm').onsubmit = function(e) {
+                e.preventDefault();
+                document.getElementById('verwijderMeldingContainer').innerHTML = '<div class="alert alert-success text-center mb-3">Voedselpakket is succesvol verwijderd</div>';
+                const id = document.getElementById('verwijderpakketid').value;
+                const rows = document.querySelectorAll('.table-responsive table tbody tr');
+                rows.forEach(function(row) {
+                    if (row.dataset && row.dataset.pakketid == id) {
+                        row.remove();
+                    }
+                });
+                setTimeout(() => {
+                    document.getElementById('verwijderMeldingContainer').innerHTML = '';
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('verwijderPakketModal'));
+                    modal.hide();
+                }, 2000);
+                return false;
+            };
+        }
+        const modal = new bootstrap.Modal(document.getElementById('verwijderPakketModal'));
+        modal.show();
+    }
 </script>
-
 <?php require_once APPROOT . '/views/includes/footer.php'; ?>
+<?php
+// Simuleer toevoegen van pakket aan tabel na succesvolle POST (alleen voor deze view, niet in database)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($foutmelding)) {
+    $klantNaam = '';
+    foreach ($klanten as $klant) {
+        if ($klant->KlantID == $_POST['klant']) {
+            $klantNaam = htmlspecialchars($klant->gezinsnaam);
+            break;
+        }
+    }
+    $omschrijving = htmlspecialchars($_POST['omschrijving']);
+    $volw = (int)$_POST['volwassenen'];
+    $kind = (int)$_POST['kinderen'];
+    $babys = (int)$_POST['babys'];
+    $beschikbaar = isset($_POST['beschikbaar']) && $_POST['beschikbaar'] == '1';
+    $datum = isset($_POST['datum_samenstelling']) ? $_POST['datum_samenstelling'] : date('Y-m-d');
+    $datum_nl = date('d-m-Y', strtotime($datum));
+    $productenArr = isset($_POST['producten']) ? $_POST['producten'] : [];
+    $aantallenArr = array_map('trim', explode(',', $_POST['aantallen']));
+    $details = [];
+    foreach ($productenArr as $i => $pid) {
+        foreach ($producten as $p) {
+            if ($p->ProductID == $pid) {
+                $aantal = isset($aantallenArr[$i]) ? (int)$aantallenArr[$i] : 1;
+                $details[] = htmlspecialchars($p->ProductNaam) . ' (' . $aantal . 'x)';
+            }
+        }
+    }
+    $detailsStr = $details ? implode(', ', $details) : '-';
+    // Bepaal hoogste pakketnummer (nieuwste = hoogste)
+    $huidigeMax = 1;
+    $sql = "SELECT MAX(VoedselpakketID) as maxid FROM voedselpakket";
+    $db->query($sql);
+    $row = $db->single();
+    if ($row && $row->maxid) {
+        $huidigeMax = (int)$row->maxid + 1;
+    }
+    echo '<script>document.addEventListener("DOMContentLoaded",function(){
+      var tbody = document.querySelector(".table-responsive table tbody");
+      if(tbody){
+        var row = document.createElement("tr");
+        row.setAttribute("data-pakketid", "' . $huidigeMax . '");
+        row.innerHTML = `<td>' . $huidigeMax . '</td><td>' . $klantNaam . '</td><td>' . $omschrijving . '</td><td>' . $volw . '</td><td>' . $kind . '</td><td>' . $babys . '</td><td>' . $detailsStr . '</td><td>' . ($beschikbaar ? '<span class=\'badge-yes\'>Ja</span>' : '<span class=\'badge-no\'>Nee</span>') . '</td><td>' . $datum_nl . '</td><td><button class=\'btn btn-sm btn-outline-primary me-1\' onclick=\'openWijzigModal("' . $huidigeMax . '", ' . ($beschikbaar ? 'true' : 'false') . ', "' . addslashes($omschrijving) . '", ' . $volw . ', ' . $kind . ', ' . $babys . ', "' . $datum . '")\'>Wijzigen</button> <button class=\'btn btn-sm btn-outline-danger\' onclick=\'openVerwijderModal("' . $huidigeMax . '")\'>Verwijderen</button></td>`;
+        tbody.prepend(row);
+      }
+    });</script>';
+}
+?>

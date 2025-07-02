@@ -1,4 +1,4 @@
-<footer class="mt-5" style="background:#DDD7D7; color:#14193B;">
+<footer class="mt-auto" style="background:#DDD7D7; color:#14193B; position: relative; bottom: 0; width: 100%;">
     <div class="container py-4">
         <div class="row align-items-center">
             <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
@@ -15,6 +15,7 @@
         </div>
     </div>
 </footer>
+</div> <!-- End main-wrapper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 <script src='<?= URLROOT; ?>/public/js/app.js'></script>
