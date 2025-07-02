@@ -90,13 +90,92 @@ if (session_status() === PHP_SESSION_NONE) {
             width: auto;
             height: auto;
         }
+
+        /* Responsive navbar styling */
+        .navbar-toggler {
+            border: none;
+            padding: 4px 8px;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28206, 206, 206, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        @media (max-width: 991px) {
+            .navbar-custom {
+                padding: 0 15px;
+                height: auto;
+                min-height: 60px;
+            }
+
+            .navbar-collapse {
+                margin-top: 10px;
+            }
+
+            .nav-link {
+                padding: 8px 16px !important;
+                border-bottom: 1px solid rgba(206, 206, 206, 0.2);
+            }
+
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+                text-align: center;
+            }
+
+            .d-flex {
+                flex-direction: column !important;
+                width: 100%;
+                padding: 10px 16px;
+            }
+
+            .dropdown-menu {
+                position: static !important;
+                transform: none !important;
+                border: none;
+                box-shadow: none;
+                background-color: rgba(255, 255, 255, 0.1);
+                margin-top: 5px;
+            }
+
+            .dropdown-item {
+                color: #CECECE !important;
+                padding: 8px 16px;
+            }
+
+            .dropdown-item:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                color: #ffffff !important;
+            }
+
+            .dropdown-item-text {
+                color: #CECECE !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-custom {
+                padding: 0 10px;
+            }
+
+            .nav-link {
+                font-size: 16px;
+                padding: 12px 16px !important;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="main-wrapper flex-grow-1">
 <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container-fluid">
-       
+        <a class="navbar-brand" href="<?php echo URLROOT; ?>homepages/index">
+            <span class="d-lg-none">Voedselpakket</span>
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
