@@ -1,0 +1,2 @@
+[2025-07-04 08:22:40] USER_ID:1 USER:admin EMAIL:peter.abraham@voedselbank.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: Maria van Dongen (ID: 1) - Reason: Successful customer deletion
+[2025-07-04 08:22:44] USER_ID:1 USER:admin EMAIL:peter.abraham@voedselbank.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: Jan de Vries (ID: 2) - Reason: Successful customer deletion

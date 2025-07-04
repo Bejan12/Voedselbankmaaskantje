@@ -63,7 +63,19 @@ class klantenModels
         $this->db->bind(':geen_varkensvlees', $data['geen_varkensvlees']);
         $this->db->bind(':veganistisch', $data['veganistisch']);
         $this->db->bind(':vegetarisch', $data['vegetarisch']);
-        return $this->db->execute();
+        
+        $success = $this->db->execute();
+        
+        if ($success) {
+            // Log de create actie
+            if (!class_exists('LogHelper')) {
+                require_once APPROOT . '/helpers/LogHelper.php';
+            }
+            $klantNaam = $data['voornaam'] . ' ' . $data['achternaam'];
+            LogHelper::logCreate('KLANTEN', $klantNaam);
+        }
+        
+        return $success;
     }
 
     public function getKlantById($klantId)
@@ -127,7 +139,19 @@ class klantenModels
         $this->db->bind(':veganistisch', $data['veganistisch']);
         $this->db->bind(':vegetarisch', $data['vegetarisch']);
         $this->db->bind(':klantid', $klantId);
-        return $this->db->execute();
+        
+        $success = $this->db->execute();
+        
+        if ($success) {
+            // Log de update actie
+            if (!class_exists('LogHelper')) {
+                require_once APPROOT . '/helpers/LogHelper.php';
+            }
+            $klantNaam = $data['voornaam'] . ' ' . $data['achternaam'];
+            LogHelper::logUpdate('KLANTEN', $klantNaam, $klantId);
+        }
+        
+        return $success;
     }
 
     public function checkBestaandeEmail($email, $huidigeKlantId)
@@ -183,7 +207,14 @@ class klantenModels
         }
 
         // Haal gebruiker en persoon ID op
-        $this->db->query("SELECT GebruikerID FROM klant WHERE KlantID = :klantid");
+        $this->db->query("SELECT 
+                k.GebruikerID,
+                p.Voornaam, 
+                p.Achternaam
+            FROM klant k
+            JOIN gebruiker g ON k.GebruikerID = g.GebruikerID
+            JOIN persoon p ON g.PersoonID = p.PersoonID
+            WHERE k.KlantID = :klantid");
         $this->db->bind(':klantid', $klantId);
         $klant = $this->db->single();
         if (!$klant) {
@@ -194,6 +225,34 @@ class klantenModels
         }
 
         $gebruikerId = $klant->GebruikerID;
+        $klantNaam = $klant->Voornaam . ' ' . $klant->Achternaam;
+
+        // Controleer of deze gebruiker een admin/directie rol heeft
+        $this->db->query("SELECT COUNT(*) as aantal FROM gebruikerrol gr
+                         JOIN rol r ON gr.RolID = r.RolID 
+                         WHERE gr.GebruikerID = :gebruikerid 
+                         AND r.Naam = 'Directie'");
+        $this->db->bind(':gebruikerid', $gebruikerId);
+        $isAdmin = $this->db->single()->aantal > 0;
+
+        if ($isAdmin) {
+            return [
+                'success' => false,
+                'message' => 'Klant "' . $klantNaam . '" kan niet worden verwijderd omdat deze persoon een admin/directie rol heeft'
+            ];
+        }
+
+        // Controleer of deze gebruiker een werknemer is
+        $this->db->query("SELECT COUNT(*) as aantal FROM werknemer WHERE GebruikerID = :gebruikerid");
+        $this->db->bind(':gebruikerid', $gebruikerId);
+        $isWerknemer = $this->db->single()->aantal > 0;
+
+        if ($isWerknemer) {
+            return [
+                'success' => false,
+                'message' => 'Klant "' . $klantNaam . '" kan niet worden verwijderd omdat deze persoon een medewerker is van de voedselbank'
+            ];
+        }
 
         $this->db->query("SELECT PersoonID FROM gebruiker WHERE GebruikerID = :gebruikerid");
         $this->db->bind(':gebruikerid', $gebruikerId);
@@ -216,6 +275,12 @@ class klantenModels
             $this->db->bind(':persoonid', $persoonId);
             $this->db->execute();
         }
+
+        // Log de succesvolle delete actie
+        if (!class_exists('LogHelper')) {
+            require_once APPROOT . '/helpers/LogHelper.php';
+        }
+        LogHelper::logDelete('KLANTEN', $klantNaam, $klantId, 'Successful customer deletion');
 
         return [
             'success' => true,
