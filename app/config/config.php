@@ -5,7 +5,7 @@
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'voedselbankdb'); // <-- Vervang dit door de juiste database naam
 define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_PASS', '');  
 
 
 /**

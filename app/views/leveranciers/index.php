@@ -77,6 +77,64 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Mobiele kaarten weergave -->
+    <div class="mobile-cards">
+        <?php if (!empty($data['leveranciers'])): ?>
+            <?php foreach ($data['leveranciers'] as $leverancier): ?>
+                <div class="mobile-card">
+                    <div class="mobile-card-header">
+                        <div>
+                            <div class="mobile-card-title"><?php echo htmlspecialchars($leverancier->Bedrijfsnaam ?? ''); ?></div>
+                            <div class="mobile-card-subtitle">#<?php echo htmlspecialchars($leverancier->LeverancierNummer ?? ''); ?> - <?php echo htmlspecialchars($leverancier->LeverancierType ?? ''); ?></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mobile-card-content">
+                        <div class="mobile-card-field">
+                            <div class="mobile-card-label">Contactpersoon</div>
+                            <div class="mobile-card-value"><?php echo htmlspecialchars($leverancier->ContactNaam ?? ''); ?></div>
+                        </div>
+                        
+                        <div class="mobile-card-field">
+                            <div class="mobile-card-label">Telefoon</div>
+                            <div class="mobile-card-value"><?php echo htmlspecialchars($leverancier->ContactTelefoon ?? ''); ?></div>
+                        </div>
+                        
+                        <div class="mobile-card-field full-width">
+                            <div class="mobile-card-label">E-mail</div>
+                            <div class="mobile-card-value"><?php echo htmlspecialchars($leverancier->ContactEmail ?? ''); ?></div>
+                        </div>
+                        
+                        <div class="mobile-card-field full-width">
+                            <div class="mobile-card-label">Adres</div>
+                            <div class="mobile-card-value"><?php echo htmlspecialchars($leverancier->Adres ?? ''); ?></div>
+                        </div>
+                        
+                        <div class="mobile-card-field full-width">
+                            <div class="mobile-card-label">Eerstvolgende levering</div>
+                            <div class="mobile-card-value"><?php echo htmlspecialchars($leverancier->EerstvolgendeLevering ?? ''); ?></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mobile-card-actions">
+                        <a href="<?= URLROOT; ?>leveranciers/edit/<?php echo $leverancier->LeverancierID; ?>" title="Wijzig" class="icon-link">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <a href="<?= URLROOT; ?>leveranciers/delete/<?php echo $leverancier->LeverancierID; ?>" title="Verwijder" class="icon-link text-danger" onclick="return confirm('Weet je zeker dat je deze leverancier wilt verwijderen?');">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="mobile-card">
+                <div class="mobile-card-content">
+                    <p>Geen leveranciers gevonden.</p>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
 </div>
 
 <style>
@@ -167,6 +225,143 @@
 
     .styled-table tbody tr:nth-child(even) {
         background-color: #f9f9f9;
+    }
+
+    /* Responsive design voor kleinere schermen */
+    @media screen and (max-width: 768px) {
+        .container {
+            padding: 10px;
+        }
+        
+        .title {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        
+        .btn-add {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .table-filter-bar {
+            text-align: center !important;
+            margin-bottom: 15px !important;
+        }
+        
+        .filter-form {
+            display: block !important;
+        }
+        
+        .filter-form label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .filter-form select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        /* Verberg de normale tabel op mobiele apparaten */
+        .styled-table {
+            display: none;
+        }
+        
+        /* Maak kaarten voor mobiele weergave */
+        .mobile-cards {
+            display: block;
+        }
+        
+        .mobile-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            padding: 15px;
+            border-left: 4px solid #7386FF;
+        }
+        
+        .mobile-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .mobile-card-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #333;
+        }
+        
+        .mobile-card-subtitle {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .mobile-card-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .mobile-card-field {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .mobile-card-field.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .mobile-card-label {
+            font-weight: bold;
+            color: #555;
+            font-size: 0.8em;
+            margin-bottom: 2px;
+        }
+        
+        .mobile-card-value {
+            color: #333;
+            font-size: 0.9em;
+        }
+        
+        .mobile-card-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        
+        .mobile-card-actions .icon-link {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background: #f8f9fa;
+        }
+        
+        .mobile-card-actions .icon-link:hover {
+            background: #e9ecef;
+        }
+    }
+    
+    /* Verberg mobiele kaarten op desktop */
+    .mobile-cards {
+        display: none;
+    }
+    
+    /* Toon mobiele kaarten alleen op kleine schermen */
+    @media screen and (max-width: 768px) {
+        .mobile-cards {
+            display: block;
+        }
     }
 
     .action-icons {
