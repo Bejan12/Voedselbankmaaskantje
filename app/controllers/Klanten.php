@@ -1,4 +1,6 @@
 <?php
+// Het is niet nodig om BaseController hier te includen, dit gebeurt al in require.php
+// require_once '../bibliotheken/Controller.php'; // Verwijderd
 
 class Klanten extends BaseController
 {
@@ -6,19 +8,22 @@ class Klanten extends BaseController
 
     public function __construct()
     {
+        // Start de sessie om meldingen te kunnen gebruiken
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         $this->klantenModel = $this->model('klantenModels');
     }
 
     public function index()
     {
         $klanten = $this->klantenModel->getKlanten();
+        
         $data = [
             'title' => 'Overzicht Klanten',
-            'klanten' => $klanten,
-            'melding' => $_SESSION['melding'] ?? null,
-            'foutmelding' => $_SESSION['foutmelding'] ?? null
+            'klanten' => $klanten
         ];
-        unset($_SESSION['melding'], $_SESSION['foutmelding']);
+
         $this->view('klanten/index', $data);
     }
 
@@ -65,13 +70,13 @@ class Klanten extends BaseController
             ]);
 
             if ($result) {
-                $_SESSION['melding'] = "Klant succesvol toegevoegd.";
+                SessionHelper::setFlash('melding', "Klant succesvol toegevoegd.");
                 header('Location: ' . URLROOT . 'klanten');
                 exit;
             } else {
                 $data = [
                     'form' => $_POST,
-                    'error' => 'Toevoegen mislukt. Mogelijk bestaat deze klant al.'
+                    'error' => 'Toevoegen mislukt. De gebruikersnaam (voornaam.achternaam) bestaat mogelijk al.'
                 ];
                 $this->view('klanten/add', $data);
             }
@@ -80,59 +85,109 @@ class Klanten extends BaseController
         }
     }
 
+    private function validateKlantData($data)
+    {
+        if (
+            empty($data['voornaam']) || empty($data['achternaam']) || empty($data['adres']) ||
+            empty($data['telefoon']) || empty($data['email']) ||
+            $data['aantal_volwassenen'] === '' || $data['aantal_kinderen'] === '' || $data['aantal_babys'] === ''
+        ) {
+            return 'Vul alle verplichte velden in.';
+        }
+        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            return 'Voer een geldig e-mailadres in.';
+        }
+        return '';
+    }
+
     public function edit($klantId)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $voornaam = trim($_POST['voornaam'] ?? '');
-            $achternaam = trim($_POST['achternaam'] ?? '');
-            $adres = trim($_POST['adres'] ?? '');
-            $telefoon = trim($_POST['telefoon'] ?? '');
-            $email = trim($_POST['email'] ?? '');
-            $aantalVolwassenen = trim($_POST['aantal_volwassenen'] ?? '');
-            $aantalKinderen = trim($_POST['aantal_kinderen'] ?? '');
-            $aantalBabys = trim($_POST['aantal_babys'] ?? '');
-            $geenVarkensvlees = isset($_POST['geen_varkensvlees']) ? 1 : 0;
-            $veganistisch = isset($_POST['veganistisch']) ? 1 : 0;
-            $vegetarisch = isset($_POST['vegetarisch']) ? 1 : 0;
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
-            if (
-                empty($voornaam) || empty($achternaam) || empty($adres) ||
-                empty($telefoon) || empty($email) ||
-                $aantalVolwassenen === '' || $aantalKinderen === '' || $aantalBabys === '' ||
-                !filter_var($email, FILTER_VALIDATE_EMAIL)
-            ) {
+            $updateData = [
+                'voornaam' => trim($_POST['voornaam'] ?? ''),
+                'achternaam' => trim($_POST['achternaam'] ?? ''),
+                'adres' => trim($_POST['adres'] ?? ''),
+                'telefoon' => trim($_POST['telefoon'] ?? ''),
+                'email' => trim($_POST['email'] ?? ''),
+                'aantal_volwassenen' => trim($_POST['aantal_volwassenen'] ?? ''),
+                'aantal_kinderen' => trim($_POST['aantal_kinderen'] ?? ''),
+                'aantal_babys' => trim($_POST['aantal_babys'] ?? ''),
+                'geen_varkensvlees' => isset($_POST['geen_varkensvlees']) ? 1 : 0,
+                'veganistisch' => isset($_POST['veganistisch']) ? 1 : 0,
+                'vegetarisch' => isset($_POST['vegetarisch']) ? 1 : 0
+            ];
+
+            $errors = [];
+            // Algemene validatie voor lege velden
+            if (empty($updateData['voornaam']) || empty($updateData['achternaam']) || empty($updateData['adres']) || empty($updateData['telefoon']) || empty($updateData['email']) || $updateData['aantal_volwassenen'] === '' || $updateData['aantal_kinderen'] === '' || $updateData['aantal_babys'] === '') {
                 $data = [
-                    'form' => $_POST,
-                    'error' => 'Vul alle verplichte velden in om de klant toe te voegen.'
+                    'klantId' => $klantId,
+                    'form' => $updateData,
+                    'errors' => [], // Leegmaken om specifieke veld-errors te vermijden
+                    'error' => 'vul alle verplichte velden in om de klant toe te voegen'
                 ];
                 $this->view('klanten/edit', $data);
                 return;
             }
 
-            $updateData = [
-                'voornaam' => $voornaam,
-                'achternaam' => $achternaam,
-                'adres' => $adres,
-                'telefoon' => $telefoon,
-                'email' => $email,
-                'aantal_volwassenen' => $aantalVolwassenen,
-                'aantal_kinderen' => $aantalKinderen,
-                'aantal_babys' => $aantalBabys,
-                'geen_varkensvlees' => $geenVarkensvlees,
-                'veganistisch' => $veganistisch,
-                'vegetarisch' => $vegetarisch
-            ];
+            if (empty($updateData['voornaam'])) {
+                $errors['voornaam'] = 'Voornaam is verplicht.';
+            }
+            if (empty($updateData['achternaam'])) {
+                $errors['achternaam'] = 'Achternaam is verplicht.';
+            }
+            // Check voor bestaande gebruikersnaam
+            if ($this->klantenModel->checkBestaandeGebruikersnaam($updateData['voornaam'], $updateData['achternaam'], $klantId)) {
+                $errors['voornaam'] = 'De combinatie van voor- en achternaam is al in gebruik.';
+                $errors['achternaam'] = 'De combinatie van voor- en achternaam is al in gebruik.';
+            }
+            if (empty($updateData['adres'])) {
+                $errors['adres'] = 'Adres is verplicht.';
+            }
+            if (empty($updateData['telefoon'])) {
+                $errors['telefoon'] = 'Telefoonnummer is verplicht.';
+            }
+            if (empty($updateData['email'])) {
+                $errors['email'] = 'E-mailadres is verplicht.';
+            } elseif (!filter_var($updateData['email'], FILTER_VALIDATE_EMAIL)) {
+                $errors['email'] = 'Voer een geldig e-mailadres in.';
+            } elseif ($this->klantenModel->checkBestaandeEmail($updateData['email'], $klantId)) {
+                $errors['email'] = 'Dit e-mailadres is al in gebruik.';
+            }
+            if ($updateData['aantal_volwassenen'] === '' || !is_numeric($updateData['aantal_volwassenen'])) {
+                $errors['aantal_volwassenen'] = 'Aantal volwassenen is verplicht.';
+            }
+            if ($updateData['aantal_kinderen'] === '' || !is_numeric($updateData['aantal_kinderen'])) {
+                $errors['aantal_kinderen'] = 'Aantal kinderen is verplicht.';
+            }
+            if ($updateData['aantal_babys'] === '' || !is_numeric($updateData['aantal_babys'])) {
+                $errors['aantal_babys'] = 'Aantal baby\'s is verplicht.';
+            }
+
+            if (!empty($errors)) {
+                $data = [
+                    'klantId' => $klantId,
+                    'form' => $updateData,
+                    'errors' => $errors
+                ];
+                $this->view('klanten/edit', $data);
+                return;
+            }
 
             $result = $this->klantenModel->updateKlant($klantId, $updateData);
 
             if ($result) {
-                $_SESSION['melding'] = "Klantgegevens succesvol bijgewerkt.";
+                SessionHelper::setFlash('melding', "Klantgegevens succesvol bijgewerkt.");
                 header('Location: ' . URLROOT . 'klanten');
                 exit;
             } else {
                 $data = [
-                    'form' => $_POST,
-                    'error' => 'Wijzigen mislukt. Klant bestaat mogelijk niet.'
+                    'klantId' => $klantId,
+                    'form' => $updateData,
+                    'errors' => $errors, // Stuur de bestaande errors mee
+                    'error' => 'Wijzigen mislukt. Controleer de ingevulde velden.'
                 ];
                 $this->view('klanten/edit', $data);
                 return;
@@ -140,11 +195,12 @@ class Klanten extends BaseController
         } else {
             $klant = $this->klantenModel->getKlantById($klantId);
             if (!$klant) {
-                $_SESSION['foutmelding'] = "Klant niet gevonden.";
+                SessionHelper::setFlash('foutmelding', "Klant niet gevonden.", 'danger');
                 header('Location: ' . URLROOT . 'klanten');
                 exit;
             }
             $data = [
+                'klantId' => $klantId, // Voeg klantId toe
                 'form' => [
                     'voornaam' => $klant->Voornaam,
                     'achternaam' => $klant->Achternaam,
@@ -168,21 +224,15 @@ class Klanten extends BaseController
         $result = $this->klantenModel->deleteKlant($klantId);
 
         if ($result['success']) {
-            // Toon altijd de melding "Klant succesvol verwijderd." als het gelukt is
-            $_SESSION['melding'] = 'Klant succesvol verwijderd.';
+            SessionHelper::setFlash('melding', $result['message']);
         } else {
-            // Specifieke foutmelding tonen als er actieve reserveringen/openstaande verplichtingen zijn
-            if ($result['message'] === 'Klant kan niet worden verwijderd vanwege een probleem in het systeem') {
-                $_SESSION['foutmelding'] = 'Klant kan niet worden verwijderd vanwege een probleem in het systeem';
-            } else {
-                $_SESSION['foutmelding'] = $result['message'];
-            }
+            SessionHelper::setFlash('foutmelding', $result['message'], 'danger');
         }
         header('Location: ' . URLROOT . 'klanten');
         exit;
     }
 
-    public function afgerondepakketten()
+    public function afgerondePakketten()
     {
         // Haal alle klanten op
         $klanten = $this->klantenModel->getKlanten();
@@ -220,6 +270,7 @@ class Klanten extends BaseController
 }
 
 // EOF
+
 
 
 

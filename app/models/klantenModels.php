@@ -91,7 +91,7 @@ class klantenModels
 
     public function updateKlant($klantId, $data)
     {
-        $this->db->query("SELECT k.GebruikerID, g.PersoonID FROM klant k JOIN gebruiker g ON k.GebruikerID = g.GebruikerID WHERE k.KlantID = :klantid");
+        $this->db->query("SELECT g.PersoonID, g.GebruikerID FROM klant k JOIN gebruiker g ON k.GebruikerID = g.GebruikerID WHERE k.KlantID = :klantid");
         $this->db->bind(':klantid', $klantId);
         $ids = $this->db->single();
         if (!$ids) return false;
@@ -103,6 +103,13 @@ class klantenModels
         $this->db->bind(':telefoon', $data['telefoon']);
         $this->db->bind(':email', $data['email']);
         $this->db->bind(':persoonid', $ids->PersoonID);
+        $this->db->execute();
+
+        // Update ook de gebruikersnaam
+        $gebruikersnaam = strtolower($data['voornaam'] . '.' . $data['achternaam']);
+        $this->db->query("UPDATE gebruiker SET Gebruikersnaam = :gebruikersnaam WHERE GebruikerID = :gebruikerid");
+        $this->db->bind(':gebruikersnaam', $gebruikersnaam);
+        $this->db->bind(':gebruikerid', $ids->GebruikerID);
         $this->db->execute();
 
         $this->db->query("UPDATE klant SET 
@@ -123,24 +130,56 @@ class klantenModels
         return $this->db->execute();
     }
 
+    public function checkBestaandeEmail($email, $huidigeKlantId)
+    {
+        $this->db->query("SELECT p.PersoonID 
+                          FROM persoon p
+                          JOIN gebruiker g ON p.PersoonID = g.PersoonID
+                          JOIN klant k ON g.GebruikerID = k.GebruikerID
+                          WHERE p.Email = :email AND k.KlantID != :huidige_klant_id");
+        $this->db->bind(':email', $email);
+        $this->db->bind(':huidige_klant_id', $huidigeKlantId);
+        
+        $result = $this->db->single();
+        return $result !== false;
+    }
+
+    public function checkBestaandeGebruikersnaam($voornaam, $achternaam, $huidigeKlantId)
+    {
+        $gebruikersnaam = strtolower($voornaam . '.' . $achternaam);
+        $this->db->query("SELECT k.KlantID 
+                          FROM gebruiker g
+                          JOIN klant k ON g.GebruikerID = k.GebruikerID
+                          WHERE g.Gebruikersnaam = :gebruikersnaam AND k.KlantID != :huidige_klant_id");
+        $this->db->bind(':gebruikersnaam', $gebruikersnaam);
+        $this->db->bind(':huidige_klant_id', $huidigeKlantId);
+        
+        $result = $this->db->single();
+        return $result !== false;
+    }
+
     public function deleteKlant($klantId)
     {
         // Controleer op actieve reserveringen of verplichtingen
         try {
+            // Deze query controleert of de 'reservering' tabel bestaat.
+            $this->db->query("SELECT 1 FROM reservering LIMIT 1");
+            $this->db->execute();
+
+            // Als de tabel bestaat, controleer op actieve reserveringen.
             $this->db->query("SELECT COUNT(*) as aantal FROM reservering WHERE KlantID = :klantid AND status = 'actief'");
             $this->db->bind(':klantid', $klantId);
             $aantal = $this->db->single()->aantal;
-        } catch (\PDOException $e) {
-            // Als de reservering-tabel niet bestaat, negeer deze check
-            $aantal = 0;
-        }
 
-        if ($aantal > 0) {
-            // Er zijn nog actieve reserveringen/verplichtingen
-            return [
-                'success' => false,
-                'message' => 'Klant kan niet worden verwijderd vanwege een probleem in het systeem'
-            ];
+            if ($aantal > 0) {
+                // Er zijn nog actieve reserveringen/verplichtingen
+                return [
+                    'success' => false,
+                    'message' => 'Klant kan niet worden verwijderd vanwege een probleem in het systeem'
+                ];
+            }
+        } catch (\PDOException $e) {
+            // Als de reservering-tabel niet bestaat, negeer deze check en ga door.
         }
 
         // Haal gebruiker en persoon ID op
@@ -202,7 +241,18 @@ class klantenModels
         $this->db->bind(':klantid', $klantId);
         return $this->db->resultSet();
     }
+
+    public function getLopendeVoedselpakkettenByKlant($klantId)
+    {
+        $this->db->query("SELECT *
+                          FROM Voedselpakket
+                          WHERE KlantId = :klantId AND DatumUitgifte IS NULL
+                          ORDER BY DatumSamenstelling DESC");
+        $this->db->bind(':klantId', $klantId);
+        return $this->db->resultSet();
+    }
 }
+
 
 
 
