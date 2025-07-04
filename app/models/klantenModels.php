@@ -168,6 +168,22 @@ class klantenModels
         return $result !== false;
     }
 
+    /**
+     * Controleert of een e-mailadres al bestaat bij het toevoegen van een nieuwe klant
+     */
+    public function emailExistsForNewKlant($email)
+    {
+        $this->db->query("SELECT p.PersoonID 
+                          FROM persoon p
+                          JOIN gebruiker g ON p.PersoonID = g.PersoonID
+                          JOIN klant k ON g.GebruikerID = k.GebruikerID
+                          WHERE p.Email = :email");
+        $this->db->bind(':email', $email);
+        
+        $result = $this->db->single();
+        return $result !== false;
+    }
+
     public function checkBestaandeGebruikersnaam($voornaam, $achternaam, $huidigeKlantId)
     {
         $gebruikersnaam = strtolower($voornaam . '.' . $achternaam);
@@ -290,18 +306,23 @@ class klantenModels
 
     public function getAfgerondeVoedselpakkettenByKlant($klantId)
     {
-        // Alleen pakketten met een uitgiftedatum (dus afgerond)
+        // Alle pakketten voor deze klant (zowel uitgegeven als lopende)
         $this->db->query("
             SELECT 
                 vp.VoedselpakketID,
+                vp.DatumSamenstelling,
                 vp.DatumUitgifte,
+                CASE 
+                    WHEN vp.DatumUitgifte IS NOT NULL THEN 'Uitgegeven'
+                    ELSE 'Nog niet uitgegeven'
+                END AS Status,
                 GROUP_CONCAT(CONCAT(p.ProductNaam, ' (', vpp.Aantal, ')') SEPARATOR ', ') AS producten
             FROM voedselpakket vp
             LEFT JOIN voedselpakketproduct vpp ON vp.VoedselpakketID = vpp.VoedselpakketID
             LEFT JOIN product p ON vpp.ProductID = p.ProductID
-            WHERE vp.KlantID = :klantid AND vp.DatumUitgifte IS NOT NULL
-            GROUP BY vp.VoedselpakketID, vp.DatumUitgifte
-            ORDER BY vp.DatumUitgifte DESC
+            WHERE vp.KlantID = :klantid
+            GROUP BY vp.VoedselpakketID, vp.DatumSamenstelling, vp.DatumUitgifte
+            ORDER BY vp.DatumSamenstelling DESC, vp.VoedselpakketID DESC
         ");
         $this->db->bind(':klantid', $klantId);
         return $this->db->resultSet();

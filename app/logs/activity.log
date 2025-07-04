@@ -1,2 +1,53 @@
 [2025-07-04 08:22:40] USER_ID:1 USER:admin EMAIL:peter.abraham@voedselbank.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: Maria van Dongen (ID: 1) - Reason: Successful customer deletion
 [2025-07-04 08:22:44] USER_ID:1 USER:admin EMAIL:peter.abraham@voedselbank.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: Jan de Vries (ID: 2) - Reason: Successful customer deletion
+[2025-07-04 09:03:04] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: samir zaka
+[2025-07-04 09:03:06] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: nieuw zaka (ID: 31) - Reason: Successful customer deletion
+[2025-07-04 09:03:20] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: zaka zaka (ID: 32) - Reason: Successful customer deletion
+[2025-07-04 09:03:22] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: samir zaka (ID: 33) - Reason: Successful customer deletion
+[2025-07-04 09:04:13] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: Maria van Dongen (ID: 1) - Reason: Successful customer deletion
+[2025-07-04 09:04:14] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: Jan de Vries (ID: 2) - Reason: Successful customer deletion
+[2025-07-04 09:05:00] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: zaka Faiz
+[2025-07-04 09:05:27] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: arjan nieuw
+[2025-07-04 09:05:48] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: nieuw nieuw
+[2025-07-04 09:17:52] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: ikbennieuw nieuw
+[2025-07-04 09:18:17] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:UPDATE DETAILS:Updated: zaka Abraham (ID: 3)
+[2025-07-04 09:19:41] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: zaka Faiz (ID: 6) - Reason: Successful customer deletion
+[2025-07-04 09:25:24] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: zaka Faiz
+[2025-07-04 09:25:57] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: azzy Faiz
+[2025-07-04 09:27:00] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: arjan nieuw (ID: 7) - Reason: Successful customer deletion
+[2025-07-04 09:27:02] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: nieuw nieuw (ID: 8) - Reason: Successful customer deletion
+[2025-07-04 09:27:04] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: ikbennieuw nieuw (ID: 9) - Reason: Successful customer deletion
+[2025-07-04 09:27:06] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: zaka Faiz (ID: 10) - Reason: Successful customer deletion
+[2025-07-04 09:27:08] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: azzy Faiz (ID: 11) - Reason: Successful customer deletion
+[2025-07-04 09:30:32] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: Jan de Vries (ID: 2) - Reason: Successful customer deletion
+[2025-07-04 09:30:35] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: Maria van Dongen (ID: 1) - Reason: Successful customer deletion
+[2025-07-04 09:34:08] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: samir nieuwsste
+[2025-07-04 09:34:15] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: samir nieuwsste (ID: 6) - Reason: Successful customer deletion
+[2025-07-04 09:36:35] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:UPDATE DETAILS:Updated: samir van Dongen (ID: 1)
+[2025-07-04 09:36:54] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: samir van Dongen (ID: 1) - Reason: Successful customer deletion
+[2025-07-04 09:38:10] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: samir nieuwss
+[2025-07-04 09:38:40] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: nieuwsteee nieuwss
+[2025-07-04 09:39:23] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:UPDATE DETAILS:Updated: zaka van Dongen (ID: 1)
+[2025-07-04 09:39:37] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:UPDATE DETAILS:Updated: klaar van Dongen (ID: 1)
+[2025-07-04 09:39:43] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: klaar van Dongen (ID: 1) - Reason: Successful customer deletion
+[2025-07-04 14:33:24] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: zaka nieuwste
+[2025-07-04 14:35:47] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: samir Faiz
+[2025-07-04 14:36:46] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: samir Faiz (ID: 6) - Reason: Successful customer deletion
+[2025-07-04 14:37:44] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: samir Faiz
+[2025-07-04 14:38:08] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: samir Faiz (ID: 6) - Reason: Successful customer deletion
+[2025-07-04 14:39:17] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:UPDATE DETAILS:Updated: samir van Dongen (ID: 1)
+[2025-07-04 14:39:39] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:UPDATE DETAILS:Updated: samir van Dongen (ID: 1)
+[2025-07-04 14:40:01] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: samir van Dongen (ID: 1) - Reason: Successful customer deletion
+[2025-07-04 14:45:17] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: zaka Faiz
+[2025-07-04 14:46:14] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: zaka Faiz
+[2025-07-04 14:46:44] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: zakaria Faiz
+[2025-07-04 14:47:28] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:UPDATE DETAILS:Updated: samir van Dongen (ID: 1)
+[2025-07-04 14:47:40] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:UPDATE DETAILS:Updated: samir van Dongen (ID: 1)
+[2025-07-04 14:47:58] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: zaka Faiz
+[2025-07-04 14:48:07] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:UPDATE DETAILS:Updated: zaka Faiz (ID: 6)
+[2025-07-04 14:48:21] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:UPDATE DETAILS:Updated: zaka Faiz (ID: 6)
+[2025-07-04 14:48:47] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: zaka Faiz (ID: 6) - Reason: Successful customer deletion
+[2025-07-04 14:49:43] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: zaka Faiz
+[2025-07-04 14:50:11] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:CREATE DETAILS:Created: samir Faiz
+[2025-07-04 14:50:56] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:UPDATE DETAILS:Updated: samir van Dongen (ID: 1)
+[2025-07-04 14:51:20] USER_ID:6 USER:samir123 EMAIL:samir@maaskantje.nl IP:::1 MODULE:KLANTEN ACTION:DELETE DETAILS:Deleted: samir van Dongen (ID: 1) - Reason: Successful customer deletion

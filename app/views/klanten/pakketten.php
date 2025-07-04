@@ -108,7 +108,7 @@
 <div class="container">
     <a href="<?= URLROOT; ?>klanten" class="back-link">← Terug naar overzicht</a>
     
-    <h1 class="title">Afgenomen voedselpakketten</h1>
+    <h1 class="title">Voedselpakketten voor deze klant</h1>
     
     <?php if (!empty($melding)): ?>
         <div class="alert alert-warning"><?= $melding ?></div>
@@ -118,7 +118,7 @@
             }, 3000);
         </script>
     <?php elseif (empty($pakketten)): ?>
-        <div class="alert alert-info">Deze klant heeft nog geen voedselpakketten ontvangen.</div>
+        <div class="alert alert-info">Deze klant heeft nog geen voedselpakketten toegewezen gekregen.</div>
         <script>
             setTimeout(function() {
                 window.location.href = "<?= URLROOT; ?>klanten";
@@ -128,15 +128,26 @@
         <?php foreach ($pakketten as $pakket): ?>
             <div class="pakket-card">
                 <div class="pakket-header">
-                    Datum uitgifte: <?= htmlspecialchars($pakket->DatumUitgifte) ?>
+                    <?php if ($pakket->DatumUitgifte): ?>
+                        Datum uitgifte: <?= htmlspecialchars($pakket->DatumUitgifte) ?> | Status: <?= htmlspecialchars($pakket->Status) ?>
+                    <?php else: ?>
+                        Samengesteld op: <?= htmlspecialchars($pakket->DatumSamenstelling) ?> | Status: <?= htmlspecialchars($pakket->Status) ?>
+                    <?php endif; ?>
                 </div>
                 <div class="pakket-body">
                     <strong>Producten:</strong>
                     <ul>
-                        <?php foreach (explode(',', $pakket->producten) as $product): ?>
-                            <li><?= htmlspecialchars(trim($product)) ?></li>
-                        <?php endforeach; ?>
+                        <?php if ($pakket->producten): ?>
+                            <?php foreach (explode(',', $pakket->producten) as $product): ?>
+                                <li><?= htmlspecialchars(trim($product)) ?></li>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <li>Geen producten toegevoegd</li>
+                        <?php endif; ?>
                     </ul>
+                    <?php if (!$pakket->DatumUitgifte): ?>
+                        <p><em>Dit pakket is nog niet uitgegeven.</em></p>
+                    <?php endif; ?>
                 </div>
             </div>
         <?php endforeach; ?>

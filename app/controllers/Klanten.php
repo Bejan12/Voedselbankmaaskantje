@@ -42,14 +42,43 @@ class Klanten extends BaseController
             $veganistisch = isset($_POST['veganistisch']) ? 1 : 0;
             $vegetarisch = isset($_POST['vegetarisch']) ? 1 : 0;
 
-            if (
-                empty($voornaam) || empty($achternaam) || empty($adres) ||
-                empty($telefoon) || empty($email) ||
-                $aantalVolwassenen === '' || $aantalKinderen === '' || $aantalBabys === ''
-            ) {
+            $errors = [];
+
+            // Validatie voor lege velden
+            if (empty($voornaam)) {
+                $errors['voornaam'] = 'Voornaam is verplicht.';
+            }
+            if (empty($achternaam)) {
+                $errors['achternaam'] = 'Achternaam is verplicht.';
+            }
+            if (empty($adres)) {
+                $errors['adres'] = 'Adres is verplicht.';
+            }
+            if (empty($telefoon)) {
+                $errors['telefoon'] = 'Telefoonnummer is verplicht.';
+            }
+            if (empty($email)) {
+                $errors['email'] = 'E-mailadres is verplicht.';
+            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors['email'] = 'Voer een geldig e-mailadres in.';
+            } elseif ($this->klantenModel->emailExistsForNewKlant($email)) {
+                $errors['email'] = 'Dit e-mailadres is al in gebruik door een andere klant.';
+            }
+            if ($aantalVolwassenen === '' || !is_numeric($aantalVolwassenen)) {
+                $errors['aantal_volwassenen'] = 'Aantal volwassenen is verplicht.';
+            }
+            if ($aantalKinderen === '' || !is_numeric($aantalKinderen)) {
+                $errors['aantal_kinderen'] = 'Aantal kinderen is verplicht.';
+            }
+            if ($aantalBabys === '' || !is_numeric($aantalBabys)) {
+                $errors['aantal_babys'] = 'Aantal baby\'s is verplicht.';
+            }
+
+            // Als er validatiefouten zijn, toon het formulier met fouten
+            if (!empty($errors)) {
                 $data = [
                     'form' => $_POST,
-                    'error' => 'Vul alle verplichte velden in om de klant toe te voegen.'
+                    'errors' => $errors
                 ];
                 $this->view('klanten/add', $data);
                 return;
@@ -154,7 +183,7 @@ class Klanten extends BaseController
             } elseif (!filter_var($updateData['email'], FILTER_VALIDATE_EMAIL)) {
                 $errors['email'] = 'Voer een geldig e-mailadres in.';
             } elseif ($this->klantenModel->checkBestaandeEmail($updateData['email'], $klantId)) {
-                $errors['email'] = 'Dit e-mailadres is al in gebruik.';
+                $errors['email'] = 'Dit e-mailadres is al in gebruik door een andere klant.';
             }
             if ($updateData['aantal_volwassenen'] === '' || !is_numeric($updateData['aantal_volwassenen'])) {
                 $errors['aantal_volwassenen'] = 'Aantal volwassenen is verplicht.';
@@ -251,7 +280,7 @@ class Klanten extends BaseController
         // Als er geen pakketten zijn, geef melding en redirect na 3 seconden
         if (empty($pakketten)) {
             $data = [
-                'melding' => "Deze klant heeft nog geen voedselpakketten ontvangen.",
+                'melding' => "Deze klant heeft nog geen voedselpakketten toegewezen gekregen.",
                 'pakketten' => [],
                 'klantId' => $klantId
             ];
@@ -259,7 +288,7 @@ class Klanten extends BaseController
             return;
         }
 
-        // Toon overzicht van alle afgenomen pakketten
+        // Toon overzicht van alle pakketten
         $data = [
             'pakketten' => $pakketten,
             'melding' => null,

@@ -126,6 +126,18 @@
         border-color: #f5c6cb;
     }
 
+    .error-text {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
+    }
+
     .back-link {
         display: inline-block;
         color: #007bff;
@@ -154,50 +166,83 @@
         <form method="post" action="">
             <div class="form-group">
                 <label for="voornaam" class="form-label">Voornaam*</label>
-                <input type="text" class="form-control" id="voornaam" name="voornaam" 
+                <input type="text" class="form-control <?= !empty($data['errors']['voornaam']) ? 'is-invalid' : '' ?>" 
+                       id="voornaam" name="voornaam" 
                        value="<?= htmlspecialchars($data['form']['voornaam'] ?? '') ?>" required>
+                <?php if (!empty($data['errors']['voornaam'])): ?>
+                    <span class="error-text"><?= htmlspecialchars($data['errors']['voornaam']) ?></span>
+                <?php endif; ?>
             </div>
             
             <div class="form-group">
                 <label for="achternaam" class="form-label">Achternaam*</label>
-                <input type="text" class="form-control" id="achternaam" name="achternaam" 
+                <input type="text" class="form-control <?= !empty($data['errors']['achternaam']) ? 'is-invalid' : '' ?>" 
+                       id="achternaam" name="achternaam" 
                        value="<?= htmlspecialchars($data['form']['achternaam'] ?? '') ?>" required>
+                <?php if (!empty($data['errors']['achternaam'])): ?>
+                    <span class="error-text"><?= htmlspecialchars($data['errors']['achternaam']) ?></span>
+                <?php endif; ?>
             </div>
             
             <div class="form-group">
                 <label for="adres" class="form-label">Adres*</label>
-                <input type="text" class="form-control" id="adres" name="adres" 
+                <input type="text" class="form-control <?= !empty($data['errors']['adres']) ? 'is-invalid' : '' ?>" 
+                       id="adres" name="adres" 
                        value="<?= htmlspecialchars($data['form']['adres'] ?? '') ?>" required>
+                <?php if (!empty($data['errors']['adres'])): ?>
+                    <span class="error-text"><?= htmlspecialchars($data['errors']['adres']) ?></span>
+                <?php endif; ?>
             </div>
             
             <div class="form-group">
                 <label for="telefoon" class="form-label">Telefoonnummer*</label>
-                <input type="text" class="form-control" id="telefoon" name="telefoon" 
+                <input type="text" class="form-control <?= !empty($data['errors']['telefoon']) ? 'is-invalid' : '' ?>" 
+                       id="telefoon" name="telefoon" 
                        value="<?= htmlspecialchars($data['form']['telefoon'] ?? '') ?>" required>
+                <?php if (!empty($data['errors']['telefoon'])): ?>
+                    <span class="error-text"><?= htmlspecialchars($data['errors']['telefoon']) ?></span>
+                <?php endif; ?>
             </div>
             
             <div class="form-group">
                 <label for="email" class="form-label">E-mailadres*</label>
-                <input type="email" class="form-control" id="email" name="email" 
+                <input type="email" class="form-control <?= !empty($data['errors']['email']) ? 'is-invalid' : '' ?>" 
+                       id="email" name="email" 
                        value="<?= htmlspecialchars($data['form']['email'] ?? '') ?>" required>
+                <?php if (!empty($data['errors']['email'])): ?>
+                    <span class="error-text"><?= htmlspecialchars($data['errors']['email']) ?></span>
+                <?php endif; ?>
             </div>
             
             <div class="form-group">
                 <label for="aantal_volwassenen" class="form-label">Aantal volwassenen*</label>
-                <input type="number" class="form-control" id="aantal_volwassenen" name="aantal_volwassenen" 
+                <input type="number" class="form-control <?= !empty($data['errors']['aantal_volwassenen']) ? 'is-invalid' : '' ?>" 
+                       id="aantal_volwassenen" name="aantal_volwassenen" 
                        min="0" value="<?= htmlspecialchars($data['form']['aantal_volwassenen'] ?? '') ?>" required>
+                <?php if (!empty($data['errors']['aantal_volwassenen'])): ?>
+                    <span class="error-text"><?= htmlspecialchars($data['errors']['aantal_volwassenen']) ?></span>
+                <?php endif; ?>
             </div>
             
             <div class="form-group">
                 <label for="aantal_kinderen" class="form-label">Aantal kinderen*</label>
-                <input type="number" class="form-control" id="aantal_kinderen" name="aantal_kinderen" 
+                <input type="number" class="form-control <?= !empty($data['errors']['aantal_kinderen']) ? 'is-invalid' : '' ?>" 
+                       id="aantal_kinderen" name="aantal_kinderen" 
                        min="0" value="<?= htmlspecialchars($data['form']['aantal_kinderen'] ?? '') ?>" required>
+                <?php if (!empty($data['errors']['aantal_kinderen'])): ?>
+                    <span class="error-text"><?= htmlspecialchars($data['errors']['aantal_kinderen']) ?></span>
+                <?php endif; ?>
             </div>
             
             <div class="form-group">
                 <label for="aantal_babys" class="form-label">Aantal baby's*</label>
-                <input type="number" class="form-control" id="aantal_babys" name="aantal_babys" 
+                <input type="number" class="form-control <?= !empty($data['errors']['aantal_babys']) ? 'is-invalid' : '' ?>" 
+                       id="aantal_babys" name="aantal_babys" 
                        min="0" value="<?= htmlspecialchars($data['form']['aantal_babys'] ?? '') ?>" required>
+                <?php if (!empty($data['errors']['aantal_babys'])): ?>
+                    <span class="error-text"><?= htmlspecialchars($data['errors']['aantal_babys']) ?></span>
+                <?php endif; ?>
+            </div>
             </div>
             
             <div class="form-group">
